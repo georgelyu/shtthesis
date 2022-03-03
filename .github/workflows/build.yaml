@@ -99,11 +99,11 @@ jobs:
           choco install sed
           choco install ghostscript --version=9.55
           echo "C:\Program Files\gs\gs9.55\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      - name: Install Noto and Sarasa fonts
+      - name: Install Noto fonts
         run: |
-          "NotoSerifCJK", "NotoSansCJK" | ForEach-Object -Process {Invoke-WebRequest -Uri "${{ env.NOTO_URL }}/$_.ttc.zip" -OutFile "$_.ttc.zip"}
-          Get-ChildItem *.ttc.zip | Expand-Archive -DestinationPath . -Force
-          Copy-Item *.ttc C:\Windows\Fonts
+          "NotoSansCJKsc-Regular", "NotoSansCJKsc-Medium" | ForEach-Object -Process {Invoke-WebRequest -Uri "https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/$_.otf" -OutFile "$_.otf"}
+          "NotoSerifCJKsc-Regular", "NotoSerifCJKsc-Bold" | ForEach-Object -Process {Invoke-WebRequest -Uri "https://github.com/googlefonts/noto-cjk/raw/main/Serif/OTF/SimplifiedChinese/$_.otf" -OutFile "$_.otf"}
+          Copy-Item *.otf C:\Windows\Fonts
       - name: Install TeX Live
         run: |
           ${env:PATH} = "${{ github.workspace }}\tmp\texlive\bin\win32;" + ${env:PATH}
@@ -115,8 +115,8 @@ jobs:
           Pop-Location
           &tlmgr install @((Get-Content ./DEPENDS.txt) + "${{ env.DOC_DEPENDENCE }}".split())
           Expand-Archive tl-win64.zip -DestinationPath ${{ github.workspace }}\tmp\texlive
-          echo "${{ github.workspace }}\tmp\texlive\bin\win64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "${{ github.workspace }}\tmp\texlive\bin\win32" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}\tmp\texlive\bin\win64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build user document (LuaLaTeX)
         run: |
           sed -i '${{ env.SED_REP_WITH_CLS_ARGS }}' shtthesis-user-guide.tex

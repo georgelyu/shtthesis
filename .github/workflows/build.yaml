@@ -8,7 +8,7 @@ on:
 
 env:
   BUILD_DIR: build
-  CTAN_URL: http://mirrors.ctan.org
+  CTAN_URL: https://mirrors.rit.edu/CTAN
   DOC_DEPENDENCE: ctable listings hologo emoji
   NOTO_URL: https://noto-website-2.storage.googleapis.com/pkgs
   SED_REP_WITH_CLS_ARGS: s/\\documentclass\[\(.*\)\]/\\documentclass\[\1, fontset=none\]/
@@ -34,7 +34,7 @@ jobs:
           ./install-tl --profile ../.github/workflows/texlive.profile --repository ${{ env.CTAN_URL }}/systems/texlive/tlnet/
           popd
           echo "$(cat DEPENDS.txt | tr '\n' ' ') ${{ env.DOC_DEPENDENCE }}" | xargs tlmgr install 
-          echo "::set-env name=PATH::/tmp/texlive/bin/x86_64-linux:$PATH"
+          echo "/tmp/texlive/bin/x86_64-linux" >> $GITHUB_PATH
       - name: Build user document (LuaLaTeX)
         run: |
           sed -i '${{ env.SED_REP_WITH_CLS_ARGS }}' shtthesis-user-guide.tex
@@ -72,7 +72,7 @@ jobs:
           ./install-tl --profile ../.github/workflows/texlive.profile --repository ${{ env.CTAN_URL }}/systems/texlive/tlnet/
           popd
           echo "$(cat DEPENDS.txt | tr '\n' ' ') ${{ env.DOC_DEPENDENCE }}" | xargs tlmgr install 
-          echo "::set-env name=PATH::/tmp/texlive/bin/universal-darwin:$PATH"
+          echo "/tmp/texlive/bin/universal-darwin" >> $GITHUB_PATH
       - name: Build user document (LuaLaTeX)
         run: |
           gsed -i '${{ env.SED_REP_WITH_CLS_ARGS }}' shtthesis-user-guide.tex
@@ -98,8 +98,7 @@ jobs:
         run: |
           choco install sed
           choco install ghostscript --version=9.55
-          $util_path = "C:\Program Files\gs\gs9.55\bin;" + ${env:PATH}
-          echo "::set-env name=PATH::$util_path"
+          echo "C:\Program Files\gs\gs9.55\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Install Noto and Sarasa fonts
         run: |
           "NotoSerifCJK", "NotoSansCJK" | ForEach-Object -Process {Invoke-WebRequest -Uri "${{ env.NOTO_URL }}/$_.ttc.zip" -OutFile "$_.ttc.zip"}
@@ -116,8 +115,8 @@ jobs:
           Pop-Location
           &tlmgr install @((Get-Content ./DEPENDS.txt) + "${{ env.DOC_DEPENDENCE }}".split())
           Expand-Archive tl-win64.zip -DestinationPath ${{ github.workspace }}\tmp\texlive
-          $tl_path_w64 = "${{ github.workspace }}\tmp\texlive\bin\win64;" + "${{ github.workspace }}\tmp\texlive\bin\win32;" + ${env:PATH}
-          echo "::set-env name=PATH::$tl_path_w64"
+          echo "${{ github.workspace }}\tmp\texlive\bin\win64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}\tmp\texlive\bin\win32" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build user document (LuaLaTeX)
         run: |
           sed -i '${{ env.SED_REP_WITH_CLS_ARGS }}' shtthesis-user-guide.tex

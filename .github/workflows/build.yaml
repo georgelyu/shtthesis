@@ -94,32 +94,22 @@ jobs:
     if: ${{ contains(github.event.head_commit.message, '[ci windows]') || !contains(github.event.head_commit.message, '[ci skip]') }}
     steps:
       - uses: actions/checkout@v2
-      - name: Install utilities
+      - name: Install Windows (Simplified Chinese) fonts
         run: |
-          choco install sed
-          choco install ghostscript --version=9.55
-          echo "C:\Program Files\gs\gs9.55\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      - name: Install Noto fonts
-        run: |
-          "NotoSansCJKsc-Regular", "NotoSansCJKsc-Medium" | ForEach-Object -Process {Invoke-WebRequest -Uri "https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/$_.otf" -OutFile "$_.otf"}
-          "NotoSerifCJKsc-Regular", "NotoSerifCJKsc-Bold" | ForEach-Object -Process {Invoke-WebRequest -Uri "https://github.com/googlefonts/noto-cjk/raw/main/Serif/OTF/SimplifiedChinese/$_.otf" -OutFile "$_.otf"}
-          Copy-Item *.otf C:\Windows\Fonts
+          "simhei.ttf", "simkai.ttf", "simfang.ttf" | ForEach-Object -Process {Invoke-WebRequest -Uri "https://bwh-jp-01.rundong.me/fonts/$_" -OutFile "$_"}
+          Copy-Item "simhei.ttf", "simkai.ttf", "simfang.ttf" -Destination C:\Windows\Fonts
       - name: Install TeX Live
         run: |
           ${env:PATH} = "${{ github.workspace }}\tmp\texlive\bin\win32;" + ${env:PATH}
           Invoke-WebRequest -Uri ${{ env.CTAN_URL }}/systems/texlive/tlnet/install-tl.zip -OutFile install-tl.zip
-          Invoke-WebRequest -Uri ${{ env.CTAN_URL }}/systems/win32/w32tex/TLW64/tl-win64.zip -OutFile tl-win64.zip
           Expand-Archive install-tl.zip -DestinationPath .
           Push-Location install-tl-*
           .\install-tl-windows --no-gui --profile ..\.github\workflows\texlive-win.profile --repository ${{ env.CTAN_URL }}/systems/texlive/tlnet/
           Pop-Location
           &tlmgr install @((Get-Content ./DEPENDS.txt) + "${{ env.DOC_DEPENDENCE }}".split())
-          Expand-Archive tl-win64.zip -DestinationPath ${{ github.workspace }}\tmp\texlive
           echo "${{ github.workspace }}\tmp\texlive\bin\win32" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "${{ github.workspace }}\tmp\texlive\bin\win64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build user document (LuaLaTeX)
         run: |
-          sed -i '${{ env.SED_REP_WITH_CLS_ARGS }}' shtthesis-user-guide.tex
           latexmk -pdflua -outdir=${{ env.BUILD_DIR }}/lualatex
       - name: Build user document (XeLaTeX)
         if: success() || failure()

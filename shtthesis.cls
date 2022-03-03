@@ -1,5 +1,5 @@
 % shtthesis, an unofficial LaTeX thesis template for ShanghaiTech University.
-% Copyright (C) 2021 Li Rundong <rundong.001@gmail.com>
+% Copyright (C) 2022 Li Rundong <rundong.001@gmail.com>
 %
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 % Identification
 % ==============================================================================
 \NeedsTeXFormat{LaTeX2e}
-\newcommand\version{0.3.2}
-\newcommand\versiondate{2021/01/23}
+\newcommand\version{0.3.3}
+\newcommand\versiondate{2022/03/03}
 \ProvidesClass{shtthesis}[%
   \versiondate\space%
   v\version\space%
@@ -299,6 +299,7 @@
   backend = biber,
   gbpub = false,
   gbcitelocal = chinese,
+  sortcites = false,
 }{biblatex}
 \LoadClass{ctexbook}
 \RequirePackage{expl3}
@@ -372,7 +373,7 @@
 \def\figurename{图}
 \definecolor{ShtRed}{RGB}{146,46,23}
 \def\school@logo@missing{%
-  校徽文件缺失，请至\href{https://github.com/lirundong/shtthesis/raw/master/%
+  校徽文件缺失，请至\href{https://github.com/lirundong/shtthesis/raw/v0.3/%
   shanghaitech-emblem.pdf}{项目主页}下载！%
 }
 % ------------------------------------------------------------------------------
@@ -980,6 +981,15 @@
     beforeskip = {12pt},
     afterskip = {6pt},
   },
+  subsubsection = {
+    format = \heiti\normalsize\linespread{1.0}\raggedright,
+    nameformat = {},
+    numberformat = \rmfamily,
+    titleformat = {},
+    aftername = \hspace{0.75\ccwd},
+    beforeskip = {12pt},
+    afterskip = {6pt},
+  },
   paragraph = {
     indent = 2\ccwd,
     beforeskip = {0pt},
@@ -1015,6 +1025,11 @@
       beforeskip = {18pt},
     },
     subsection = {
+      format = \sht@subsection@fmt,
+      numberformat = {},
+      indent = \sht@section@indent,
+    },
+    subsubsection = {
       format = \sht@subsection@fmt,
       numberformat = {},
       indent = \sht@section@indent,

@@ -22,7 +22,7 @@
 
 ## Get the Template
 - Stable version: Install or download with any of following methods
-  - CTAN (**strongly recommended**): [`shtthesis`](https://ctan.org/pkg/shtthesis) package on CTAN can be installed via `tlmgr` for TeX Live and MacTeX users:
+  - CTAN (**highly recommended**): [`shtthesis`](https://ctan.org/pkg/shtthesis) package on CTAN can be installed via `tlmgr` for TeX Live and MacTeX users:
     ```bash
     tlmgr install shtthesis
     ```
@@ -31,15 +31,15 @@
     tlmgr update shtthesis
     ```
 
-    **Note**: `shtthesis` package on CTAN does not include the university logo file. Please download [`shanghaitech-emblem.pdf`](https://github.com/lirundong/shtthesis/raw/master/shanghaitech-emblem.pdf) from this repository and put it in the root of your project directory.
+    **Note**: `shtthesis` package on CTAN does not include the university logo file. Please download [`shanghaitech-emblem.pdf`](https://github.com/lirundong/shtthesis/raw/v0.3/shanghaitech-emblem.pdf) from this repository and put it in the root of your project directory.
   - [Overleaf](https://www.overleaf.com/latex/templates/shanghaitech-university-thesis-template/mskbxkmfxqpt): Please compile with XeLaTeX. Since compilation time for Overleaf free-plan is limited to *1 minute*, you might encounter with timeout issue if compiling with LuaLaTeX
-  - GitHub Release: Please refer to the [release](https://github.com/lirundong/sht-thesis/releases) page and download required files based on release information
+  - GitHub Release: Please refer to the [release](https://github.com/lirundong/shtthesis/releases) page and download required files based on release information
 - Develop version: Directly clone the GitHub repo
   ```bash
   git clone https://github.com/lirundong/shtthesis.git
   ```
 
-Please, read through [the user's guide](shtthesis-user-guide.pdf) before continuing.
+Please, read through [the user's guide](http://mirrors.ctan.org/macros/latex/contrib/shtthesis/shtthesis-user-guide.pdf) before continuing.
 
 ## Get Started
 After cloning or downloading this template, please

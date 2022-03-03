@@ -7,7 +7,8 @@ on:
   - pull_request
 
 env:
-  CTAN_URL: http://mirrors.ctan.org
+  CTAN_URL: http://mirrors.ctan.org/systems/texlive/Images
+  TL_IMAGE: texlive2021.iso
   DOWNLOAD_DIR: texlive_download
   EXTRACT_DIR: texlive_extract
   BUILD_DIR: build
@@ -31,7 +32,7 @@ jobs:
       - name: Get TeX Live hash
         id: texlive-hash
         run: |
-          HASH=$(curl -sSL ${{ env.CTAN_URL }}/systems/texlive/Images/texlive2020.iso.sha512 | head -c 10)
+          HASH=$(curl -sSL ${{ env.CTAN_URL }}/${{ env.TL_IMAGE }}.sha512 | head -c 10)
           echo "::set-output name=hash::$HASH"
       - name: Check TeX Live cache
         id: texlive-cache
@@ -44,11 +45,11 @@ jobs:
         run: |
           mkdir ${{ env.DOWNLOAD_DIR }}
           pushd ${{ env.DOWNLOAD_DIR }}
-          curl -O -L ${{ env.CTAN_URL }}/systems/texlive/Images/texlive2020.iso
+          curl -O -L ${{ env.CTAN_URL }}/${{ env.TL_IMAGE }}
           popd
       - name: Install TeX Live
         run: |
-          7z x ${{ env.DOWNLOAD_DIR }}/texlive2020.iso -o${{ env.EXTRACT_DIR }}
+          7z x ${{ env.DOWNLOAD_DIR }}/${{ env.TL_IMAGE }} -o${{ env.EXTRACT_DIR }}
           chmod +x ${{ env.EXTRACT_DIR }}/install-tl
           ./${{ env.EXTRACT_DIR }}/install-tl --profile .github/workflows/texlive.profile
           echo "/tmp/texlive/bin/x86_64-linux" >> $GITHUB_PATH
@@ -83,7 +84,7 @@ jobs:
       - name: Get TeX Live hash
         id: texlive-hash
         run: |
-          HASH=$(curl -sSL ${{ env.CTAN_URL }}/systems/texlive/Images/texlive2020.iso.sha512 | head -c 10)
+          HASH=$(curl -sSL ${{ env.CTAN_URL }}/${{ env.TL_IMAGE }}.sha512 | head -c 10)
           echo "::set-output name=hash::$HASH"
       - name: Check TeX Live cache
         id: texlive-cache
@@ -96,11 +97,11 @@ jobs:
         run: |
           mkdir ${{ env.DOWNLOAD_DIR }}
           pushd ${{ env.DOWNLOAD_DIR }}
-          curl -O -L ${{ env.CTAN_URL }}/systems/texlive/Images/texlive2020.iso
+          curl -O -L ${{ env.CTAN_URL }}/${{ env.TL_IMAGE }}
           popd
       - name: Install TeX Live
         run: |
-          7z x ${{ env.DOWNLOAD_DIR }}/texlive2020.iso -o${{ env.EXTRACT_DIR }}
+          7z x ${{ env.DOWNLOAD_DIR }}/${{ env.TL_IMAGE }} -o${{ env.EXTRACT_DIR }}
           chmod +x ${{ env.EXTRACT_DIR }}/install-tl
           ./${{ env.EXTRACT_DIR }}/install-tl --profile .github/workflows/texlive.profile
           echo "/tmp/texlive/bin/x86_64-darwin" >> $GITHUB_PATH
@@ -128,7 +129,7 @@ jobs:
       - name: Get TeX Live hash
         id: texlive-hash
         run: |
-          Invoke-WebRequest -Uri ${{ env.CTAN_URL }}/systems/texlive/Images/texlive2020.iso.sha512 -OutFile texlive2020.iso.sha512
+          Invoke-WebRequest -Uri ${{ env.CTAN_URL }}/${{ env.TL_IMAGE }}.sha512 -OutFile texlive2020.iso.sha512
           $hash = (Get-Content .\texlive2020.iso.sha512 -Raw).Substring(0, 10)
           echo "::set-output name=hash::$hash"
       - name: Check TeX Live cache
@@ -142,12 +143,12 @@ jobs:
         run: |
           New-Item ${{ env.DOWNLOAD_DIR }} -ItemType Directory
           Push-Location ${{ env.DOWNLOAD_DIR }}
-          Invoke-WebRequest -Uri ${{ env.CTAN_URL }}/systems/texlive/Images/texlive2020.iso -OutFile texlive2020.iso
-          Invoke-WebRequest -Uri ${{ env.CTAN_URL }}/systems/win32/w32tex/TLW64/tl-win64.zip -OutFile tl-win64.zip
+          Invoke-WebRequest -Uri ${{ env.CTAN_URL }}/${{ env.TL_IMAGE }} -OutFile ${{ env.TL_IMAGE }}
+          Invoke-WebRequest -Uri http://mirrors.ctan.org/systems/win32/w32tex/TLW64/tl-win64.zip -OutFile tl-win64.zip
           Pop-Location
       - name: Install TeX Live and utilities
         run: |
-          7z x ${{ env.DOWNLOAD_DIR }}/texlive2020.iso -o${{ env.EXTRACT_DIR }}
+          7z x ${{ env.DOWNLOAD_DIR }}/${{ env.TL_IMAGE }} -o${{ env.EXTRACT_DIR }}
           Push-Location ${{ env.EXTRACT_DIR }}
           .\install-tl-windows --no-gui --profile ..\.github\workflows\texlive-win.profile
           Pop-Location

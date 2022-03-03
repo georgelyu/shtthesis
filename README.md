@@ -1,5 +1,5 @@
 # ShangHaiTech university THESIS (shtthesis)
-[![Action status](https://github.com/lirundong/sht-thesis/workflows/build/badge.svg)](https://github.com/lirundong/shtthesis/actions)
+[![Action status](https://github.com/lirundong/shtthesis/workflows/build/badge.svg?branch=v0.3)](https://github.com/lirundong/shtthesis/actions)
 [![GitHub release](https://img.shields.io/github/v/release/lirundong/shtthesis?style=flat&logo=GitHub)](https://github.com/lirundong/shtthesis/releases/latest)
 [![CTAN version](https://img.shields.io/ctan/v/shtthesis?style=flat&logo=LaTeX)](https://ctan.org/pkg/shtthesis)
 [![Overleaf](https://img.shields.io/badge/overleaf-shtthesis-green?style=flat&logo=Overleaf&color=1C890F)](https://www.overleaf.com/latex/templates/shanghaitech-university-thesis-template/mskbxkmfxqpt)
@@ -26,7 +26,7 @@
     ```bash
     tlmgr install shtthesis
     ```
-    If your distribution has already installed `shtthesis`, please update it to the latest version:
+    If your distribution already contains `shtthesis`, please update it to the latest version:
     ```bash
     tlmgr update shtthesis
     ```

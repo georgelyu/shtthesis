@@ -762,7 +762,7 @@ P(A|B) &= \frac{P(A)P(B|A)}{P(B)} \label{eq::bayesian}
 % ...
 \end{latex}
 
-《规范》要求在文末依此列出致谢、作者简历、攻读学位期间发表的论文与研究成果。用户可使用 \shtthesis{} 提供的相应环境 acknowledgement、resume、publications、patterns 和 projects 进行排版。同时为了生成符合盲审要求的论文，\shtthesis{} 也提供了对应的\emph{匿名环境} publications*、patterns* 和 projects*。在打开 \verb|anonymous| 选项（第~\ref{sec::option_anonymous} 节）后，论文中不出现“致谢”一节，作者简历内容替换为匿名字符串，其他小节使用匿名环境内容排版。注意在第一次使用任一上述环境前，需要使用 \verb|\backmatter| 切换至后记模式。
+《规范》要求在文末依此列出致谢、作者简历、攻读学位期间发表的论文与研究成果。用户可使用 \shtthesis{} 提供的相应环境 acknowledgement、resume、publications、patents 和 projects 进行排版。同时为了生成符合盲审要求的论文，\shtthesis{} 也提供了对应的\emph{匿名环境} publications*、patents* 和 projects*。在打开 \verb|anonymous| 选项（第~\ref{sec::option_anonymous} 节）后，论文中不出现“致谢”一节，作者简历内容替换为匿名字符串，其他小节使用匿名环境内容排版。注意在第一次使用任一上述环境前，需要使用 \verb|\backmatter| 切换至后记模式。
 
 \subsection{致谢}
 在 acknowledgement 环境内书写致谢，致谢内容在匿名模式下不显示。
@@ -773,7 +773,7 @@ P(A|B) &= \frac{P(A)P(B|A)}{P(B)} \label{eq::bayesian}
 \end{latex}
 
 \subsection{简历及科研成果}
-此部分需要依此书写个人简历（resume 环境）、已发表（或正式接受）的学术论文（publications 和 publications* 环境）、申请或已获得的专利（patterns 和 patterns* 环境）、参加的研究项目及获奖情况（projects 和 projects*）。根据是否匿名分别显示非匿名环境内容和匿名环境内容。
+此部分需要依此书写个人简历（resume 环境）、已发表（或正式接受）的学术论文（publications 和 publications* 环境）、申请或已获得的专利（patents 和 patents* 环境）、参加的研究项目及获奖情况（projects 和 projects*）。根据是否匿名分别显示非匿名环境内容和匿名环境内容。
 \begin{latex}
 \begin{resume}
   个人简历…… （仅非匿名环境显示）
@@ -856,13 +856,13 @@ P(A|B) &= \frac{P(A)P(B|A)}{P(B)} \label{eq::bayesian}
   论文发表…… （匿名环境）
 \end{publications*}
 
-\begin{patterns}
+\begin{patents}
   专利申请或授权记录…… （非匿名环境）
-\end{patterns}
+\end{patents}
 
-\begin{patterns*}
+\begin{patents*}
   专利申请或授权记录…… （匿名环境）
-\end{patterns*}
+\end{patents*}
 
 \begin{projects}
   个人参与的科研项目、获奖情况…… （仅非匿名环境显示）

@@ -1756,7 +1756,7 @@
     \endcomment
   }{}
 }
-\renewenvironment{patterns}{%
+\newenvironment{patents}{%
   \sht@check@resume@title
   \ifsht@anonymous
     \comment
@@ -1767,7 +1767,7 @@
     \endcomment
   \fi
 }
-\newenvironment{patterns*}{%
+\newenvironment{patents*}{%
   \sht@check@resume@title
   \ifthenelse{\not \boolean{sht@anonymous}}{
     \comment

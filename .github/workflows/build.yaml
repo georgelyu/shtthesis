@@ -96,8 +96,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Windows (Simplified Chinese) fonts
         run: |
-          "simhei.ttf", "simkai.ttf", "simfang.ttf" | ForEach-Object -Process {Invoke-WebRequest -Uri "https://bwh-jp-01.rundong.me/fonts/$_" -OutFile "$_"}
-          Copy-Item "simhei.ttf", "simkai.ttf", "simfang.ttf" -Destination C:\Windows\Fonts
+          "simhei.ttf", "simkai.ttf", "simfang.ttf" | ForEach-Object -Process {Invoke-WebRequest -Uri "https://bwh-jp-01.rundong.me/fonts/$_" -OutFile "C:\Windows\Fonts\$_"}
       - name: Install TeX Live
         run: |
           ${env:PATH} = "${{ github.workspace }}\tmp\texlive\bin\win32;" + ${env:PATH}
@@ -109,22 +108,26 @@ jobs:
           &tlmgr install @((Get-Content ./DEPENDS.txt) + "${{ env.DOC_DEPENDENCE }}".split())
           echo "${{ github.workspace }}\tmp\texlive\bin\win32" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build user document (LuaLaTeX)
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          retry_on: error
-          command: |
-            latexmk -pdflua -outdir=${{ env.BUILD_DIR }}/lualatex
+        run: |
+          New-Item -Path "${{ env.BUILD_DIR }}\lualatex" -ItemType Directory
+          Push-Location "${{ env.BUILD_DIR }}\lualatex"
+          Copy-Item "..\..\shtthesis-user-guide.tex", "..\..\shtthesis.cls", "..\..\shanghaitech-emblem.pdf" -Destination .
+          lualatex shtthesis-user-guide.tex
+          biber shtthesis-user-guide.bcf
+          lualatex shtthesis-user-guide.tex
+          lualatex shtthesis-user-guide.tex
+          Pop-Location
       - name: Build user document (XeLaTeX)
         if: success() || failure()
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          retry_on: error
-          command: |
-            latexmk -pdfxe -outdir=${{ env.BUILD_DIR }}/xelatex
+        run: |
+          New-Item -Path "${{ env.BUILD_DIR }}\xelatex" -ItemType Directory
+          Push-Location "${{ env.BUILD_DIR }}\xelatex"
+          Copy-Item "..\..\shtthesis-user-guide.tex", "..\..\shtthesis.cls", "..\..\shanghaitech-emblem.pdf" -Destination .
+          xelatex shtthesis-user-guide.tex
+          biber shtthesis-user-guide.bcf
+          xelatex shtthesis-user-guide.tex
+          xelatex shtthesis-user-guide.tex
+          Pop-Location
       - name: Archive build outputs
         if: success() || failure()
         uses: actions/upload-artifact@v2

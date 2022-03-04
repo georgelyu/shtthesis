@@ -2,10 +2,12 @@
 
 `sht-thesis` 项目派生于 `ucasthesis`，一个在 GPLv3 License 下分发的项目。根据该许可证条款，`sht-thesis` 项目列出基于 `ucasthesis` (commit `faad94b` 之后) 的所有修改条目：
 
-## Unreleased
+## 2022-03-03
+> Release: v0.3.3
 
 1. Issue [#4](https://github.com/lirundong/shtthesis/issues/4): 增加三级标题（subsubsection）格式定义；
 2. Issue [#5](https://github.com/lirundong/shtthesis/issues/5): 确保引用排版顺序与源文档顺序一致；
+3. 修正「申请或已获得的专利」章节对应的环境及匿名环境名称为 `patents` 及 `patents*`（学渣捂脸）；
 
 ## 2021-02-14
 > Release: v0.3.2

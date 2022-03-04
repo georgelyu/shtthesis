@@ -33,6 +33,7 @@ OVER_LEAF_CONTENT="\
   "
 CTAN_CONTENT="\
   ${BASE_CONTENT}
+  DEPENDS.txt
   shtthesis-user-guide.pdf \
   "
 

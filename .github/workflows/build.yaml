@@ -58,11 +58,12 @@ jobs:
       - name: Install utilities
         run: |
           brew install gnu-sed
-      - name: Install Noto fonts
+      - name: Install Noto and FangZheng fonts
         run: |
           for i in NotoSerifCJK NotoSansCJK; do curl -O ${{ env.NOTO_URL }}/$i.ttc.zip; done
+          for i in FZKTK FZFSK; do curl -O https://bwh-jp-01.rundong.me/fonts/$i.TTF; done
           unzip -o "*.zip"
-          cp -vf *.ttc /Library/Fonts/
+          cp -vf *.ttc *.TTF /Library/Fonts/
       - name: Install TeX Live
         run: |
           export PATH=/tmp/texlive/bin/universal-darwin:$PATH

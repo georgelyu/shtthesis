@@ -17,6 +17,7 @@ _minted*/
 *.out
 *.toc
 *.xdv
+*.xml
 *-converted-to.pdf
 *.thm
 *.lof

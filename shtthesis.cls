@@ -300,6 +300,7 @@
   gbpub = false,
   gbcitelocal = chinese,
   sortcites = false,
+  mergedate = none,
 }{biblatex}
 \LoadClass{ctexbook}
 \RequirePackage{expl3}

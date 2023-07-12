@@ -109,6 +109,8 @@
 \lstnewenvironment{latex}{\lstset{style=lstStyleLaTeX}}{}
 \lstnewenvironment{shell}{\lstset{style=lstStyleShell}}{}
 
+\providecommand{\TODO}[1]{{\color{red}{#1}}}
+
 \usepackage{hologo}
 \ifluahbtex
   \usepackage{emoji}
@@ -145,6 +147,9 @@
 \mainmatter
 % C - 正文
 \input{contents/c1_introduction}
+\input{contents/c2_background}
+
+\makebiblio
 
 \backmatter
 \input{contents/d_acknowledgement}

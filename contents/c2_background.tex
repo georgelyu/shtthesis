@@ -77,7 +77,7 @@
 
 可以认为LBM虽然采用了一种非常简化的方案，但它依然计算了部分的微观层面的交互。这也使得LBM的求解过程与N-S方程求解有本质的区别。然而我们最终目的依然是获取宏观的流体状态，以符合我们在宏观世界中对流体的感受。接下来我们将逐步介绍LBM中的概念，并建立其与宏观世界的联系。
 
-可以认为，在一个给定的控制体积 (control volume) 中，分布函数表示了速度在$\boldsymbol{Xi}$与$\boldsymbol{Xi}+d\boldsymbol{Xi}$之间的粒子总数。所以宏观和介观值可以通过对速度空间$\boldsymbol{Xi}$积分来建立，通过积分我们可以得到速度的n阶矩
+可以认为，在一个给定的控制体积 (control volume) 中，分布函数表示了速度在$\boldsymbol{\xi}$与$\boldsymbol{\xi}+d\boldsymbol{\xi}$之间的粒子总数。所以宏观和介观值可以通过对速度空间$\boldsymbol{Xi}$积分来建立，通过积分我们可以得到速度的n阶矩
 \begin{equation}
     \boldsymbol{M}^{(n)}=\int_{\mathbb{R}^{\mathrm{D}}} \underbrace{\boldsymbol{\xi} \boldsymbol{\xi} \ldots \boldsymbol{\xi}}_{\mathrm{n} \text {次}} f(\boldsymbol{x}, \boldsymbol{\xi}, t) \mathrm{d} \boldsymbol{\xi},
 \end{equation}
@@ -116,4 +116,198 @@
 
 % Sec 2.3
 \section{速度空间的离散化}
-为了对速度空间进行离散，离散分布函数$f$对于任意阶的矩均有贡献，所以对于$f$，应该有一个多项式的表达。
+如前文所述，由于在求解时保留了格子的概念，所以我们必须类似地对速度空间进行离散。因为分布函数$f$对于任意阶的矩均有贡献，所以对于$f$，应该有一个多项式的表达。分布函数事实上可以表达为Hermite多项式构成的无穷级数，变量为经过声速正则化后的速度空间$\tilde{\xi}=\xi/c_s$：
+\begin{equation}
+    f(\boldsymbol{x}, \boldsymbol{\xi}, t)=\frac{1}{c_s^{\mathrm{D}}} \omega(\tilde{\boldsymbol{\xi}}) \sum_{n=0}^{\infty} \frac{1}{n !} \boldsymbol{a}^{(n)}(\boldsymbol{x}, t) \mathscr{H}^{(n)}(\tilde{\boldsymbol{\xi}}),
+    \label{eq:hermite_f}
+\end{equation}
+其中$\mathscr{H}^{(n)}$是$n$次多项式。Hermite多项式的一个特点是展开系数$\boldsymbol{a}^{(n)}$是$f$本身的速度矩~\cite{shan2006kinetic}，权重函数$\omega$为
+\begin{equation}
+    \omega(\tilde{\boldsymbol{\xi}})=\frac{1}{(2 \pi)^{\mathrm{D} / 2}} \exp \left(-\tilde{\boldsymbol{\xi}}^2 / 2\right).
+\end{equation}
+当流体不受压力时，流体可以被一个平衡态函数描述。这只会出现在密度和速度在整个流体域中都是常值的情况下。此时的平衡态可由麦克斯韦分布函数描述
+\begin{equation}
+    f^{eq}=\frac{\rho}{\left(2 \pi c_s^2\right)^{\mathrm{D} / 2}} \exp \left(\frac{-(\boldsymbol{\xi}-\boldsymbol{u})^2}{2 c_s^2}\right),
+    \label{eq:maxwell_eq}
+\end{equation}
+其中$\rho$和$\boldsymbol{u}$分别为宏观的密度和速度。我们可以将这个平衡态函数投影到基为Hermite多项式的空间，此时速度矩变为$\boldsymbol{a}^{eq,(n)}$：
+\begin{equation}
+    f^{eq}(\boldsymbol{x}, \boldsymbol{\xi}, t)=\frac{1}{c_s^{\mathrm{D}}} \omega(\tilde{\boldsymbol{\xi}}) \sum_{n=0}^{\infty} \frac{1}{n !} \boldsymbol{a}^{eq,(n)}(\boldsymbol{x}, t) \mathscr{H}^{(n)}(\tilde{\boldsymbol{\xi}}).
+    \label{eq:maxwell_eq_hermite}
+\end{equation}
+对比公式~\ref{eq:maxwell_eq}，我们可以注意到两式几乎有着相同的形式。事实上，$f^{eq}$还可表达为
+\begin{equation}
+    f^{eq}=\frac{\rho}{c_s^D}\omega(\tilde{\boldsymbol{v}}),
+\end{equation}
+其中$\tilde{\boldsymbol{v}}=(\boldsymbol{\xi})$可视为本动马赫数。所以麦克斯韦分布函数的Hermite展开系数为
+\begin{equation}
+    \boldsymbol{a}^{eq,(n)}=\rho \int w(\tilde{\boldsymbol{v}}) \mathscr{H}^{(n)}\left(\tilde{\boldsymbol{v}}+\frac{\boldsymbol{u}}{c_s}\right) \mathrm{d} \tilde{\boldsymbol{v}}.
+    \label{eq:hermite_coefficients}
+\end{equation}
+对公式~\ref{eq:hermite_f}这样的无穷级数进行截断，即对应着对速度空间的离散化，并且保证了连续空间和离散空间下的矩在截断的阶数前是不变的。而离散的一个重要约束来自于高斯积分
+\begin{equation}
+    \int w(\boldsymbol{x}) f(\boldsymbol{x}) \mathrm{d} \boldsymbol{x} \approx \sum w_i f\left(\boldsymbol{x}_i\right) \quad \text{with} \quad i=0,1, \ldots, q-1
+\end{equation}
+其中，$f(\boldsymbol{x})$可表示任意函数而$\omega_i$是常值的权重。
+%我们用$\tilde{\xi}_i$表达在$N$阶截断后的Hermite级数的横坐标 (abscissae)，则高阶的截断一定会需要更多数量的离散速度，使格子的拓扑更难构造。
+则高斯积分的公式$E$可被抽象地记为
+\begin{equation}
+    E^q_{D,n},
+\end{equation}
+其中$D$表示空间的维度，$n$为积分精度的阶数，$q$表示积分所需要的点的数量。则我们可以推导出这三个值间的关系。对于一维空间，约束为$n>2N$并且$n=2q-1$~\cite{shan2006kinetic}，即$q=N+1$。对于高维空间并没有一般的高斯积分理论，但是我们可以假设有
+\begin{equation}
+    q=(N+1)^D.
+\end{equation}
+则二维的速度空间在$N=2$阶截断时需要9个离散速度，$N=3$时需要16个。当然实际的格子方向可能有所不同，因为考虑到某些矩的对称性，在维持$N$不变时所需的离散速度数量可能会减少。然而从几何上考虑，要设计能充满空间且各向同性的格子可能又会增加所需的格子方向数量。如果依然采用~\cite{qian1992lattice}中的D$d$Q$q$的命名的话，能维持二阶精度的格子分别为D1Q3、D2Q9、D3Q16。由公式~\ref{eq:hermite_coefficients}可得，在截断至二阶时，Hermite展开的系数为
+\begin{equation}
+    \left\{\begin{array}{l}\boldsymbol{a}^{eq, 0}=\rho \\ \boldsymbol{a}^{eq, 1}=\rho \frac{\boldsymbol{u}}{c_0} \\ \boldsymbol{a}^{eq, 2}=\rho \frac{u_i u_j}{c_0^2}\end{array}\right.
+\end{equation}
+将其代入到公式~\ref{eq:maxwell_eq_hermite}中，可以得到
+\begin{equation}
+    f_i^{eq}(\boldsymbol{x}, t)=w_i \rho\left(1+\frac{\boldsymbol{\xi}_i \cdot \boldsymbol{u}}{c_0^2}+\frac{\left(\boldsymbol{\xi}_i \cdot \boldsymbol{u}\right)^2}{2 c_0^4}-\frac{u^2}{2 c_0^2}\right),
+    \label{eq:f_eq_o2}
+\end{equation}
+其中$f_i^{eq}(\boldsymbol{x}, t)=f^{eq}(\boldsymbol{x}, \xi_i, t)$, $\omega_i=\omega(\frac{\xi}{c_s})/c_s^D$。上述的推导尝试用比较系统且严格的形式推导出分布函数及速度空间的离散，但同时尽量保持简洁，所以无法过于详尽地展示出所有步骤。对于更彻底的推导，读者们可以参考~\cite{shan2006kinetic, malaspinas2010lattice}。
+
+
+% Sec 2.4
+\section{从LBM到N-S方程}
+在介绍过速度矩作为介观和宏观世界之间的联系之后，我们现在将使用多尺度分析 (Multiple-scale Analysis) 来从LBE推导出N-S方程。许多流体的动态特征其实表现于其与平衡态的偏移。如果在介观上，分布函数都处于平衡态，那么可以想像，在宏观上流体也是平静的。所以多尺度分析的思想是将$f$在$f^{eq}$处展开。展开后的$f^{eq}$可以被记为$f^{0}$，其余部分为非平衡态项：
+\begin{equation}
+    f=\underbrace{f^{(0)}}_{f^{e q}}+\underbrace{\epsilon f^{(1)}+\epsilon^2 f^{(2)}}_{f^{n e q}} \cdots .
+\end{equation}
+多尺度分析的扩展依赖于一个很小的参数$\epsilon$，这个值是碰撞时间$\tau=\nu/c_s^2$与格子时间步长$\Delta t$的比值。对流的时间尺度 (advection timescale) 是直接与$\Delta t_1=\tau/\epsilon$联系的，之后粘性扩散的时间尺度是联系于
+\begin{equation}
+    \Delta t_2=\frac{\Delta x^2}{\nu} \sim \frac{c_s^2 \Delta t^2}{\nu}=\frac{\tau}{\epsilon^2}
+\end{equation}
+的。有推导证明展开到一阶的$\epsilon$时，可以推导出欧拉方程~\cite{huang2008statistical}。展开到二阶时，时间上的导数为
+\begin{equation}
+    \frac{\partial}{\partial t}=\epsilon \frac{\partial}{\partial t_1}+\epsilon^2 \frac{\partial}{\partial t_2},
+    \label{eq:ms_t}
+\end{equation}
+空间上的导数为
+\begin{equation}
+    \frac{\partial}{\partial \boldsymbol{x}}=\epsilon \frac{\partial}{\partial \boldsymbol{x}_1}.
+    \label{eq:ms_x}
+\end{equation}
+在将$f$分解为平衡态与非平衡态后，公式~\ref{eq:collision_invariants}所表达的约束可被表达为
+\begin{equation}
+    \sum_{i} f_{i}^{(n)}=\sum_{i} \boldsymbol{\xi}_{i} f_{i}^{(n)}=0, \quad  n=1,2, \ldots.
+\end{equation}
+那么为了将LBE恢复到N-S方程，首先我们要将公式~\ref{eq:LBM_in_one_BGK}的左手侧进行二阶的泰勒展开
+\begin{align}
+    \begin{split}
+        & f_{i}\left(\boldsymbol{x}+\boldsymbol{\xi}_{i} \Delta t, t+\Delta t\right) \approx \\
+        & \quad f_{i}(\boldsymbol{x}, t)+\left(\xi_{i \alpha} \Delta t \frac{\partial}{\partial x_{\alpha}}+\Delta t \frac{\partial}{\partial t}\right) f_{i}(\boldsymbol{x}, t)+ \\
+        & \quad \frac{1}{2}\left(\xi_{i \alpha} \xi_{i \beta} \Delta t^{2} \frac{\partial^{2}}{\partial x_{\alpha} \partial x_{\beta}}+2 \xi_{i \alpha} \Delta t^{2} \frac{\partial}{\partial x_{\alpha}} \frac{\partial}{\partial t}+\Delta t^{2} \frac{\partial^{2}}{\partial t^{2}}\right) f_{\alpha}(\boldsymbol{x}, t)+\mathcal{O}\left(\Delta t^{3}\right) .
+    \end{split}
+\end{align}
+我们将上式代入公式~\ref{eq:LBM_in_one_BGK}，并用$\tau$替代$\tilde{\omega}$后，可以得到
+\begin{equation}
+\Delta t\left(\xi_{i \alpha} \frac{\partial}{\partial x_{\alpha}}+\frac{\partial}{\partial t}\right) f_{\alpha}+\frac{\Delta t^{2}}{2}\left(\xi_{i \alpha} \xi_{i \beta} \frac{\partial^{2}}{\partial x_{\alpha} \partial x_{\beta}}+2 \xi_{i \alpha} \frac{\partial}{\partial x_{\alpha}} \frac{\partial}{\partial t}+\frac{\partial^{2}}{\partial t^{2}}\right) f_{\alpha}=-\frac{\Delta t}{\tau}\left(f_{\alpha}-f_{\alpha}^{e q}\right) .
+\end{equation}
+接下来，我们将多尺度分析的公式~\ref{eq:ms_t}与~\ref{eq:ms_x}代入
+\begin{align}
+    \begin{split}
+& {\left[\xi_{\alpha i}\left(\epsilon \frac{\partial}{\partial x_{1 i}}\right)+\left(\epsilon \frac{\partial}{\partial t_{1}}+\epsilon^{2} \frac{\partial}{\partial t_{2}}\right)\right]\left(f_{\alpha}^{(0)}+\epsilon f_{\alpha}^{(1)}+\epsilon^{2} f_{\alpha}^{(2)}\right)+} \\
+& \frac{\Delta t}{2}\left[\xi_{\alpha i} \xi_{\alpha j}\left(\epsilon^{2} \frac{\partial^{2}}{\partial x_{1 i} \partial x_{1 j}}\right)+\left(2 \xi_{\alpha i} \epsilon^{2} \frac{\partial}{\partial x_{1 i}} \frac{\partial}{\partial t_{1}}\right)+\left(\epsilon^{2} \frac{\partial^{2}}{\partial t_{1}^{2}}\right)\right]\left(f_{\alpha}^{(0)}+\epsilon f_{\alpha}^{(1)}+\epsilon^{2} f_{\alpha}^{(2)}\right)= \\
+& \quad-\frac{1}{\tau}\left(f_{\alpha}^{(0)}+\epsilon f_{\alpha}^{(1)}+\epsilon^{2} f_{\alpha}^{(2)}-f_{\alpha}^{e q}\right) .
+    \end{split}
+    \label{eq:ms_total}
+\end{align}
+接下来，我们把公式~\ref{eq:ms_total}按照$\epsilon$的阶数分离：
+
+\noindent
+$\mathcal{O}\left(\epsilon^{0}\right):$
+\begin{equation}
+f_{\alpha}^{(0)}=f_{\alpha}^{e q}
+\end{equation}
+$\mathcal{O}\left(\epsilon^{1}\right):$
+\begin{equation}
+\epsilon\left(\xi_{\alpha i} \frac{\partial}{\partial x_{1 i}}+\frac{\partial}{\partial t_{1}}\right) f_{\alpha}^{(0)}=-\frac{1}{\tau} \epsilon f_{\alpha}^{(1)}
+\label{eq:ms_o1}
+\end{equation}
+$\mathcal{O}\left(\epsilon^{2}\right):$
+\begin{equation}
+\epsilon^{2} \frac{\partial}{\partial t_{2}} f_{\alpha}^{(0)}+\left(\xi_{\alpha i} \epsilon \frac{\partial}{\partial x_{1 i}}+\epsilon \frac{\partial}{\partial t_{1}}\right) \epsilon f_{\alpha}^{(1)}+\frac{\Delta t}{2}\left(\xi_{\alpha i} \epsilon \frac{\partial}{\partial x_{1 i}}+\epsilon \frac{\partial}{\partial t_{1}}\right)^{2} f_{\alpha}^{(0)}=-\frac{1}{\tau} \epsilon^{2} f_{\alpha}^{(2)}
+\label{eq:ms_o2}
+\end{equation}
+将公式~\ref{eq:ms_o1}代入公式~\ref{eq:ms_o2}，可以得到
+\begin{equation}
+\epsilon^{2} \frac{\partial}{\partial t_{2}} f_{\alpha}^{(0)}+\left(\xi_{\alpha i} \epsilon \frac{\partial}{\partial x_{1 i}}+\epsilon \frac{\partial}{\partial t_{1}}\right)\left(1-\frac{\Delta t}{2 \tau}\right) \epsilon f_{\alpha}^{(1)}=-\frac{1}{\tau} \epsilon^{2} f_{\alpha}^{(2)}
+\label{eq:ms_o1_into_o2}
+\end{equation}
+接下来我们想要获得关于宏观量的守恒公式，与求矩类似，我们对公式~\ref{eq:ms_o1}与公式~\ref{eq:ms_o1_into_o2}对碰撞不变量积分得到
+\begin{equation}
+\epsilon \frac{\partial \rho}{\partial t_{1}}+\epsilon \frac{\partial \rho u_{i}}{\partial x_{1 i}}=0,
+\label{eq:ms_moment_o1_a}
+\end{equation}
+\begin{equation}
+\epsilon \frac{\partial \rho u_{i}}{\partial t_{1}}+\epsilon \frac{\partial P_{i j}^{(0)}}{\partial x_{1 j}}=0,
+\label{eq:ms_moment_o1_b}
+\end{equation}
+即无粘的欧拉公式。同样地，我们对公式~\ref{eq:ms_o2}积分得到
+\begin{equation}
+\epsilon^{2} \frac{\partial \rho}{\partial t_{2}} = 0,
+\end{equation}
+\begin{equation}
+\epsilon^{2} \frac{\partial \rho u_{i}}{\partial t_{2}} +\left(1-\frac{\Delta t}{2 \tau}\right) \epsilon^{2} \frac{P_{i j}^{(1)}}{\partial x_{1 j}}=0 .
+\end{equation}
+然后我们将同阶数的部分归化到一起，可以得到0阶的矩方程
+\begin{equation}
+\frac{\partial \rho}{\partial t}+\frac{\partial \rho u_{i}}{\partial x_{i}}=0,
+\end{equation}
+即连续性方程。1阶的矩方程为
+\begin{equation}
+\frac{\partial \rho u_{i}}{\partial t}+\frac{\partial}{\partial x_{j}}\left[P_{i j}^{e q}+\left(1-\frac{\Delta t}{2 \tau}\right) P_{i j}^{n e q}\right]=0,
+\end{equation}
+为了计算$P_{i j}^{n e q}$，我们将公式~\ref{eq:ms_o1}转为二阶矩方程，得到
+\begin{equation}
+\epsilon \frac{\partial P_{i j}^{(0)}}{\partial t_{1}}+\epsilon \frac{\partial Q_{i j k}^{(0)}}{\partial x_{1 k}}=-\frac{1}{\tau} \epsilon P_{i j}^{(1)}.
+\label{eq:ms_moment_o2}
+\end{equation}
+由公式~\ref{eq:f_eq_o2}我们可以由下面的方式得到三阶矩$Q_{ijk}$，
+\begin{equation}
+Q_{i j k}^{(0)}=Q_{i j k}^{e q}=\sum_{\alpha} f_{\alpha}^{e q} \xi_{\alpha, i} \xi_{\alpha, j} \xi_{\alpha, k}=\rho c_{0}^{2}\left(u_{i} \delta_{j k}+u_{j} \delta_{i k}+u_{k} \delta_{i j}\right).
+\end{equation}
+接下来，我们引入如下的积分公式 (乘积法则)：
+\begin{align}
+\epsilon \frac{\partial \rho u_{i} u_{j}}{\partial t_{1}} & =u_{i} \epsilon \frac{\rho u_{j}}{\partial t_{1}}+u_{j} \epsilon \frac{\rho u_{i}}{\partial t_{1}}-u_{i} u_{j} \epsilon \frac{\partial \rho}{\partial t_{1}}, \\
+\epsilon \frac{\partial \rho u_{i} u_{j} u_{k}}{\partial x_{1 k}} & =u_{i} \epsilon \frac{\rho u_{j} u_{k}}{\partial x_{1 k}}+u_{j} \epsilon \frac{\rho u_{i} u_{k}}{\partial x_{1 k}}-u_{i} u_{j} \epsilon \frac{\partial \rho u_{k}}{\partial x_{1 k}} .
+\end{align}
+使用上述的公式，公式~\ref{eq:ms_moment_o2}的左手边的$\epsilon \frac{\partial P_{i j}^{(0)}}{\partial t_{1}}$可以被表达为
+\begin{align}
+    \begin{split}
+\epsilon \frac{\partial P_{i j}^{(0)}}{\partial t_{1}}= & \epsilon \frac{\partial \rho u_{i} u_{j}}{\partial t_{1}}+c_{0}^{2} \delta_{i j} \epsilon \frac{\partial \rho}{\partial t_{1}} \\
+= & u_{i} \epsilon \frac{\partial \rho u_{j}}{\partial t_{1}}+u_{j} \epsilon \frac{\partial \rho u_{i}}{\partial t_{1}}-u_{i} u_{j} \epsilon \frac{\partial \rho}{\partial t_{1}}+c_{0}^{2} \delta_{i j} \epsilon \frac{\partial \rho}{\partial t_{1}} \\
+= & -u_{i} \epsilon \frac{\partial P_{j k}^{(0)}}{\partial x_{1 k}}-u_{j} \epsilon \frac{\partial P_{i j}^{(0)}}{\partial x_{1 k}}+u_{i} u_{j} \epsilon \frac{\partial \rho u_{k}}{\partial x_{1 k}}-c_{0}^{2} \delta_{i j} \epsilon \frac{\partial \rho u_{k}}{\partial x_{1 k}} \quad \text {(由公式~\ref{eq:ms_moment_o1_a}、\ref{eq:ms_moment_o1_b})} \\
+= & -u_{i} \epsilon \frac{\partial}{\partial x_{1 k}}\left(\rho u_{j} u_{k}+\rho c_{0}^{2} \delta_{j k}\right)-u_{j} \epsilon \frac{\partial}{\partial x_{1 k}}\left(\rho u_{i} u_{k}+\rho c_{0}^{2} \delta_{i k}\right) \\
+& +u_{i} u_{j} \epsilon \frac{\partial \rho u_{k}}{\partial x_{1 k}}-c_{0}^{2} \delta_{i j} \frac{\partial \rho u_{k}}{\partial x_{1 k}} \\
+= & -\epsilon \frac{\partial \rho u_{i} u_{j} u_{k}}{\partial x_{1 k}}-c_{0}^{2}\left(u_{i} \epsilon \frac{\partial \rho}{\partial x_{1 j}}+u_{j} \epsilon \frac{\partial \rho}{\partial x_{1 i}}\right)-c_{0}^{2} \delta_{i j} \epsilon \frac{\partial \rho u_{k}}{\partial x_{1 k}} .
+    \end{split}
+\end{align}
+同时，$\epsilon \frac{\partial Q_{i j k}^{(0)}}{\partial x_{1 k}}$可表达为
+\begin{align}
+    \begin{split}
+\epsilon \frac{\partial Q_{i j k}^{(0)}}{\partial x_{1 k}} & =\epsilon \frac{\partial}{\partial x_{1 k}} \rho c_{0}^{2}\left(u_{i} \delta_{j k}+u_{j} \delta_{i k}+u_{k} \delta_{i j}\right) \\
+& =c_{0}^{2}\left(\epsilon \frac{\partial \rho u_{i}}{\partial x_{1 j}}+\epsilon \frac{\partial \rho u_{j}}{\partial x_{1 i}}\right)+c_{0}^{2} \delta_{i j} \epsilon \frac{\partial \rho u_{k}}{\partial x_{1 k}}.
+    \end{split}
+\end{align}
+将上述两公式相加可得到$P_{i j}^{(1)}$的表达式
+\begin{equation}
+\epsilon P_{i j}^{(1)}=-\rho c_{0}^{2} \tau\left(\epsilon \frac{\partial u_{i}}{\partial x_{1 j}}+\epsilon \frac{\partial u_{j}}{\partial x_{1 i}}\right)+\tau \epsilon \frac{\partial \rho u_{i} u_{j} u_{k}}{\partial x_{1 k}}.
+\end{equation}
+将 $P^{n e q}=\epsilon P^{(1)}$，$\partial / \partial \boldsymbol{x}=\epsilon \partial / \partial \boldsymbol{x}_{1}$代入，我们可以获得
+\begin{equation}
+P_{i j}^{n e q}=\underbrace{-\rho c_{0}^{2} \tau\left(\frac{\partial u_{i}}{\partial x_{j}}+\frac{\partial u_{j}}{\partial x_{i}}\right)}_{\boldsymbol{\sigma}^{\prime}}+\underbrace{\tau \frac{\partial \rho u_{i} u_{j} u_{k}}{\partial x_{k}}}_{\text {误差项}} .
+\label{eq:p_neq}
+\end{equation}
+上式中我们可以发现，第一项对应于N-S方程中的粘性应力张量 (viscous stress tensor)，第二项是误差项，因为平衡态函数$f_i^{eq}$只展开到了二阶，所以$\mathcal{O}\left(u^{3}\right)$项是不正确的。这个误差项在大多数情况下都可以被忽略，因为当我们仔细观察公式~\ref{eq:p_neq}时，我们发现当$u^{2}<<c_{s}^{2}$时，$\mathcal{O}\left(u^{3}\right)$项的模值相比前一项就可以被忽略了。所以在低马赫数时，我们可以直接忽略上式中的误差项。这也是为什么许多工作描述LBM只在弱可压情况下有效。
+那么我们将忽略误差项的公式~\ref{eq:p_neq}代入xxxx后，可以得到动量守恒方程
+\begin{equation}
+    \frac{\partial \rho u_{i}}{\partial t}+\frac{\partial \rho u_{i} u_{j}}{\partial x_{j}}=-\frac{\partial p}{\partial x_{i}}+\mu \frac{\partial}{\partial x_{j}}\left(\frac{\partial u_{i}}{\partial x_{j}}+\frac{\partial u_{j}}{\partial x_{i}}\right),
+\end{equation}
+其中$\mu=\left(1-\frac{\Delta t}{2 \tau}\right) \rho c_{0}^{2} \tau$，动力粘度$\nu=\mu / \rho$与松弛时间$\tau$之间的关系为
+\begin{equation}
+    \nu=c_{0}^{2}\left(\tau-\frac{\Delta t}{2}\right) \quad \text {或} \quad \tau=\frac{\nu}{c_{0}^{2}}+\frac{\Delta t}{2} .
+\end{equation}

@@ -51,6 +51,7 @@
 
 % Sec 1.2.3
 \subsection{格子玻尔兹曼方法}
+\label{sec:1_related_works_LBM}
 \paragraph{碰撞模型}
 在LBM中最简洁也最易于实现的碰撞模型为BGK (Bhatnagar-Gross-Krook) 碰撞模型~\cite{Bhatnagar-1954, Chen-1998}，然而在高雷诺数流体中，BGK模型有着很大的截断误差，从而在数值上非常不稳定。多松弛时间 (multiple relaxation time, MRT) 碰撞模型~\cite{dHumieres-1992, Lallemand-2000, Coveney-2002}尝试通过在矩 (moment) 空间进行松弛，来提升整体的数值稳定性与准确性。最初MRT碰撞模型通过原始矩 (raw moments) 进行构造，而这一形式违反了伽利略不变性 (Galilean invariance)。而之后为了进一步提升精度与稳定性，基于中心矩 (central moments)~\cite{Geier-2006, Geier-2009}、埃尔米特矩 (Hermite moments)~\cite{Shan-2007, Chen-2014, Adhikari-2008}、中心埃尔米特矩 (central Hermite moments)~\cite{Mattila-2017, Shan-2019}和累积量 (cumulants)~\cite{Geier-2015, Geier-2017}的MRT碰撞模型被提出，并满足了伽利略不变性。
 还有一类碰撞模型是对分布函数进行埃尔米特多项式 (Hermite polynomial) 展开后截断来去除非水动力学动理学的模态，之后进行碰撞。这类碰撞模型被称为正则化碰撞模型~\cite{Zhang-2006, Latt-2006}。后期有工作通过递归形式改进了正则化碰撞模型，被称为递归正则化碰撞模型~\cite{Malaspinas-2015, Coreixas-2017}。作者证明该方法有着更好的数值耗散和色散性质。Jacob 等~(\citeyear{Jacob-2018}) 之后又提出了混合递归正则化模型，对二阶应力张量的重构做了调整，提高了方法的稳定性。

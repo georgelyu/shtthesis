@@ -313,7 +313,7 @@ Q_{\alpha \beta \gamma}^{(0)}=Q_{\alpha \beta \gamma}^{e q}=\sum_{\alpha} f_{i}^
 P_{\alpha \beta}^{n e q}=\underbrace{-\rho c_{s}^{2} \tau\left(\frac{\partial u_{\alpha}}{\partial x_{\beta}}+\frac{\partial u_{\beta}}{\partial x_{\alpha}}\right)}_{\boldsymbol{\sigma}^{\prime}}+\underbrace{\tau \frac{\partial \rho u_{\alpha} u_{\beta} u_{\gamma}}{\partial x_{k}}}_{\text {误差项}} .
 \label{eq:p_neq}
 \end{equation}
-从上式中我们可以发现，第一项对应于N-S方程中的粘性应力张量 (viscous stress tensor)，第二项是误差项，因为平衡态函数$f_i^{eq}$只展开到了二阶，所以$\mathcal{O}\left(u^{3}\right)$项是不正确的。当我们仔细观察公式~\ref{eq:p_neq}时，我们发现当$u^{2} \ll c_{s}^{2}$时，$\mathcal{O}\left(u^{3}\right)$项的模值相比前一项就可以被忽略了。所以在低马赫数时，我们可以直接忽略上式中的误差项。这也是为什么许多工作描述LBM只在弱可压情况下有效。
+从上式中我们可以发现，第一项对应于N-S方程中的粘性应力张量 (viscous stress tensor)，第二项是误差项，因为平衡态函数$f_i^{eq}$只展开到了二阶，所以$\mathcal{O}\left(u^{3}\right)$项是不正确的。当我们仔细观察公式~\ref{eq:p_neq}时，我们发现当${u_x}^{2} \ll c_{s}^{2}$时，$\mathcal{O}\left(u^{3}\right)$项的模值相比前一项就可以被忽略了。所以在低马赫数时，我们可以直接忽略上式中的误差项。这也是为什么许多工作描述LBM只在弱可压情况下有效。
 那么我们将忽略误差项的公式~\ref{eq:p_neq}代入公式~\ref{eq:ms_continuity_puzzle}后，可以得到动量守恒方程
 \begin{equation}
     \frac{\partial \rho u_{\alpha}}{\partial t}+\frac{\partial \rho u_{\alpha} u_{\beta}}{\partial x_{\beta}}=-\frac{\partial p}{\partial x_{\alpha}}+\mu \frac{\partial}{\partial x_{\beta}}\left(\frac{\partial u_{\alpha}}{\partial x_{\beta}}+\frac{\partial u_{\beta}}{\partial x_{\alpha}}\right),
@@ -327,7 +327,7 @@ P_{\alpha \beta}^{n e q}=\underbrace{-\rho c_{s}^{2} \tau\left(\frac{\partial u_
 
 % Sec 2.5
 \section{累积量碰撞模型}
-在第~\ref{sec:2_LBM_origin} 节的末尾，我们介绍了LBM中的BGK碰撞模型 (即单松弛时间模型) 与多松弛时间模型出现的动机，并在第~\ref{sec:1_related_works_LBM} 节中介绍了基于不同量的MRT模型。在这些碰撞模型中，累积量碰撞模型相比其它模型 (原始矩、中心矩等) 有着遵守伽利略不变性、自由度耦合程度低、超黏度 (hyper-viscosity) 误差更低的优势，所以我们将基于累积量碰撞模型进行改进。在这里我们先简要的介绍累积量碰撞模型本身。
+在第~\ref{sec:2_LBM_origin} 节的末尾，我们介绍了LBM中的BGK碰撞模型 (即单松弛时间模型) 与多松弛时间模型出现的动机，并在第~\ref{sec:1_related_works_LBM} 节中介绍了基于不同量的MRT模型。在这些碰撞模型中，累积量碰撞模型相比其它模型 (原始矩、中心矩等) 有着遵守伽利略不变性、自由度耦合程度低、超黏度 (hyper-viscosity) 误差更小的优势，所以我们将基于累积量碰撞模型进行改进。在这里我们先简要的介绍累积量碰撞模型本身。
 
 不同的碰撞模型的本质是在探索什么量可以最优地描述分布函数，我们称这些量为可观察量 (observable variables)。在累积量方法中，不同累积量之间是统计独立的 (statistically independent)，也就是说，两个累积量的联合概率等于各自概率的积。为了推导出累积量，我们先将分布函数$f$转换到频率空间$F$中，这样便于我们进行泰勒展开。到频域的变换由拉普拉斯变换 (Laplace transform) 完成：
 $$
@@ -382,8 +382,67 @@ k_{222} & =m_{222}-\left(4 m_{111}^{2}+m_{200} m_{022}+m_{020} m_{202}+m_{002} m
 \end{align*}
 对于同阶的累积量，同样可以将上述的对应公式的变量下标交换位置得到。
 
-第三个阶段是“碰撞”。
-
+第三个阶段是“碰撞”。首先二阶累积量的碰撞公式如下：
+\begin{align*}
+& k_{110}^{*}=\left(1-\omega_{1}\right) k_{110}, \\
+& k_{101}^{*}=\left(1-\omega_{1}\right) k_{101}, \\
+& k_{011}^{*}=\left(1-\omega_{1}\right) k_{011} ,
+\end{align*}
+其中含星号的变量代表碰撞后的变量。这些累积量的平衡态为0，所以被省去。而由于格子离散化时的各向异性，有些累积量并不为0：
+\begin{align*}
+k_{200}^{*}-k_{020}^{*} & =\left(1-\omega_{1}\right)\left(k_{200}-k_{020}\right)-3 \rho\left(1-\frac{\omega_{1}}{2}\right)\left({u_x}^{2} \frac{\partial u_x}{\partial x}-{u_y}^{2} \frac{\partial u_y}{\partial y}\right), \\
+k_{200}^{*}-k_{002}^{*} & =\left(1-\omega_{1}\right)\left(k_{200}-k_{002}\right)-3 \rho\left(1-\frac{\omega_{1}}{2}\right)\left({u_x}^{2} \frac{\partial u_x}{\partial x}-{u_z}^{2} \frac{\partial u_z}{\partial z}\right), \\
+k_{200}^{*}+k_{020}^{*}+k_{002}^{*} & =\kappa_{000} \omega_{2}+\left(1-\omega_{2}\right)\left(k_{200}+k_{020}+k_{002}\right) \\
+&\quad -3 \rho\left(1-\frac{\omega_{2}}{2}\right)\left({u_x}^{2} \frac{\partial u_x}{\partial x}+{u_y}^{2} \frac{\partial u_y}{\partial y}+{u_z}^{2} \frac{\partial u_z}{\partial z}\right) ,
+\end{align*}
+其中速度的梯度部分可由二阶的累积量计算得到：
+\begin{align*}
+\frac{\partial u_x}{\partial x} & =-\frac{\omega_{1}}{2 \rho}\left(2 k_{200}-k_{020}-k_{002}\right)-\frac{\omega_{2}}{2 \rho}\left(k_{200}+k_{020}+k_{002}-\kappa_{000}\right), \\
+\frac{\partial u_y}{\partial y} & =\frac{\partial u_x}{\partial x}+\frac{3 \omega_{1}}{2 \rho}\left(k_{200}-k_{020}\right), \\
+\frac{\partial u_z}{\partial z} & =\frac{\partial u_x}{\partial x}+\frac{3 \omega_{1}}{2 \rho}\left(k_{200}-k_{002}\right), \\
+\frac{\partial u_y}{\partial x}+\frac{\partial u_x}{\partial y} & =-\frac{3 \omega_{1}}{\rho} k_{110}, \\
+\frac{\partial u_z}{\partial x}+\frac{\partial u_x}{\partial z} & =-\frac{3 \omega_{1}}{\rho} k_{101}, \\
+\frac{\partial u_z}{\partial y}+\frac{\partial u_y}{\partial z} & =-\frac{3 \omega_{1}}{\rho} k_{011}.
+\end{align*}
+剩余部分的碰撞公式为：
+\begin{align*}
+k_{120}^{*}+k_{102}^{*} & =\left(1-\omega_{3}\right)\left(k_{120}+k_{102}\right), \\
+k_{210}^{*}+k_{012}^{*} & =\left(1-\omega_{3}\right)\left(k_{210}+k_{012}\right), \\
+k_{201}^{*}+k_{021}^{*} & =\left(1-\omega_{3}\right)\left(k_{201}+k_{021}\right), \\
+k_{120}^{*}-k_{102}^{*} & =\left(1-\omega_{4}\right)\left(k_{120}-k_{102}\right), \\
+k_{210}^{*}-k_{012}^{*} & =\left(1-\omega_{4}\right)\left(k_{210}-k_{012}\right), \\
+k_{201}^{*}-k_{021}^{*} & =\left(1-\omega_{4}\right)\left(k_{201}-k_{021}\right), \\
+k_{111}^{*} & =\left(1-\omega_{5}\right) k_{111}, \\
+k_{220}^{*}-2 k_{202}^{*}+k_{022}^{*} & =\frac{2}{3}\left(\frac{1}{\omega_{1}}-\frac{1}{2}\right) \omega_{6} A \rho\left(\frac{\partial u_x}{\partial x}-2 \frac{\partial u_y}{\partial y}+\frac{\partial u_z}{\partial z}\right) \\
+&\quad +\left(1-\omega_{6}\right)\left(k_{220}-2 k_{202}+k_{022}\right), \\
+k_{220}^{*}+k_{202}^{*}-2 k_{022}^{*} & =\frac{2}{3}\left(\frac{1}{\omega_{1}}-\frac{1}{2}\right) \omega_{6} A \rho\left(\frac{\partial u_x}{\partial x}+\frac{\partial u_y}{\partial y}-2 \frac{\partial u_z}{\partial z}\right) \\
+&\quad +\left(1-\omega_{6}\right)\left(k_{220}+k_{202}-2 k_{022}\right), \\
+k_{220}^{*}+k_{202}^{*}+k_{022}^{*} & =-\frac{4}{3}\left(\frac{1}{\omega_{1}}-\frac{1}{2}\right) \omega_{7} A \rho\left(\frac{\partial u_x}{\partial x}+\frac{\partial u_y}{\partial y}+\frac{\partial u_z}{\partial z}\right) \\
+&\quad +\left(1-\omega_{7}\right)\left(k_{220}+k_{202}+k_{022}\right), \\
+k_{211}^{*} & =-\frac{1}{3}\left(\frac{1}{\omega_{1}}-\frac{1}{2}\right) \omega_{8} B \rho\left(\frac{\partial u_z}{\partial y}+\frac{\partial u_y}{\partial z}\right)+\left(1-\omega_{8}\right) k_{211}, \\
+k_{121}^{*} & =-\frac{1}{3}\left(\frac{1}{\omega_{1}}-\frac{1}{2}\right) \omega_{8} B \rho\left(\frac{\partial u_z}{\partial x}+\frac{\partial u_x}{\partial z}\right)+\left(1-\omega_{8}\right) k_{121}, \\
+k_{112}^{*} & =-\frac{1}{3}\left(\frac{1}{\omega_{1}}-\frac{1}{2}\right) \omega_{8} B \rho\left(\frac{\partial u_y}{\partial x}+\frac{\partial u_x}{\partial y}\right)+\left(1-\omega_{8}\right) k_{112}, \\
+k_{221}^{*} & =\left(1-\omega_{9}\right) k_{221}, \\
+k_{212}^{*} & =\left(1-\omega_{9}\right) k_{212}, \\
+k_{122}^{*} & =\left(1-\omega_{9}\right) k_{122}, \\
+k_{222}^{*} & =\left(1-\omega_{10}\right) k_{222} .
+\end{align*}
+可以看到，4阶的累积量中有$A$和$B$两个参数变量，这两个参数变量源于~\cite{Geier-2017}中的对4阶累积量参数化，这个参数化的目的是消除线性的领头误差 (linearized leading error)，从而提高求解精度。在优化后，三阶累积量的松弛系数与$A$、$B$可以被确定为
+\begin{align*}
+\omega_{3} =& \frac{8\left(\omega_{1}-2\right)\left(\omega_{2}\left(3 \omega_{1}-1\right)-5 \omega_{1}\right)}{8\left(5-2 \omega_{1}\right) \omega_{1}+\omega_{2}\left(8+\omega_{1}\left(9 \omega_{1}-26\right)\right)} \\
+\omega_{4} =& \frac{8\left(\omega_{1}-2\right)\left(\omega_{1}+\omega_{2}\left(3 \omega_{1}-7\right)\right)}{\omega_{2}\left(56-42 \omega_{1}+9 \omega_{1}^{2}\right)-8 \omega_{1}} \\
+\omega_{5} =& \frac{24\left(\omega_{1}-2\right)\left(4 \omega_{1}^{2}+\omega_{1} \omega_{2}\left(18-13 \omega_{1}\right)+\omega_{2}^{2}\left(2+\omega_{1}\left(6 \omega_{1}-11\right)\right)\right)}{16 \omega_{1}^{2}\left(\omega_{1}-6\right)-2 \omega_{1} \omega_{2}\left(216+5 \omega_{1}\left(9 \omega_{1}-46\right)\right)+\omega_{2}^{2}\left(\omega_{1}\left(3 \omega_{1}-10\right)\left(15 \omega_{1}-28\right)-48\right)}, \\
+A =& \frac{4 \omega_{1}^{2}+2 \omega_{1} \omega_{2}\left(\omega_{1}-6\right)+\omega_{2}^{2}\left(\omega_{1}\left(10-3 \omega_{1}\right)-4\right)}{\left(\omega_{1}-\omega_{2}\right)\left(\omega_{2}\left(2+3 \omega_{1}\right)-8 \omega_{1}\right)}, \\
+B = & \frac{4 \omega_{1} \omega_{2}\left(9 \omega_{1}-16\right)-4 \omega_{1}^{2}-2 \omega_{2}^{2}\left(2+9 \omega_{1}\left(\omega_{1}-2\right)\right)}{3\left(\omega_{1}-\omega_{2}\right)\left(\omega_{2}\left(2+3 \omega_{1}\right)-8 \omega_{1}\right)} .
+\end{align*}
+由于$\omega_{2}$在累积量碰撞模型中是用来控制体积黏度 (bulk viscosity) 的，为了简化，我们可以将$\omega_{2}$设置为1，则上述公式简化为
+\begin{align*}
+    \omega_{3} =& \frac{8\left(\omega_{1}-2\right)\left(1+2 \omega_{1}\right)}{-8-14\omega_{1}+7\omega_{1}^2} \\
+    \omega_{4} =& \frac{8\left(\omega_{1}-2\right)\left(4 \omega_{1}-7\right)}{56-50\omega_{1}+9\omega_{1}^2} \\
+    \omega_{5} =& \frac{24\left(\omega_{1}-2\right)\left(-2-7\omega_{1}+3\omega_{1}^2\right)}{48+152\omega_{1}-130\omega_{1}^2+29\omega_{1}^3}, \\
+    A =& \frac{4+2\omega_{1}-3\omega_{1}^2}{2-7\omega_{1}+5\omega_{1}^2}, \\
+    B =& \frac{4+28\omega_{1}-14\omega_{1}^2}{6-21\omega_{1}+15\omega_{1}^2} .
+\end{align*}
 
 第四个阶段是“后向累积量变换”：
 \begin{align*}
@@ -411,3 +470,7 @@ m_{222}^{*}= & k_{222}^{*}+\left(4 m_{111}^{* 2}+m_{200}^{*} m_{022}^{*}+m_{020}
     & f_{i j 1}^{*}=\left(m_{i j \mid 0}^{*}\left(u_z^{2}+u_z\right)+m_{i j \mid 1}^{*}(2 u_z+1)+m_{i j \mid 2}^{*}\right) / 2 .
 \end{align*}
     
+
+% Sec 2.6
+\section{方向性边界处理}
+LBM的边界处理有一定的复杂性，其中一个主要来源是，因为LBM普遍使用笛卡尔网格，所以边界通常是落在格点之外的位置。针对这个问题在实际应用中有两类边界处理方法，分别是基于格点的 (node-based) 和方向性的 (directional)。基于格点的方法会根据边界的位置和其它信息来一次性修改所有方向的分布函数，而方向性方法只会修改未知方向的分布函数。

@@ -36,7 +36,7 @@
 其中$\Omega$是碰撞运算符。然而在实际中，通常会将公式~\ref{eq:LBM_in_one}表示为两个分开的过程，即碰撞和迁移：
 \begin{alignat}{2}
 \textbf{碰撞:} & \quad\quad &f_i^*(\boldsymbol{x}, t) & =f_i(\boldsymbol{x}, t)+\Omega\left(f_i(\boldsymbol{x}, t)\right); \\
-\textbf{迁移:} & & f_i\left(\boldsymbol{x}+\boldsymbol{\xi}_i \Delta t, t+\Delta t\right) & =f_i^*(\boldsymbol{x}, t),
+\textbf{迁移:} & & f_i\left(\boldsymbol{x}+\boldsymbol{\xi}_i \Delta t, t+\Delta t\right) & =f_i^*(\boldsymbol{x}, t),\label{eq:LBM_streaming_in_one}
 \end{alignat}
 其中，$f_i^*$表示碰撞后的分布函数。为了满足质量与动量守恒，LGA中的碰撞中设定了一些固定的规则。对于FHP模型来说，其只允许两个或三个粒子间的碰撞，并且粒子离开格点的方向不能和进入格点的方向一样。这使得两个粒子间的碰撞只有两种可能的结果，而三个粒子间的碰撞只有一种可能的结果，参见图~\ref{img:LGA_collision}。
 
@@ -471,6 +471,32 @@ m_{222}^{*}= & k_{222}^{*}+\left(4 m_{111}^{* 2}+m_{200}^{*} m_{022}^{*}+m_{020}
 \end{align*}
     
 
-% % Sec 2.6
-% \section{方向性边界处理}
-% LBM的边界处理有一定的复杂性，其中一个主要来源是，因为LBM普遍使用笛卡尔网格，所以边界通常是落在格点之外的位置。针对这个问题在实际应用中有两类边界处理方法，分别是基于格点的 (node-based) 和方向性的 (directional)。基于格点的方法会根据边界的位置和其它信息来一次性修改所有方向的分布函数，而方向性方法只会修改未知方向的分布函数。
+% Sec 2.6
+\section{边界处理}
+\label{sec:boundary_treatment}
+显然，在公式~\ref{eq:LBM_streaming_in_one} 所描述的迁移过程中，分布函数可以顺利移动的一个原因是，流体中并没有任何固体的阻碍。
+那么当流体附近存在固体时，边界处理是必须的。如图~\ref{img:bounce_back_scheme} 中，对于流体点$\bm{x}_b$，存在速度方向$\bm{l}_j$，使得邻点$\bm{x}_b-\bm{l}_j$位于固体内部。这会导致$\bm{l}_j'$方向的分布函数无法通过正常迁移得到，从而必须需要边界处理方法进行构造。
+LBM的边界处理有一定的复杂性，其中一个主要来源是，因为LBM普遍使用笛卡尔网格，所以边界通常是落在格点之外的位置。针对这个问题在实际应用中有两类边界处理方法，分别是基于格点的 (node-based) 和方向性的 (directional)。基于格点的方法会根据边界的位置和其它信息来一次性修改所有方向的分布函数，而方向性方法只会修改未知方向的分布函数。
+
+由于在LBM中有着非常多的边界处理形式，我们在这里回顾一些跟当前工作最相关的边界处理方法。
+
+\subsection{浸入边界法}
+浸入边界法 (immersed boundary method，IBM) 是一个在LBM被经常采用的边界处理方法，其一般通过施加惩罚力实现边界条件~\cite{patel2018diffuse,mittal-2008,Li-2020}。在浸入边界法的诸多变种中，锐利界面浸入边界法 (sharp-interface immersed boundary, SI-IBM)~\cite{mittal-2008} 是最为精准的。该方法的图示可见图~\ref{img:bounce_back_scheme}。
+对于边界点，SI-IBM首先重建相邻固体点的分布函数 (在图~\ref{img:bounce_back_scheme} 中标为方框)。之后将该格点投影到固体边界上 (在图~\ref{img:bounce_back_scheme} 中标为$\bm{p}^\perp$)，然后沿着法向$\bm{p}^\perp\!-\!\bm{p}$方向求得一个镜像点$\bm{p}'$。$\bm{p}'$的宏观速度可在固体边界的一侧通过周围点插值得到。因为固体点的速度$\bm{u}_b(\bm{p}^\perp)$是已知的，我们可以容易地计算出$\bm{p}$点的速度$\bm{u}^*(\bm{p}) = 2\bm{u}_b(\bm{p}^\perp) - \bm{u}(\bm{p}')$。显然这个速度会与$\bm{p}$点现有的宏观速度$\bm{u}(\bm{p})$有一个速度差$\Delta\bm{u}(\bm{p}) = \bm{u}^*(\bm{p}) - \bm{u}(\bm{p})$。这个速度差可以构成一个惩罚力$\bm{F}(\bm{p}) = \rho\Delta\bm{u}(\bm{p})$来修正$\bm{p}$点的流体速度。
+
+SI-IBM的一个优势是通过插值，固体边界的大速度梯度会被压制，从而提升稳定性。但是由于它需求有固体内部点参与计算，对于亚网格尺度的物体，SI-IBM并不适合。这一点在第\ref{sec:siga21}章中有更详细的说明。同时，在物体运动时，SI-IBM需要格点重填 (node refilling)，这会引入速度外插之外的新的误差。
+
+\subsection{简单反弹边界}
+简单反弹边界在LBM中同样有着重要的地位，不仅因为它是最早被应用在LBM中的边界处理方法之一，也因为其非常简洁的构造被广泛使用。对于未知的分布函数，简单反弹边界通过一个事实上的“反弹”来构造未知的分布函数：
+\begin{equation}\label{eq:bounce-back}
+f_{j}(\bm{x},t+1) = f_{j'}(\bm{x},t) - 6 w_{j}\rho\bm{u}_s \cdot \bm{l}_{j}\;,
+\end{equation}
+其中$j'$是与$j$相反的速度方向序号，即$\bm{l}_{j'}\!=\!-\bm{l}_j$；$w_j$是速度方向权重，$\bm{u}_s$是线段$\bm{x}_b$至$\bm{x}_b-\bm{l}_{j'}$与边界交点的速度。
+然而，简单反弹边界的简洁也带来了一些局限性。因为分布函数永远假设在速度方向的中间被反弹，这会产生较大的速度梯度与色散误差，并给高雷诺数湍流仿真带来很强的不稳定性。这一点同样在第\ref{sec:siga21}章中有更详细的说明。
+
+\begin{figure}[htb]
+    \centering
+      \includegraphics[width=0.75\columnwidth]{figures/bounce_back_scheme.png}
+    \bicaption{固体边界的简单反弹方法与锐利界面浸入边界法。在迁移过程中，固体边界附近的流体格点$\bm{x}_b$ (图中标为红色圆圈) 的一部分分布函数$f_{j'}$ (图中标为橘色箭头) 是未知的，因为格点$\bm{x}_b-\bm{l}_{j'}$在固体内部 (图中标为方框)，从而需要使用线段$\bm{x}_b$至$\bm{x}_b-\bm{l}_{j'}$与边界的交点 (图中标为绿色圆圈) 的速度$\bm{u}_s$来实现简单反弹边界处理，或$\bm{p}^\perp$与$\bm{p}'$点来实现锐利界面浸入边界处理。}{Simple bounce-back scheme and sharp-interface immersed boundary near fluid-solid boundary. During streaming, some of the distribution functions $f_{j'}$ (corresponding to the orange links) at the fluid node $\bm{x}_b$ (red circle) near a solid boundary are unknown, since the node at $\bm{x}_b-\bm{l}_{j'}$ is located inside the solid region (shown as boxes), requiring a bounce-back scheme using the velocity $\bm{u}_s$ of the boundary velocity at the intersection point (green circles) between the line segment from $\bm{x}_b$ to $\bm{x}_b-\bm{l}_{j'}$ and the solid boundary, or sharp-interface immersed boundary using $\bm{p}^\perp$ and $\bm{p}'$.}
+    \label{img:bounce_back_scheme}
+\end{figure}

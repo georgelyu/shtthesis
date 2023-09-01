@@ -500,3 +500,17 @@ f_{j}(\bm{x},t+1) = f_{j'}(\bm{x},t) - 6 w_{j}\rho\bm{u}_s \cdot \bm{l}_{j}\;,
     \bicaption{固体边界的简单反弹方法与锐利界面浸入边界法。在迁移过程中，固体边界附近的流体格点$\bm{x}_b$ (图中标为红色圆圈) 的一部分分布函数$f_{j'}$ (图中标为橘色箭头) 是未知的，因为格点$\bm{x}_b-\bm{l}_{j'}$在固体内部 (图中标为方框)，从而需要使用线段$\bm{x}_b$至$\bm{x}_b-\bm{l}_{j'}$与边界的交点 (图中标为绿色圆圈) 的速度$\bm{u}_s$来实现简单反弹边界处理，或$\bm{p}^\perp$与$\bm{p}'$点来实现锐利界面浸入边界处理。}{Simple bounce-back scheme and sharp-interface immersed boundary near fluid-solid boundary. During streaming, some of the distribution functions $f_{j'}$ (corresponding to the orange links) at the fluid node $\bm{x}_b$ (red circle) near a solid boundary are unknown, since the node at $\bm{x}_b-\bm{l}_{j'}$ is located inside the solid region (shown as boxes), requiring a bounce-back scheme using the velocity $\bm{u}_s$ of the boundary velocity at the intersection point (green circles) between the line segment from $\bm{x}_b$ to $\bm{x}_b-\bm{l}_{j'}$ and the solid boundary, or sharp-interface immersed boundary using $\bm{p}^\perp$ and $\bm{p}'$.}
     \label{img:bounce_back_scheme}
 \end{figure}
+
+\subsection{插值反弹边界}
+简单反弹边界的一个问题是只有边界在速度方向中点时，边界处理的精度才可达到二阶。边界处于其他位置时，边界处理的精度只有一阶。
+针对这一问题，插值反弹边界 (Interpolated bounce-back, IBB) 被提出~\cite{Bouzidi-2001}，通过考虑边界到格点的距离，进行分布函数的插值：
+\begin{equation}\label{eq:ibb_2001}
+    f_i(\mathbf{x}_B, t+1) = 
+    \begin{cases}
+        2 q f^{*}_{\bar{\imath}}(\mathbf{x}_B, t)+(1-2 q) f^{*}_{\bar{\imath}}(\mathbf{x}_{F}, t), & q < 0.5, \\
+        \frac{1}{2 q} f^{*}_{\bar{\imath}}(\mathbf{x}_B, t)+\frac{2 q-1}{2 q} f^{*}_i(\mathbf{x}_B, t), & q \geq 0.5,
+    \end{cases}
+\end{equation}
+其中$q=\|\mathbf{x}_B - \mathbf{x}_W\|/\|\bm{c}_i\|$是边界点到边界的正则化距离。
+
+在引入基于距离的插值后，反弹边界可以达到二阶精度，但是依然有一些问题。首先是公式~\ref{eq:ibb_2001} 引入了邻居点参与计算，对于GPU实现会降低数据访问效率。其次，当处理复杂外形的几何时，格点可能处于两个边界之间，导致找不到邻居点从而无法完成边界处理。最后，如第~\ref{sec:1_related_works_LBM} 节所介绍的，IBB在Bouzidi等~(\citeyear{Bouzidi-2001}) 后成为了一类方法，之后的工作提出了诸多不同的构造形式，甚至参数化的构造。这些不同的构造的性能与精度均有所区别。关于这一部分我们将在第\ref{sec:sig23}章中继续讨论。

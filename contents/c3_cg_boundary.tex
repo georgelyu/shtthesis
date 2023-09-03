@@ -151,39 +151,29 @@
 如果朝向不一致 (图~\ref{img:geometric-computing} (e) 即为此情况)，则我们认为$\bm{x}$点与$\bm{y}$点处于边界的不同侧，所以这个速度方向是与固体表面相交的。则我们应在这个方向上进行反弹边界处理。
 
 \subsection{GPU实现}
-% All of our algorithms so far, including geometric approximations, are designed to involve \emph{purely local computations} with relatively simple algebra. It results in an overall coupling approach that is straightforward to implement on a parallel computing platform such as a GPU for efficient simulation: it respects the embarrassingly parallel nature of LBM. Our simulation method is very scalable since it can run on either a single or multiple GPU(s) by leveraging the GPU optimization techniques presented in \cite{Chen-2021}; our examples are computed with only one GPU, except for a high-resolution simulation shown in Fig.~\ref{fig:result-city} where we used two GPUs instead. We discuss next a few specific accelerations and optimizations we incorporated in our GPU implementation in order to improve the overall performance for our two-way coupled simulations. \vspace*{-1mm}
+目前为止所描述的我们的算法，包括几何近似，我们都希望它们尽可能的简单，且只涉及局部计算。这样可以令GPU的实现较为简单直接，且有尽可能高的计算效率。在实现时我们应用了Chen等~(\citeyear{Chen-2021}) 中提出的加速技术，与一些针对我们算法设计的加速实现。这些实现方法在本节进行讨论。
 
-% \paragraph{Memory layout}
-% For LBM, a structure-of-arrays (SoA) memory layout is recommended to store discrete distribution functions $f_i$ of all grid nodes to improve cache utilization and thus improve performance~\cite{Chen-2021}. We follow this recommendation in our GPU implementation as our tests showed that the SoA layout is still the most efficient, even with our new coupling strategy. \vspace*{-1.5mm}
+\paragraph{存储布局}
+对于LBM来说，在并行时一般是按方向的。即先计算$f_0$，之后计算$f_1$、$f_2$、……，以此类推。在这种情况下数组结构体 (Structure-of-arrays, SoA) 是更好的存储布局，因为SoA结构可以提升缓存利用率，从而提升整体性能~\cite{Chen-2021}。我们在实现中也同样使用SoA布局。
 
-% \paragraph{Efficient collision evaluation}
-% Also discussed and demonstrated in~\cite{Chen-2021} was the computation of the inverse of the central-moment projection matrix $\bm{M}(\bm{u})$. They argued that this inverse should be computed analytically to preserve accuracy, but the algebraic expression is very lengthy and occupies many registers, resulting in low achieved GPU occupancy in practice.
-% However, we observed that if one performs an analytical LU decomposition~\cite{fei2018three} of $\bm{M}(\bm{u})^{-1}$, many elements of the resulting triangular matrices are very close to zero. Thus, we can discard those close-to-zero elements and employ the usual sparse matrix format to store the decomposed matrices, decreasing drastically the terms needed to compute the inverse. This does not influence accuracy (the reconstruction error is below machine accuracy), but significantly reduces the use of registers; the performance for parallel collision calculation is then three times faster on average compared to the implementation using~\cite{Chen-2021} on the same GPU. \vspace*{-1.5mm}
+\paragraph{快速碰撞计算}
+Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心矩投影矩阵$\bm{M}(\bm{u})$的逆矩阵$\bm{M}(\bm{u})^{-1}$计算问题。作者们在其中提到逆矩阵应该使用解析式进行计算来保证碰撞的精度。然而由于解析式非常复杂，在GPU计算时，会占用过多的寄存器，导致GPU占用率低。但是我们注意到，如果将$\bm{M}(\bm{u})^{-1}$的解析式进行LU分解~\cite{fei2018three}，分解后的三角矩阵中很多元素是非常接近于0的。所以我们可以将这些非常接近于0的元素置0，之后使用稀疏矩阵的数据格式进行存储。这样并不会影响整体计算的精度 (所造成的误差低于机器误差)，但是寄存器使用量可以大幅减少。在同样的GPU上进行测试，我们的碰撞过程的效率约是Chen等~(\citeyear{Chen-2021}) 中碰撞过程的三倍。
 
-% \paragraph{Parallel cut-cell point projection and identification}
-% Throughout all the stages of our hybrid coupling algorithm, a key operation is to project a cut-cell node onto the nearest solid boundary, which is approximated by searching for the nearest sample point on the solid boundaries.
-% While there are traditional
-% GPU implementations to achieve this task in parallel over cut-cell nodes, they often generate load imbalance and low GPU occupancy issues.
-% %as pointed out in~\cite{Chen-2021} for their case of a GPU-based immersed boundary method.
-% Thus, as suggested in \cite{Chen-2021}, we parallelize over solid samples instead --- but proceed differently to improve performance.
-% For each sample, we compute the distance to each node of the cut cell in which the sample is located (see Fig.~\ref{fig:geometric-computing} (f)) and compare with the distance stored in that node: if the distance of the sample to a cut-cell node is smaller than the current distance stored in that node, we update this distance with the new distance, and change the index of the solid sample stored along with that same node.
-% Since the same cut-cell node may be accessed from multiple solid sample threads, we employ an atomic comparison operation to avoid thread conflicts.
-% Note that Eq.~\eqref{eq:is_in_fluid} still needs to be satisfied for every comparison, so the identification of solid nodes is included in the process.
+\paragraph{并行的切削网格点识别与投影}
+我们在上一小节讨论了我们算法中的一个关键步骤是将切削网格点投影到物体表面，这一过程可以通过寻找距离该点最近的固体采样点来近似。一般这一过程会将流体边界点作为并行单元，来搜索距其最近的采样点。但是这样会造成GPU负载不均衡，从而降低GPU占用率。
+所以我们在这一过程中，将固体采样点作为并行单元。对于每一个采样点，我们计算该点到周围的切削网格点的距离 (见图~\ref{img:geometric-computing} (f))，并且比较这个距离与切削网格点当前记录的最近点的距离。如果距离更小的话则更新该采样点为最近点。因为多个线程可能会同时访问同一个流体点，这一过程需要使用原子比较计算。注意公式~\ref{eq:is_in_fluid} 依然需要满足，所以切削网格点状态可以被同时识别。
+这样的好处是，每个固体采样点附近一定存在切削网格点，并且数量接近。这样可以大幅提升GPU的负载均衡，减少无用的线程造成的线程开销，提升GPU占用率。
 
 \section{对比与仿真结果}
 \subsection{对比}
 此节中我们将我们的方法与图形学中近期提出的LBM仿真方法~\cite{Li-2020} 进行定量与定性的对比，包括与实际实验的对比。我们还针对计算效率，讨论基于Li等~\citeyear{Li-2020} 的性能改进~\cite{Chen-2021} 与我们方法的比较。
 
-% \paragraph{与图形学中现有方法的对比}
-% Recently, a kinetic solver demonstrated strong capabilities for fluid-solid two-way coupling with turbulent flows, employing a DI-IB method to treat solid boundaries~\cite{Li-2020}.
-% However, many limitations were acknowledged.
-% Since DI-IB method does not act in a one-sided manner, it exhibits flow penetration for obstacles of size equal or smaller than a grid cell.
-% Fig.~\ref{fig:comparison_with_ib} shows a comparison for a 3D jet flow shot onto a thin plate, where (a) \cite{Li-2020} creates an unexpected smoke flow on the other side of the plate as marked by the red box, while (b) our new method correctly enforces non-penetration through this thin structure.
-% Additionally, the low accuracy of the DI-IB method can fail to produce the right simulation result, especially for boundary layers around a solid object when the flow is turbulent.
-% %as a consequence, Li et al.~\shortcite{Li-2020} can in fact produce inaccurate qualitative results.
-% A clear and obvious example of this issue is the airflow simulation around a moving car model shown in Fig.~\ref{fig:comparsion_car_ib_ours}. As is well-known by car designers, a reasonable design for a car should induce a flow separation at the rear of the car to reduce aerodynamic drag, and the use of rear spoilers (or ``ducktails'') helps push the flow separation further away, as can be seen in Fig.~\ref{fig:comparsion_car_design} (d) in a real wind tunnel experiment. The DI-IB method of \cite{Li-2020} in this case predicts a boundary layer which separates at the top of the car, far too forward compared to the wind tunnel experiment; instead, our new boundary treatment method (for exactly the same grid resolution) reproduces the correct behavior.
-% To demonstrate further how a small, thin structure like a ducktail can affect the flow around a car, we also show in Fig.~\ref{fig:comparsion_car_design} that the absence of the rear spoiler changes dramatically the turbulence patterns witnessed behind the car: the spoiler thus acts as a wake generator, and sometimes lift reducer as well, to improve the maneuverability at high speed. These two examples both point to our method having an improved accuracy compared to the existing LBM methods in graphics.\vspace*{-1mm}
+\paragraph{与图形学中现有方法的对比}
+最近，Li等~\citeyear{Li-2020} 提出了一个基于动理学方法的双向流固耦合湍流求解方法，该方法使用DI-IBM处理固体边界。然而这一方法有一定的局限性。首先因为DI-IBM在边界两侧施加惩罚力，其在求解亚网格物体的流固耦合时，会有流体穿透的现象。图~\ref{img:comparison_with_ib} 展示了一个三维的喷射流打向一个薄板，其中图 (a) 使用了Li等~\citeyear{Li-2020} 的方法，并出现了不应该存在的流体穿透现象 (图中红框)。图 (b) 使用了我们的方法，没有产生类似的现象。
 
+另外，DI-IBM有精度不足的问题，使得在湍流仿真时得不到正确结果，尤其是在固体边界层上。我们对一个向前运动的汽车模型进行气流仿真来说明这一问题，见图~\ref{img:comparsion_car_ib_ours}。对于汽车外形来说，气流的分离点一般位于汽车尾部，并且可以通过扰流板等进一步影响尾流走向 (如图~\ref{img:comparsion_car_design} (d) 中的风洞实验)。但仿真结果显示，DI-IBM预测的边界分离点在车顶，完全不符合实际风洞实验，而我们的方法可以正确预测边界的分离点 (两次仿真除边界处理外使用同样的参数设置)。
+
+为了展示如扰流板这样的小且薄的结构对汽车周围流场的影响，我们还在图~\ref{img:comparsion_car_design}中展示了有或无扰流板时汽车流场的仿真结果。从结果中我们可以看到，在添加了扰流板后，汽车的尾流发生了明显的变化。扰流板破坏了车身尾部表面的气流，产生湍流的同时减少了车辆尾部的升力，从而提升了车辆在高速时的操控性。这两个例子展示出了我们的方法针对于计算机图形学中已有LBM方法的优势。
 \begin{figure}[htb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/result_thin_shell_sub_grid.png}
@@ -205,17 +195,9 @@
   \label{img:comparsion_car_ib_ours}
 \end{figure}
 
-% \paragraph{与实际实验的对比}
-% To further estimate the accuracy of our boundary treatment especially for thin structures, we conducted comparisons of our simulations with two real experiments.
-% In a first comparison, we simulated the airflow through a delta wing with a $75^\circ$ swept angle and for an angle-of-attack of $20^\circ$, as shown in Fig.~\ref{fig:comparison_delta_wing} (a). This well-known test case is expected to create stable spiral vortices above the wing to increase aerodynamic lift (the so-called ``vortex lift'' in aeronautics~\cite{anderson2010aircraft}, which has frequently been used in modern aircraft design such as the Concorde airplane for example in Fig.~\ref{fig:teaser}), as shown by the experimental visualization in Fig.~\ref{fig:comparison_delta_wing} (b) produced by \cite{Delery:2001}.
-% Our result matches the experimental results visually, producing similar spiral vortex structures.
-% In addition to phenomenological comparisons, we provide an additional quantitative evaluation of our method by simulating the aerodynamic flow of a rotating %DJI Mavic-2
-% rotor blade, where we recreated the shape of a real drone blade based on the geometric description provided in a recent patent~\cite{lin2020screw}.
-% We simulated the coupling using different rotating speeds, computed the resulting thrust values according to ~\cite{leishman_2016}, and compared our numerical approximations to the measurements given in the patent (which we assume to be accurate).
-% Fig.~\ref{fig:DJI_thrust_compare} (a) shows a plot of our thrust approximation error as the rotating speed increases, indicating good agreement with the experimental measurements even with a relatively coarse grid.
-% Note that a major reason for the increased error observed at higher rotating speed is that after rescaling, the effective viscosity in the LBM domain becomes so small that it reaches the limit of precision for 32-bit floating-point numbers, affecting the overall accuracy for collision; to retain accuracy for high rotating speed, double precision (64-bit) should be used instead.
-% We also conducted convergence tests of our thrust approximation at a fixed rotating speed but for increasing grid resolutions in
-% Fig.~\ref{fig:DJI_thrust_compare} (b), indicating consistency of our method.\vspace*{-1.25mm}
+\paragraph{与实际实验的对比}
+为了进一步验证我们方法在有亚网格物体时边界处理的精度，我们与现实世界中的实验进行对比。
+首先我们与三角翼的风洞实验进行比较。该三角翼的后掠角度为$75^\circ$，攻角为$20^\circ$ (见图~\ref{img:comparison_delta_wing} (a))。在实验中，三角翼上方会产生稳定的螺旋涡流结构，提升气动升力 (这种升力被称为涡升力~\cite{anderson2010aircraft})。这种结构被广泛使用于现代飞行器的设计中，如图~\ref{img:teaser_concorde} 中的协和客机。该实验的可视化可见图~\ref{img:comparison_delta_wing} (b)~\cite{Delery:2001}。我们的仿真结果在视觉上与实验结果相匹配，展示出相似的螺旋涡流结构。除去这一定性的对比实验，我们还对旋翼的气动性能进行了定量分析。我们参照一项最近的专利~\cite{lin2020screw} 中的描述重建了旋翼模型，并测量旋翼在旋转时的推力 (计算方法参照~\cite{leishman_2016})，与专利中的数据对比。图~\ref{img:DJI_thrust_compare} (a) 展示了不同转速下的计算误差，显示出较好的一致性。值得注意的是，随着转速的提升，相对误差会升高。这一点的主要原因是在LBM中，随着参照速度的提升，LBM空间下粘度在不断减小，以至于我们在测试时使用的32位浮点数已无法有效保证碰撞过程的计算精度。我们还对收敛性进行了测试，即在固定转速下提升分辨率，结果可见图~\ref{img:DJI_thrust_compare} (b)。这一结果显示了我们方法误差随分辨率的收敛性。
 
 \begin{figure}[htb]
   \centering
@@ -224,9 +206,8 @@
   \label{img:comparison_delta_wing}
 \end{figure}
 
-% \paragraph{性能对比}
-% As demonstrated in~\cite{Li-2020} and \cite{Chen-2021}, a kinetic solver has much higher computational performance than NS solvers, especially for turbulent flows with coupling where relatively small time steps are required.
-% Since our new kinetic solver is built upon the same framework, we retain this competitive advantage even when their DI-IB boundary treatment is replaced by our hybrid method. However, because of our hybrid boundary treatment and new GPU optimizations discussed in Sec~\ref{sec:GPUopt}, we actually exceed their performance at all grid resolutions (using the same NVIDIA GeForce RTX 3090 GPU for fairness of comparisons) as shown in Fig.~\ref{fig:Performance}. Two factors are responsible for this improved computational efficiency: profiling the two codes shows, as expected, that our simplification of the collision operator via analytical LU decomposition~\cite{fei2018three} improves GPU occupancy, and that our hybrid coupling treatment with sample-based geometric approximations, despite being more accurate in practice, involve less computations with reduced penalty forces (less stiffness) than the original DI-IB method, thus allowing larger time steps for faster simulations. \vspace*{-1mm}
+\paragraph{性能对比}
+在Li等~(\citeyear{Li-2020}) 与Chen等~(\citeyear{Chen-2021}) 中，作者已经通过对比，说明了动理学方法的计算效率是显著优于N-S方法的。这种优势在湍流流固耦合仿真中更加明显，因为需要的时间步长更小。由于我们的方法与这些工作的框架相同，结合上述的各项优化，使得我们的方法在性能上更有优势。我们在同一张NVIDIA RTX 3090 GPU上，进行了多个分辨率的对比，结果显示我们的方法在所有的分辨率上都有显著提升 (见图~\ref{img:Performance})。通过代码性能分析，我们分析出两个使性能得以提升的主要因素：第一个是基于LU分解的碰撞运算符简化~\cite{fei2018three} 显著提升了GPU占用率，第二个是使用了几何近似优化之后，我们的混合边界处理比起之前工作使用的DI-IBM，计算量要更小。这两点使得我们的GPU计算效率得以提升。
 
 \begin{figure}[htb]
   \centering
@@ -238,13 +219,12 @@
 \begin{figure}[htb]
   \centering
     \includegraphics[width=0.93\columnwidth]{figures/performance.png}
-  \bicaption{性能对比。我们将我们的方法 (绿色) 与Li等~(\citeyear{Li-2020})、Chen等~(\citeyear{Chen-2021}) 中的动力学求解方法 (红色) 进行比较，比较用例为图~\ref{img:comparsion_car_ib_ours} 中所示的汽车仿真，仿真时长为1秒。在同一张NVIDIA RTX 3090 GPU上得到的测试结果显示我们的方法在所有分辨率上都有显著的性能提升。}{Performance comparison. We compare the efficiency of the kinetic solver from~\cite{Li-2020,Chen-2021} (red) with our kinetic solver (green) based on one second of simulation of the car model shown in Fig.~\ref{img:comparsion_car_ib_ours} and both executed on a same NVIDIA RTX 3090 GPU, showing significant performance improvement for all grid resolutions.}
+  \bicaption{性能对比。我们将我们的方法 (绿色) 与Li等~(\citeyear{Li-2020})、Chen等~(\citeyear{Chen-2021}) 中的动理学求解方法 (红色) 进行比较，比较用例为图~\ref{img:comparsion_car_ib_ours} 中所示的汽车仿真，仿真时长为1秒。在同一张NVIDIA RTX 3090 GPU上得到的测试结果显示我们的方法在所有分辨率上都有显著的性能提升。}{Performance comparison. We compare the efficiency of the kinetic solver from~\cite{Li-2020,Chen-2021} (red) with our kinetic solver (green) based on one second of simulation of the car model shown in Fig.~\ref{img:comparsion_car_ib_ours} and both executed on a same NVIDIA RTX 3090 GPU, showing significant performance improvement for all grid resolutions.}
   \label{img:Performance}
 \end{figure}
 
-% \subsection{仿真结果}
-% All simulations presented in this paper were conducted with our fluid simulator platform, on a workstation with a 14-core Intel Xeon E5-2690 CPU, 128 GB of memory and up to two NVIDIA RTX 3090 GPUs.
-% We tested a number of different one-way and two-way examples and configurations with a wide range of geometric complexity to demonstrate that we can simulate fluid-solid coupling with both thick and thin solid structures, and for both laminar and turbulent flows. We also show a spectrum of results covering an interactive simulation as well as offline high-resolution large-scale simulations with complex solid structures to illustrate scalability. We discuss each example below (available in the \textit{supplementary video}).
+\subsection{仿真结果}
+下面我们展示一些列的仿真结果。这些仿真结果都于一个14核Intel Xeon E5-2690 CPU、128 GB内存、NVIDIA RTX 3090的工作站上运行得到。我们通过一系列的单向与双向流固耦合算例，对一系列的复杂几何进行测试，以显示我们的方法处理不同类型物体的能力。我们还展示了一些可交互的仿真、与离线的高分辨率大规模仿真。
 
 \begin{figure}[htb]
   \centering
@@ -267,22 +247,28 @@
   \label{img:teaser_concorde}
 \end{figure}
 
-% \vspace*{-1mm}
-% \paragraph{Coupling with thin shells}
-% We first simulate a simple thin shell in the shape of a cylinder rotating at a constant speed, and thus generating a shear flow, see Fig.~\ref{fig:result-tube}; this setup computed at low Reynolds number (high viscosity) exhibits a very different behavior from its high Reynolds number (low viscosity) counterpart, as expected.
-% A case where multiple thin shells are piling up is also tested, see Fig.~\ref{fig:result-thin-shell-sub-grid}, where the plates are first well separated, before getting stacked up. Here, our sub-grid approximation produces plausible coupling results, with a seamless transition between separate plates early on and an airtight block of plates by the end of the animation: our method degrades gracefully in the presence of obstacles that it cannot be resolved by the grid. A two-way coupling example in Fig.~\ref{fig:result-blowing-leaves} shows dried-up leaves (each far thinner than a grid cell size) being blown by an upward gust of wind. As expected, the dead leaves are lifted up by the air flow, and fall back slowly on the ground while being rotated by the surrounding air.
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/result_tube.png}
+  \bicaption{旋转的薄圆柱面。一个薄圆柱面分别在高粘度 (顶图) 与低粘度 (底图) 流体中绕轴旋转。在圆柱面内部和外部分别有烟雾粒子对流场进行可视化 (内部为蓝色，外部为红色)。左图与右图分别展示仿真在4s与7s后的烟雾形态。}{Rotating cylindrical thin shell. A cylindrical thin shell rotating around its axis in a very high (top) and very low viscosity (bottom) fluid respectively, where smoke particles scattered inside (blue) and outside (red) the thin-shell cylinder are advected in the flow (left: after 4 seconds; right: after 7 seconds) to demonstrate that boundary layers are well resolved.}
+  \label{img:result-tube}
+\end{figure}
 
-% \vspace*{-1mm}
-% \paragraph{Coupling with thin rods}
-% We also show that our solver can handle thin rods, first with a simple example where a thin ring-like object rotates with a constant speed in the air. Our boundary treatment method generates a reasonable turbulent wake flow, see Fig.~\ref{fig:result-rotating-torus}.
-% When several rods are grouped together, our sub-grid approximation still creates visually plausible coupling results as demonstrated in Fig.~\ref{fig:result-thin-rod-sub-grid}; note the increased amount of turbulent flows near the solid boundary as well as in the wake due to the addition of bristles.
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/result_thin_rod_sub_grid.png}
+  \bicaption{发梳仿真。一个包含着上百根硬毛地发梳 (左图) 在旋转的同时从左向右平移，带动周围气流运动。与有硬毛的情况 (右图) 相比，没有硬毛时的发梳 (中图) 运动产生的尾流更加平滑，涡旋也更大。这个结果展示了我们的边界处理方法，包括亚网格近似，处理复杂几何的能力。}{Hair brush. The translating and rotating motion of a hair brush containing hundreds of bristles (left) creates fine vortices in its wake as well as around the bristles (right) as evidenced by the evolution of the smoke passing around it, properly capturing the intricate fluid-solid interaction engendered by this complex geometry. Compared to the coupling with bristles (right), the smoke near the hair brush without bristles (middle) is much smoother, and the wake flows contain relatively large vortices, indicating the efficacy of subgrid approximation in handling such complex solid shapes.}
+  \label{img:result-thin-rod-sub-grid}
+\end{figure}
 
-% \vspace*{-1mm}
-% \paragraph{Coupling with complex solid}
-% A more complicated, yet very common case is when both thick and thin structures form a complex solid shape that interacts with a fluid.
-% Our hybrid boundary treatment method is an efficient and unified approach to supporting such cases. Indeed,
-% Fig.~\ref{fig:result-wind-turbine} shows the two-way coupling simulation of a three-blade wind turbine where the air flow blows through the turbine to drive its rotating motion, and in turn, the air flow gets affected by the motion. Additionally,
-% Fig.~\ref{fig:teaser_concorde} shows a simulation of the Concorde airplane flying in the air with an angle of attack of $20^\circ$; for such a complex shape and for a reasonable grid size, many of the plane's parts (in particular near the wings) are thin structures. In both cases, the results are consistent with expectations.
+\paragraph{与薄板的耦合}
+我们首先构造一个薄圆柱面，使得厚度远小于网格大小，之后令圆柱面旋转，产生剪切流 (见图~\ref{img:result-tube})。我们在低雷诺数 (高粘度) 与高雷诺数 (低粘度) 分别进行了测试，并展示出完全不同的流场特性。我们还测试了多个薄板相叠的算例。这些薄板最初是分开的，之后逐渐叠落在一起。我们的亚网格近似使得我们的方法可以仿真从起初分离的薄板到叠在形成一个固体的整个过程，而无需任何调整。结果可见图~\ref{img:result-thin-shell-sub-grid}。我们最后展示一个双向耦合的结果，仿真一阵风从地面吹起树叶的过程。树叶一开始被风吹起后，缓慢地落回地面，并因风产生旋转。结果可见图~\ref{img:result-blowing-leaves}。
+
+\paragraph{与细棒的耦合}
+下面继续展示我们的求解器对细棒耦合的仿真结果。我们先展示一个环状物体在空气中定速旋转的结果，其直径远小于网格大小，见图~\ref{img:result-rotating-torus}。我们还对多个细棒组合在一起时的情况进行仿真，结果见图~\ref{img:result-thin-rod-sub-grid}。注意当固体表面有硬毛时，尾流的湍流程度有显著的差别。
+
+\paragraph{与复杂物体耦合}
+一个更复杂但非常常见的情况是厚物体与薄物体同时存在，并共同构成一个复杂物体。我们的边界处理可以有效并统一地处理这种情况。图~\ref{img:result-wind-turbine} 展示了通过风带动一个三扇叶风力涡轮机模型旋转的仿真结果。这里风在带动扇叶旋转的同时，扇叶也影响空气流动，展现了我们方法处理复杂物体的双向耦合。图~\ref{img:teaser_concorde} 展示了协和式客机以攻角20度姿态在空中飞行的仿真结果。对于飞机这样的复杂物体，许多部件对于网格都是亚网格大小的，尤其是机翼部分。在这两次仿真中，得到的结果都与期望相符。
 
 \begin{figure}[htb]
   \centering
@@ -291,10 +277,8 @@
   \label{img:result-blowing-leaves}
 \end{figure}
 
-% \vspace*{-1mm}
-% \paragraph{Fast simulation for interactive design}
-% Our fluid-solid coupling simulator is particularly efficient given its high level of parallelism, which allows for interactive testing of product design even with a single GPU. As an example, an interactive simulation conducted with a $200\!\times\!200\!\times\!200$ grid resolution for a fast rotating blade is performed in Fig.~\ref{fig:result-design}, where a cross-sectional magnitude plot of the velocity field of the surrounding air is displayed.
-% One frame corresponding to an animation of 1/100 s. is computed in less than $0.4$ second including the data read-back and visualization time (cross-section visualization is currently done on CPU), meaning that a preliminary design of the blade can be quickly evaluated, e.g., for turbulence reduction by optimizing the geometric shape. Our supplementary video contains a recording of the whole user interaction on our simulation platform for this example, captured in real time.
+\paragraph{快速仿真以进行交互式设计}
+我们的流固耦合算法可足够高效，以进行交互式产品设计与测试。作为示例，我们在$200\!\times\!200\!\times\!200$分辨率下对一个旋翼旋转的情况进行仿真。图~\ref{img:result-design} 展示了仿真中的速度场截面。完成1/100 s的仿真所需的计算时间为0.4 s。这个时间包括数据的读取与可视化 (截面可视化在CPU上完成)。这意味着类似旋翼这类的产品可以使用我们的算法进行快速的气动性能评估，并可基于此优化设计。
 
 \begin{figure}[htb]
   \centering
@@ -310,19 +294,21 @@
   \label{img:DJI_thrust_compare}
 \end{figure}
 
-% \paragraph{High-resolution simulations}
-% Finally, we simulate a high-resolution large-scale scenario to demonstrate the scalability of our approach, using this time two GPUs.
-% Fig.~\ref{fig:result-city} shows a mass of smoke particles passing through a neighborhood of a high-rise, high-density city, where the buildings containing thin and sharp structures affect the air flow. For this very large-scale example with fine turbulence details, 5 seconds of animation took only around 1.5 hours to compute; as discussed in detail in~\cite{Li-2020}, such an efficiency for this level of accuracy is currently out of reach for NS-based solvers even with multi-GPU accelerations: their pressure projection and implicit viscosity handling require accurate matrix solves that are too time consuming if realistic vortical structures are desired.
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/result_city.png}
+  \bicaption{气流经过城市街区的高分辨率仿真。我们对气流经过城市街区进行高分辨率仿真 (($889\times333\times556$))，建筑中包含诸多细且尖锐的结构。一层相对薄的烟雾从左侧注入，在建筑间产生涡流细节。}{High-resolution simulation of airflow through a city neighborhood. We simulate the airflow passing around and over buildings using a high resolution grid ($889\times333\times556$), where the buildings contain both thin and sharp structures. A layer of smoke particles with relatively small thickness is coming from the left, creating fine vortical structures behind and in between the buildings.}
+  \label{img:result-city}
+\end{figure}
 
-% \section{方法的局限性}
-% Despite its excellent numerical results and increased generality, our method still suffers from limitations.
-% First, due to our sample-based geometric representation, the approximate bounce-back scheme may have undesired behavior at extremely sharp corners, for example, at the tip of a delta wing, since the projection achieved via the nearest available sample may not be accurate.
-% Increasing sample size or using adaptive sampling can improve the accuracy, but at a cost of more memory usage.
-% For visual applications, however, the resulting animations are not particularly different, so this issue mostly matters for the rapid testing of product design.
-% Second, our total force and torque applied to the solid resulting from our two-way coupling approach inherit the typical limitation of a staircase approximation of the solid boundary on grid: for coarse grids, our proposed sub-grid approximation cannot faithfully reflect the true geometry, affecting the accuracy of the force and torque on solid.  Finally, an efficient sampling method that can adjust to a deforming geometry is currently needed.
+\paragraph{高分辨率仿真}
+最后，我们展示一个高分辨率的大规模仿真结果，来展示我们方法的可扩展性。该仿真使用两个GPU同时计算，展示了大量烟雾穿过一个高密度城市街区的场景 (见图~\ref{img:result-city})。场景中包含诸多细且尖锐的物体对尾流产生影响。对于这样的大场景湍流仿真，5 s的仿真所需的计算时间为1.5小时左右。正如Li等~(\citeyear{Li-2020}) 所讨论的，达到这样的仿真效率对于N-S方法来说是十分困难的，即使同样使用多GPU进行加速。主要原是N-S方法中压力场求解这一步需要求解全局的线性方程组，在高分辨率下会严重影响计算效率。
 
-% \section{总结}
-% In this paper, we proposed a hybrid coupling treatment for kinetic solvers that enables robust, fast and plausible handling of a large variety of obstacle shapes including both thick and thin structures. Our approach leverages the complementary advantages of the bounce-back scheme and the sharp-interface immersed boundary method by introducing a novel unified approach: it consists of a double-sided bounce-back treatment followed by a one-sided velocity correction, together with a hybrid boundary force and torque calculation to enable two-way coupling.
-% Efficient geometric approximations based on boundary point-samples (along with their parallel implementations on GPU) were proposed to improve computational performance, and further improvements in the GPU implementation of existing LBM solvers were also offered.
-% The resulting simulator was shown to exceed the accuracy of existing state-of-the-art solvers, to further improve on their efficiency, and to capture the correct physical behavior of complex fluid-solid interactions even for very turbulent flows.
-% A wide range of simulation results with different types of immersed boundary shapes were demonstrated, followed by comparisons to other coupling methods as well as physical experiments to show the potential applicability of our method in both efficient visual production and fast computational design. This capacity to rival both CG-based and CFD-based fluid methods in efficiency and accuracy is particularly promising, and we hope it will lead to a variety of follow-up works in both communities.
+\section{方法的局限性}
+虽然我们的方法展示出了优秀的通用性与数值结果，我们的方法依旧有一定的局限性。
+首先，由于我们使用了基于采样点的几何计算近似，当固体包含尖角的时候，是否需要应用反弹边界可能发生误判。增加采样点数量或使用自适应采样可以提升精度，但是也会同时提升显存需求。第二，对固体所受的力和力矩的计算也受制于对固体外形的近似。如我们的亚网格近似无法真实反应物体的几何形状，会影响固体受力计算的精度。最后，对于可变形的物体，我们的方法需求一个更高效的采样方法，以每帧更新物体表面的采样点。
+
+\section{总结}
+在本章中，我们提出了一个基于动理学方法的混合边界处理方法，以处理在流固双向耦合。我们的方法可以有效、统一地同时处理厚、薄物体，并可以稳定、快速地完成仿真，得到视觉上可信的结果。我们的方法充分利用了反弹边界与尖锐界面浸没边界法优点的互补性，包含双面反弹边界处理与单边的速度修正，与双向耦合所需的固体受力计算。
+我们基于边界采样点提出了高效的几何近似算法与对应的GPU并行实现，以提升整体计算效率。我们的方法在效率与精度上都超越了现有的计算机图形学中的LBM算法，并在强湍流中依然可以捕捉到正确的物理现象。
+我们展示了我们的方法与其它方法和实际实验的对比，和一系列的仿真结果，包括不同的几何形状在流体中的单向或双向耦合仿真，及我们的方法在快速交互式设计中的应用。

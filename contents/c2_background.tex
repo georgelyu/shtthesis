@@ -327,6 +327,7 @@ P_{\alpha \beta}^{n e q}=\underbrace{-\rho c_{s}^{2} \tau\left(\frac{\partial u_
 
 % Sec 2.5
 \section{累积量碰撞模型}
+\label{sec:cumulant}
 在第~\ref{sec:2_LBM_origin} 节的末尾，我们介绍了LBM中的BGK碰撞模型 (即单松弛时间模型) 与多松弛时间模型出现的动机，并在第~\ref{sec:1_related_works_LBM} 节中介绍了基于不同量的MRT模型。在这些碰撞模型中，累积量碰撞模型相比其它模型 (原始矩、中心矩等) 有着遵守伽利略不变性、自由度耦合程度低、超黏度 (hyper-viscosity) 误差更小的优势，所以我们将基于累积量碰撞模型进行改进。在这里我们先简要的介绍累积量碰撞模型本身。
 
 不同的碰撞模型的本质是在探索什么量可以最优地描述分布函数，我们称这些量为可观察量 (observable variables)。在累积量方法中，不同累积量之间是统计独立的 (statistically independent)，也就是说，两个累积量的联合概率等于各自概率的积。为了推导出累积量，我们先将分布函数$f$转换到频率空间$F$中，这样便于我们进行泰勒展开。到频域的变换由拉普拉斯变换 (Laplace transform) 完成：

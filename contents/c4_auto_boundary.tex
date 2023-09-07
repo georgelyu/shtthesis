@@ -156,6 +156,21 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 为了保证在薄边界层上保证更高的精度，在动态耦合时，我们依赖于上述的静态边界处理方法，不同点是现在各个切削速度方向的$\bm{u}_w$都需要求解。并且我们依然使用\emph{浸没}的模式来处理边界，以避免格点重填。即所有的格点我们都认为是流体点，没有固体点。当然我们注意到，要在每个时间步都进行求交并求解边界的速度，通常需要进行层级搜索~\cite{Karras-2012}，而当分辨率非常高时，在GPU上进行这样的操作非常耗时。
 于是我们提出了相应的GPU实现，以减轻求交与动态耦合的计算开销。这些算法我们在第 \TODO{XXX} 章中介绍。
 
+\paragraph{计算域边界处理}
+在固体边界之外，还有一些边界也需要进行处理，其中一类就是计算域边界。计算域的边界同样对仿真得到的物理量有很大影响。我们在实现时使用了滑移边界条件 (slipping boundary conditions) 来处理入口与出口之外的计算域边界。虽然有多种方法可以实现滑移边界~\cite{Kruger-2016}，这些方法的精度不足以在强湍流中准确求解计算域边界处的流体，并会对物体附近的流体产生影响。于是我们需要扩大计算域来减轻其影响，但这样会额外增加仿真的时间和存储成本。
+为了弥补这一问题，我们在计算域边界首先采用$\bm{u}_w \!=\! \bm{u}_n$的边界条件，其中$\bm{u}_n$是沿着计算域边界法向方向，距边界最近的流体点的速度。
+然后使用这一边界速度，我们将计算域边界视为动态边界并使用上述方法进行处理。同样的处理也可以应用在计算域的入口或出口上。在已知速度或压力后，未知的分布函数可用同样的边界处理方法获得。我们通过这样的处理，避免计算域边界对计算域内部产生过大的影响。
+
+\paragraph{地面处理}
+由于虚拟风洞中的实验经常要与现实风洞实验相对应，很多时候模型会被放置在地面上。此时由于地面与模型距离非常接近，地面的边界处理对精度有着非常大的影响。所以在模型被放置在地面时，我们不能认为地面是普通的计算域边界，而要进行特殊处理。我们这里的特殊处理方法使用了壁面函数~\cite{Malaspinas-2014}，即通过地面上方的格点与壁面函数，推导出地面速度$\bm{u}_g$。而地面的密度可以认为与地面上方的点一致 (即诺伊曼边界条件$\nabla \rho \cdot \bm{n} \!=\! 0$)。具体的宏观量推导过程由于篇幅限制，无法按步骤详细列出，请读者参见参考文献~\cite{Malaspinas-2014}。
+在获得地面的宏观量之后，我们重建未知的分布函数$\smash{f_i \!=\! f_i^{eq} + f_i^{neq}}$，其中
+\begin{align} 
+    f_i^{eq} &\approx w_i \rho_g+\biggl(1+\frac{\bm{c}_i \cdot \bm{u}_g}{c_s^2}+\frac{\left(\bm{c}_i \cdot \bm{u}_g\right)^2}{2 c_s^4}-\frac{\bm{u}_g \cdot \bm{u}_g}{2 c_s^2}\biggr), \\
+    f_i^{neq} &\approx -\frac{\tau \rho_g \omega_i}{2 c_s^2} \langle \bm{Q},  \nabla \bm{u}_g + \nabla \bm{u}_g ^ T \rangle,\\[-6mm]\nonumber
+\end{align}
+这里面$\smash{Q_{\alpha\beta} = c_{i\alpha} c_{i\beta} - c_s^2\delta_{\alpha\beta}}$ ($\delta_{\alpha\beta}$是克罗内克 (Kronecker) $\delta$函数)。
+使用这样的壁面函数处理地面，在高雷诺数流体仿真中，依然不足以获得足够高精度的解。原因是地面可能与模型本身形成一条窄缝 (想象汽车在地面上时，底盘与地面之中的间隙)，在这种情况下流体的运动情况很难被现有的LBM准确捕捉。我们注意到类似情况的边界处理仍然是热门的研究课题，所以在这一方向若有后续工作可以对地面处理部分进行改进。
+
 \paragraph{固体受力计算}
 对于上述的边界处理，我们依然可以用动量交换法计算固体受力~\cite{Ladd-1994, Mei-2002}，即对于边界点$\bm{x}$有
 \begin{equation}
@@ -173,8 +188,7 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 
 然而，我们已经讨论过，许多传统的基于有限体积法的N-S求解器均需要非结构化网格。对于工业精度的几何模型，构建这样的网格是十分耗时的。虽然针对非结构化网格，有自动化的网格构建方法，但是由于模型的高复杂性，网格中产生空洞或尖角的情况依然无法避免，这些会导致FVM的求解最后无法收敛。而对模型的检查、修复需要专业工程师的人工努力，这对实际工业设计中的效率有很大影响。
 
-在LBM的文献中，多分辨率网格方法一般都基于八叉树的数据结构~\cite{EitelAmor-2013,Hasert-2014}，但是要在GPU上完成高效且可扩展的实现是十分复杂的~\cite{Schornbaum-2016, Schornbaum-2018}.
-Instead, we propose a fully automatic block-based multiresolution grid construction method for our LBM fluid simulator that is better adapted to efficient GPU implementation and can handle flows through extremely complex structures as described next.
+在LBM的文献中，多分辨率网格方法一般都基于八叉树的数据结构~\cite{EitelAmor-2013,Hasert-2014}，但是要在GPU上完成高效且可扩展的实现是十分复杂的~\cite{Schornbaum-2016, Schornbaum-2018}。而我们提出了新的全自动网格构建算法，以支持十分复杂的几何模型与更简单、高效的GPU实现。下面我们描述该算法的具体过程。
 
 % \paragraph{Multiresolution grid construction}
 % Grid refinement is often guided by different criteria, among which incoming flow direction and distance to a model~\cite{Sandoval-2012,Li-2019} are arguably the most common choices.

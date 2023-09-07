@@ -132,7 +132,7 @@ f_{i}^\text{neq}(\bm{x}_b, t) = f_{i}(\bm{x}_b, t) - f_{i}^\text{eq}(\bm{u}_b, t
 \label{eq:neq_bb}
 f^\text{neq}_{i}(\bm{x}_b, t\!+\!1) = f^\text{neq}_{\bar{i}}(\bm{x}_b, t).
 \end{equation}
-对于平衡态部分，我们可以采用与Tao等~\citeyear({Tao-2018-b}) 同样的二阶精度单点插值方法
+对于平衡态部分，我们可以采用与Tao等~(\citeyear{Tao-2018-b}) 同样的二阶精度单点插值方法
 \begin{align}
 f^\text{eq}_i(\bm{x}_b, t\!+\!1) &= \frac{1}{1+q}f^\text{eq}_{i}(\bm{x}_w, t\!+\!1) + \frac{q}{1+q}f^\text{eq}_{i}(\bm{x}_a, t\!+\!1).
 \end{align}
@@ -231,8 +231,9 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 % This process is applied recursively from the coarsest grid to the finest grid in a cascaded serialized manner.
 % Fig.~\ref{fig:vis_building} for instance shows an instantaneous macroscopic velocity field cross-section from the simulation of the same architecture model from Fig.~\ref{fig:grid_construction} using this interpolation approach.
 
-% \begin{figure}[t] %\vspace*{0mm}
-% 	\centering \includegraphics[width=0.55\columnwidth]{images/propagation}\vspace*{-3mm} 
-% 	\caption{\textbf{Propagation of valid fluid nodes.} To find and tag all valid fluid nodes, we start from an already known fluid node, e.g., node $\bm{p}$ in 2D, then we check its immediate neighbors to see whether a link intersects a boundary. If no intersection is detected (e.g., link $\bm{p}\bm{q}$), the untagged node $\bm{q}$ is tagged as a new valid fluid node. This process repeats in a bread-first search order, enabling internal regions to be connected to the external fluid region.  \vspace*{-3mm}}
-% 	\label{fig:propagation}
-% \end{figure}
+\begin{figure}[htb]
+    \centering
+      \includegraphics[width=0.7\columnwidth]{figures/propagation.png}
+    \bicaption{固体附近的边界处理。对于切削网格点 (图中标为橘色)，它们的未知分布函数必须要通过边界处理决定。图中黄色点为固体内部点，青色点为流体点。对于$\bm{x}_b$点，$q$表达该点沿$\bm{c}_i$方向到边界的正则化距离，其中$\bm{c}_{\bar{i}}$为$\bm{c}_i$的反方向。}{Propagation of valid fluid nodes. To find and tag all valid fluid nodes, we start from an already known fluid node, e.g., node $\bm{p}$ in 2D, then we check its immediate neighbors to see whether a link intersects a boundary. If no intersection is detected (e.g., link $\bm{p}\bm{q}$), the untagged node $\bm{q}$ is tagged as a new valid fluid node. This process repeats in a bread-first search order, enabling internal regions to be connected to the external fluid region.}
+    \label{img:boundary}
+  \end{figure}

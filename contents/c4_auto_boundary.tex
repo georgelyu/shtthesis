@@ -167,13 +167,14 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 \end{equation}
 注意因为我们使用了浸没的思想，所以所有的切削网格点都应被视为边界点。
 
-% \subsection{Multiresolution simulation}
-% \label{sec:multi-res}
-% Running the simulation framework we described up to now on a single LBM grid would be enough for most CG applications looking to efficiently capture a fluid flow over relatively simple geometric models for visual purposes. But in an engineering context, a virtual wind tunnel must accommodate large domains (typically of size 40m$\times$20m$\times$20m for a 16-foot car model) with a constraint on resolving geometric details as small as 3mm typically to capture small-scale flow features well enough to ensure an accurate evaluation of key physical quantities. A single grid would thus have to be impractically large to fit these requirements, creating an unacceptable wall-clock time and memory storage for simulation. 
-% Multiresolution simulation is thus an indispensable ingredient of a physically-accurate fluid simulator for engineering design, and grid refinement has thus been systematically adopted in most industrial simulators~\cite{Hou-2019,Aultman-2022,Romani-2022}.
-% However, as argued before, many traditional FVM-based NS solvers usually require body-fitted unstructured meshes, for which a versatile and fully automatic mesh construction algorithm is extremely challenging to generate due to the complex geometry (and sometimes, topology) of the prototypes.
-% In the LBM literature, multiresolution methods often employ octree-based grid data structure~\cite{EitelAmor-2013,Hasert-2014}, but their GPU implementations are quite involved~\cite{Schornbaum-2016, Schornbaum-2018}.
-% Instead, we propose a fully automatic block-based multiresolution grid construction method for our LBM fluid simulator that is better adapted to efficient GPU implementation and can handle flows through extremely complex structures as described next.
+\subsection{多分辨率仿真}
+\label{sec:multi-res}
+如果我们在单分辨率网格上应用上述的算法，对于CG领域的应用应该足够。因为一般CG中的物体模型较为简单，且我们只需捕捉视觉现象。但应用于工程领域，虚拟风洞需要被应用至非常大的场景 (一般对于4m左右长度的汽车模型需要40m$\times$20m$\times$20m的计算域)，且几何模型的精度需要有3mm或更高的解析度，以捕捉到足够小的流体特征。这些特征也许对湍流本身的视觉效果来说没有明显改变，但是它们对物理量的大小有关键的影响。使用单分辨率网格进行这样高分辨率的仿真无论从仿真时间或存储需求考虑，都是不切实际的。所以显然多分辨率网格在工业领域流体仿真应用中是不可或缺的~\cite{Hou-2019,Aultman-2022,Romani-2022}。
+
+然而，我们已经讨论过，许多传统的基于有限体积法的N-S求解器均需要非结构化网格。对于工业精度的几何模型，构建这样的网格是十分耗时的。虽然针对非结构化网格，有自动化的网格构建方法，但是由于模型的高复杂性，网格中产生空洞或尖角的情况依然无法避免，这些会导致FVM的求解最后无法收敛。而对模型的检查、修复需要专业工程师的人工努力，这对实际工业设计中的效率有很大影响。
+
+在LBM的文献中，多分辨率网格方法一般都基于八叉树的数据结构~\cite{EitelAmor-2013,Hasert-2014}，但是要在GPU上完成高效且可扩展的实现是十分复杂的~\cite{Schornbaum-2016, Schornbaum-2018}.
+Instead, we propose a fully automatic block-based multiresolution grid construction method for our LBM fluid simulator that is better adapted to efficient GPU implementation and can handle flows through extremely complex structures as described next.
 
 % \paragraph{Multiresolution grid construction}
 % Grid refinement is often guided by different criteria, among which incoming flow direction and distance to a model~\cite{Sandoval-2012,Li-2019} are arguably the most common choices.

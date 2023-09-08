@@ -190,50 +190,252 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 
 在LBM的文献中，多分辨率网格方法一般都基于八叉树的数据结构~\cite{EitelAmor-2013,Hasert-2014}，但是要在GPU上完成高效且可扩展的实现是十分复杂的~\cite{Schornbaum-2016, Schornbaum-2018}。而我们提出了新的全自动网格构建算法，以支持十分复杂的几何模型与更简单、高效的GPU实现。下面我们描述该算法的具体过程。
 
-% \paragraph{Multiresolution grid construction}
-% Grid refinement is often guided by different criteria, among which incoming flow direction and distance to a model~\cite{Sandoval-2012,Li-2019} are arguably the most common choices.
-% We thus designed our automatic multiresolution grid construction algorithm around these two factors.
-% Given an axis-aligned bounding box (AABB) of the model, we first extend it by a certain distance $d^*$ representing the boundary layer thickness determined by the Reynolds number, in order to form a larger box-shaped region labeled $\Omega_n$ --- see the red box in Fig.~\ref{fig:grid_construction}.
-% From the whole simulation domain $\Omega$, we then define the pure flow region $\Omega_f \!=\! \Omega \setminus \Omega_n$.
-% Inside $\Omega_f$, we construct our multiresolution data structure based solely on the direction of the incoming flow by using axis-aligned grids of power-of-two resolutions which partially overlap (to ease grid transition); i.e., we go from coarse at the domain boundary to finest at $\Omega_n$ by ensuring that each uniform grid level is twice as fine as its parent while being offset from the center $\Omega_n$ along the incoming flow direction so as to cover more of the wake flow (where the turbulence must be well resolved) than in the front --- see how the regions from blue to yellow unevenly straddle the building in Fig.~\ref{fig:grid_construction}.
-% As for inside $\Omega_n$, we refine the sampling once further compared to the finest grid level in $\Omega_f$, but this time we transition to a refinement based on the distance to the model: using an unsigned distance field of the model computed within $\Omega_n$, we use a once-refined uniform grid compared to the finest grid level in $\Omega_f$, and consider its nodes to be \emph{valid} only if they are within a distance $d^*$ of the model --- see the orange nodes in Fig.~\ref{fig:grid_construction}. Note that we use a mask per grid node to indicate whether or not it is a valid fluid node, and we adopt the efficient GPU-based approach of~\cite{Imre-2017} to compute the distance field. 
-% The resulting multiresolution sampling is thus block-based and independent, as it does not form a tree-like hierarchy --- but it allows for a good transition between multiple levels of resolutions without the prohibitive memory storage required by the continuous-scale approach of \cite{Li-2019}, for instance.
+\paragraph{多分辨率网格构建}
+自动的网格细化一般都需要基于一定的标准来指导对哪一部分进行细化。这其中最常被考虑的应该是来流方向及网格到边界的距离~\cite{Sandoval-2012,Li-2019}。
+于是我们也主要围绕这两个因素，设计我们的自动网格构建方法。
+对于一个模型，我们首先将该模型的轴对齐包围盒 (axis-aligned bounding box, AABB) 的每个维度延长一定的距离$d^*$，这个距离表示贴体网格的厚度。至此我们得到了一个比模型稍大的方形区域$\Omega_n$ (见图~\ref{img:grid_construction} 中的红色方框区域)。为了方便网格间的数据过渡，从粗到细，每层格子间的网格大小均是上一层的2分之1。同时格子间要有部分的重叠以减小网格数据过渡的误差。
+下面我们将整个计算域标记为$\Omega$，我们可以将纯流体区域标记为$\Omega_f \!=\! \Omega \setminus \Omega_n$。在$\Omega_f$中，我们主要考虑来流方向。
+即$\Omega_f$中的所有网格均会沿来流方向延伸，以用更细的网格覆盖物体后的尾流部分 (见图~\ref{img:grid_construction} 中从蓝色到黄色的网格)。
+而在$\Omega_n$中，我们对每一个点计算一个到模型的距离，构成一个无符号距离场 (我们会在下面讨论为什么不使用有符号距离场)，之后保留所有距离小于$d^*$的点 (见图~\ref{img:grid_construction} 中的橘色网格)。在计算距离场时，我们使用了Imre等~(\citeyear{Imre-2017}) 提出的高效GPU距离场计算方法。通过这样我们得到的多分辨率网格并不需要树形结构进行组织，同时也可以使各层网格间顺利地进行数据过渡，而无需Li等~(\citeyear{Li-2019}) 所提出的连续尺度方法中大量的内存及显存消耗
 
-% \paragraph{Dynamic objects}
-% Because of the specific nature of a wind tunnel facility, we can restrict our handling of dynamic objects in a simulation with one-way coupling to mostly rotations, such as the wheels of a car spinning. From an axis-aligned bounding box of the rotating object, 
-% we construct a grid with the finest resolution and set all its nodes as valid fluid nodes. More complex motions, such as the opening of a plane's wheel well with the landing gear coming out, can in fact be handled the same way, but one must then pick an axis-aligned bounding box that encloses the complete motion of the dynamic objects, which can be potentially wasteful in the number of finest nodes depending on the scenario at hand. We leave such very specific improvements to future work.
+\paragraph{针对动态物体构建网格}
+为了应用于虚拟风洞测试，我们必须考虑一定的动态物体。由于风洞中需要双向耦合的频率远低于单向耦合，所以这里我们只考虑单向耦合。依然从该物体的AABB出发，我们将该模型所有可能经过的位置都设为最细的网格区，以满足边界附近的精度。这样的构建对如轮胎旋转等物体绕轴旋转的场景十分适合，因为物体的运动几乎不会扩大网格覆盖的范围。但是对于更复杂的运动，如飞机的起落架从机腹中落下这样的场景，虽然可以使用同样的方法构建网格，但会浪费大量的细网格，从而造成显存浪费。我们认为这一部分可以在未来工作中有所改进。
 
-% \begin{figure}[t] %\vspace*{0mm}
-% 	\centering \includegraphics[width=0.9\columnwidth]{images/grid_construction}\vspace*{-2.5mm} 
-% 	\caption{\textbf{Multiresolution grid construction.} To keep memory size low when computing accurate predictions of physical quantities, multiresolution grids are automatically constructed, with a refinement guided by the incoming flow direction for all but the last grid level (left) --- explaining the offset of the different levels of grid compared to this architectural building so as to capture its wake accurately --- then by the distance to the object. All active fluid nodes are finally found by flooding to ensure that the flow goes through all the mesh openings larger than the finest grid resolution (right).\vspace*{-3mm} }
-% 	\label{fig:grid_construction}
-% \end{figure}
+\begin{figure}[htb]
+	\centering
+	  \includegraphics[width=0.9\columnwidth]{figures/grid_construction.png}
+	\bicaption{多分辨率网格的构建。为了尽可能在节约内存与显存使用的同时，依旧维持足够的仿真精度，我们依据来流方向对所有网格进行自动构建 (最后一层网格除外，见左图)。即除最后一层网格外，每一层网格均有一定的方向性扩展。这个扩展是为了更准确的捕捉建筑物模型后的尾流。最后一层网格依据到边界的距离进行构建。最后我们通过传播找到所有的有效流体点，以保证场景中每一个连通部分都可以参与流体计算 (前提是这些连接部分至少大于最细网格的大小，见右图)。}{Multiresolution grid construction. To keep memory size low when computing accurate predictions of physical quantities, multiresolution grids are automatically constructed, with a refinement guided by the incoming flow direction for all but the last grid level (left) --- explaining the offset of the different levels of grid compared to this architectural building so as to capture its wake accurately --- then by the distance to the object. All active fluid nodes are finally found by flooding to ensure that the flow goes through all the mesh openings larger than the finest grid resolution (right).}
+	\label{img:grid_construction}
+  \end{figure}
 
-% \paragraph{Dealing with complex models}
-% %Propagation of valid fluid nodes}
-% We assumed until now that the model surface is closed, for which using a signed distance is sufficient to identify valid fluid regions.
-% However, in real applications, many models are not truly closed: e.g., a car may have a grill wire as an external air inlet, or an architectural model can have small openings, still larger in size than the finest grid cell, to let the wind flow inside parts of the building.
-% In this case, the above grid construction is not sufficient: we
-% must run a flooding algorithm on the \emph{finest} grid level to properly tag as valid the nodes that are connected to the external flow. 
-% Starting from a known fluid node ---  e.g., the node at the corner of the region $\Omega_n$ --- we check its 6 neighbor nodes and perform link-surface intersection to see whether a neighboring node is connected to the current fluid node, see Fig.~\ref{fig:propagation} in 2D as an illustration. 
-% Only if a neighboring node is connected to the current fluid node do we mark it as a valid fluid node, and we propagate through the valid fluid nodes using a breath-first search order such that all fluid nodes inside $\Omega_n$ are visited.
+\paragraph{针对复杂物体构建网格}
+如果我们认为物体模型至少是闭合的，那么我们通过有符号距离场 (signed distance field) 已经可以有效地分辨格点位于物体的内外。但是在实际应用中，很多模型并不具有这样的良好特质。如汽车的栅格实际上可以视作汽车内部的空气入口，建筑模型也有很多很小的开口足以使空气流入。
+在这种情况下，我们无法实际判别物体内外。所以我们在最细的网格上使用一个传播算法，来标记所有有效的网格点。具体地说，我们从一个已知的流体点出发，如$\Omega_n$中的网格原点，沿各个速度方向检查该点与其邻居是否相连。相连的标准为它们之间的速度方向是否与物体边界相交，若相交则认为不连通。该过程的一个二维示例见图~\ref{img:propagation}。
+我们将所有连通的点标记为有效流体点后，继续重复这一过程，进行广度优先搜索，以找到所有的有效流体点。
+这样做的好处主要有两个。第一个为我们可以剔除掉所有的固体点，因为固体点对仿真没有实际影响。这样我们可以进一步节省显存占用。第二个为我们可以同时将边界处理时所需要的正则化距离$q$一并求出，留至之后边界处理时使用。
 
-% %Fig.~\ref{fig:grid_construction} shows the multi-resolution grid construction the right figure shows the fluid grids constructed automatically inside the geometry where the domain is connected to the exterior. 
-% %m@: pointless, no? the figure does not show which one is valid, which was is not.
-
-% \paragraph{Grid interpolation}
-% Our multiresolution grid construction enforces that only \emph{two} grids that are one level apart can overlap.
-% We must therefore define how to evaluate and update in time the distribution functions at a given node based on the values stored on these two levels.
-% For this purpose, we strictly follow the approach described in~\cite{Lagrava-2012}. 
-% The internal nodes of a coarser parent grid provide boundary values which allow the finer grid to be updated twice (since a twice-finer grid requires twice-smaller integration time steps in LBM), where the distribution functions at the boundary nodes of the finer grid are readily interpolated from the coarser grid at the current time step.
-% Then, the boundary nodes of the coarser grid can be updated by interpolating from the already updated finer grid at the next time step, and so on. 
-% The interpolation is done by separating the distribution functions into equilibrium and non-equilibrium parts, where the equilibrium part is computed by first interpolating macroscopic quantities before evaluating its equilibrium distribution values, while the non-equilibrium part is interpolated directly; both interpolations are done using high-order schemes~\cite{Lagrava-2012}. 
-% This process is applied recursively from the coarsest grid to the finest grid in a cascaded serialized manner.
-% Fig.~\ref{fig:vis_building} for instance shows an instantaneous macroscopic velocity field cross-section from the simulation of the same architecture model from Fig.~\ref{fig:grid_construction} using this interpolation approach.
+\paragraph{网格间数据过渡}
+接下来我们必须考虑数据如何在不同网格大小的网格间传递、过渡。这一方面我们使用了Lagrava等~(\citeyear{Lagrava-2012}) 中提出的方法。该过程可简要概括如下。对于两个网格之间的数据交互，永远存在一个较粗的网格和较细的网格 (两个网格的网格大小是2倍关系)，并且这两个网格中会有一定的重叠区域以方便过渡 (这些在我们的网格构建方法中已经通过约束保证)。那么粗、细网格会交替执行仿真。由于网格大小的2倍关系，为了保证同样的粘度，它们的时间步长也是2倍关系，即粗网格仿真一个时间步长，细网格需仿真两个时间步长。在这两个网格中，最外层的格点均可视为需要进行网格过渡的格点 (我们接下来称为待求点)，因为它们的分布函数信息无法靠自己获得，只能从另一网格获得。而因为重叠区域的存在，细网格的待求点在粗网格中是正常格点。同理，粗网格的待求点在细网格中也是正常格点。所以，在两个网格交替前进时间步长的过程中，待求点的信息都可以从另一个网格插值得到。而这个插值需要分为平衡态与非平衡态。因为平衡态部分只取决于宏观量，而宏观量在不同网格中是不变的。但非平衡态部分与应力张量有关，这里不同网格间有一定的系数关系，所以在不同网格间插值时需要进行缩放。关于整体数据过渡的细节可参考~\cite{Lagrava-2012}。
+这一过程其实对于每一对 (粗、细) 网格都是相同的，所以可以从粗到细以递归的方式完成。
+% Fig.~\ref{img:vis_building} for instance shows an instantaneous macroscopic velocity field cross-section from the simulation of the same architecture model from Fig.~\ref{img:grid_construction} using this interpolation approach.
 
 \begin{figure}[htb]
     \centering
       \includegraphics[width=0.7\columnwidth]{figures/propagation.png}
-    \bicaption{固体附近的边界处理。对于切削网格点 (图中标为橘色)，它们的未知分布函数必须要通过边界处理决定。图中黄色点为固体内部点，青色点为流体点。对于$\bm{x}_b$点，$q$表达该点沿$\bm{c}_i$方向到边界的正则化距离，其中$\bm{c}_{\bar{i}}$为$\bm{c}_i$的反方向。}{Propagation of valid fluid nodes. To find and tag all valid fluid nodes, we start from an already known fluid node, e.g., node $\bm{p}$ in 2D, then we check its immediate neighbors to see whether a link intersects a boundary. If no intersection is detected (e.g., link $\bm{p}\bm{q}$), the untagged node $\bm{q}$ is tagged as a new valid fluid node. This process repeats in a bread-first search order, enabling internal regions to be connected to the external fluid region.}
-    \label{img:boundary}
-  \end{figure}
+    \bicaption{通过传播找到有效的流体点。为了找到并标记所有有效的流体点，我们从一个已知的流体点出发 (如图中的$\bm{p}$点)，然后我们找到该点所有的邻接点，检测它们之间的连接有没有与固体边界相交。如果两点间的连接没有与边界相交 (如$\bm{p}\bm{q}$)，则点$\bm{q}$被标记为新的有效流体点。这个过程以广度优先顺序重复，直到找到所有有效的流体点，使所有的连通部分相互连接}{Propagation of valid fluid nodes. To find and tag all valid fluid nodes, we start from an already known fluid node, e.g., node $\bm{p}$ in 2D, then we check its immediate neighbors to see whether a link intersects a boundary. If no intersection is detected (e.g., link $\bm{p}\bm{q}$), the untagged node $\bm{q}$ is tagged as a new valid fluid node. This process repeats in a bread-first search order, enabling internal regions to be connected to the external fluid region.}
+    \label{img:propagation}
+\end{figure}
+
+\subsection{算法优化}
+我们接下来讨论一些我们在实现过程中发现的，对计算效率有重要影响的一些实现要点。
+% An overview of our simulation process is summarized in Alg.~\ref{alg:simulation}.
+
+\paragraph{高效链路-几何求交}
+在边界处理中，每一步我们都需要得到边界点上各链路到几何模型的距离。对于静止模型，我们可以只在前处理中做一次求交，但是对动态物体，由于其形状在不停改变，我们需要在每个时间步都进行一次求交。由于求交的复杂性，这一步在时间上的消耗甚至大于仿真本身的消耗。
+为了解决这一问题，我们采用与浸没边界法~\cite{Chen-2021}中的扩散 (spreading) 类似的想法，以物体模型的元素为出发点，寻找周围的流体点，而不是以流体点为并行单元进行并行。
+对于边界上的每个元素 (在三维中通常为三角形)，我们找到所有该元素覆盖的网格。这一步只需不遗漏网格即可，所以使用该元素的AABB也是可以的。这一过程的一个二维示意图可见图~\ref{img:intersection}，在二维中模型元素是线段而不是三维中的三角形。
+对于每个覆盖的网格，格点上的所有链路都会与该模型元素进行求交测试。如果有链路相交，则我们在这个格点上记录正则化距离$q$，这个距离会在边界处理中被使用。
+这样做的优势是，每个模型元素所找到的流体点的数量都是相对较少的，这在GPU上有着数据连续和负载均衡的优势。为了测试效率，我们使用一个4.5 m长的、元素数量在1千万的模型，在一个网格大小为4 mm的计算网格中求交。结果显示使用上述的求交方法，相比传统的树状结构加速的方法，效率的提升在大约十倍。这可以有效地提升整体仿真的计算效率，尤其是场景中有动态物体时。
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.7\columnwidth]{figures/intersection.png}
+  \bicaption{高效链路-几何求交。我们不使用传统方法，即将模型的元素放入一个树形结构中进行查找。我们使用以模型元素作为并行单元，来查找附近和其相交的链路。这里在二维中，模型元素是线段，而三维中一般是三角形。对于一个模型元素，我们可以很快地找到其所覆盖的网格，并于可能相交的链路依次求交。}{Efficient link-boundary intersection. Instead of building a tree-based data structure, we parallelize our link-mesh intersection over all boundary elements --- here boundary edges $\ell$ in 2D. For a given boundary edge, we efficiently locate the cells that the edge straddles, and perform intersection for every link of the nodes that belong to the covered cells.}
+  \label{img:intersection}
+\end{figure}
+
+\paragraph{数据布局}
+在LBM中，分布函数的迁移是必须要访问邻接点的。而GPU中数据的访问顺序又直接影响吞吐量，进而影响计算效率。所以设计一定的数据布局以适应LBM的访问对LBM的效率也有很大影响 (尤其是在多分辨率网格中)。
+首先整体上，我们依然使用~\cite{Chen-2021} 中的数组结构体结构。一个需要注意的点是，我们构建出的网格中，有效流体点并不一定连续，所以我们需要一个紧凑且GPU友好的数据结构来存储有效流体点的索引。然而在我们的测试中，perfect spatial hashing~\cite{Lefebvre-2006} 或用于稀疏矩阵的紧凑存储结构~\cite{Greathouse-2014} 表现均不够好。在测试中两者均会增加显存读取频率并使数据访问更不连续，造成计算效率下降。使用针对不规则数据的z-排序 (z-ordering) 结构~\cite{Chen-2021} 也并没有获得预期的性能提升。
+所以，为了实现简单，我们生成了一个简单的索引映射 (index map)，即以x-y-z顺序，直接在一个线性数组中记录所有流体点的显存索引。这样的数据布局与~\cite{Chen-2021} 中的基于块的存储方法的性能接近，但实现会简单很快。我们认为多分辨率LBM网格的数据布局也是未来可以改进的方向之一。
+
+\section{对比与仿真结果}
+% We now discuss the various tests we performed to validate the accuracy and efficiency of our virtual wind tunnel testing facility, along with a series of additional rendered results to show how the improvements we made to the state-of-the-art LBM techniques allow not only for faster wind tunnel testing in automotive,
+% architectural, or aeronautical industries, but also for high-resolution realistic fluid flows for VFX production. 
+
+% We implemented our virtual wind tunnel to exploit the massive parallelism of graphics processors, and simulations were executed with one or more NVIDIA A100 GPU(s). 
+% We ran our code on a workstation equipped with an Intel 20-core CPU and 128 GB of RAM.
+% Each simulation is typically set up by placing the test model at  one third along the direction of the flow (streamwise), and in the middle of the orthogonal plane (spanwise) to capture the turbulent wake flow well.
+% For test models flying in the air, we place the model in the middle along the vertical direction; otherwise, they are placed on the ground.
+% The simulation domain is selected to be typically 8 to 10 times in size compared to the bounding box of the model --- see Fig.~\ref{img:domain_setup} for an example illustrating the setup of our virtual wind tunnel domain for the aerodynamic simulation of a car model. 
+
+% Cross-section visualizations of the magnitudes of velocity fields as in Figs.~\ref{img:golf_ball_vis},~\ref{img:golf_ball_comp_single_res},~\ref{img:fastback} and \ref{img:vis_building} were generated on the finest grid resolution of the simulation, where the color of each pixel is mapped from the linearly interpolated velocity magnitude --- other fields such as vorticity or pressure are done similarly. To display the pressure (or pressure coefficient $C_\text{p}$) \emph{on} the surface of a model, we did not use a simple projection or extrapolation from nearby cut-cell nodes as the nodes used could have different distances to the surface, causing sudden changes of pressure values and generating obvious staircase phenomena; instead, for each mesh vertex, we perform pressure interpolation at an offset position one-cell-width away along the outer normal direction to ensure consistent interpolation, and use this resulting value as the mapped color, which leads to much improved surface visualization --- see Fig.~\ref{img:teaser} for instance.
+% We also use passively-advected particles injected in the virtual flow,  which were converted to VDB files and rendered with ~\cite{redshift} to offer a Lagrangian visualization of the flow in some of our figures, such as Fig.~\ref{img:vis_plane}.
+% Simulations were computed in a few hours depending on the scale of the model, the size of the computational domain, as well as the finest spatial resolution required, with our multiresolution grid construction usually taking a few minutes: 
+% Tab.~\ref{tab:parameter-time} details timings and configurations for all the simulations we conducted in this paper.	\vspace*{-1mm}
+
+\subsection{对比}
+% To validate our virtual testing facility, we perform three increasingly difficult cases for which experimental data acquired in real-life wind tunnels exist to compare our results both qualitatively and quantitatively: drag crisis for a sphere, a golf ball in flight, and finally, three variants of a benchmark car model (that we each test with or without the wheels being allowed to spin) which are typically used to validate a solver's accuracy, and for which we can thus better compare performance and accuracy.
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.8\columnwidth]{figures/sphere_cd_comp.png}
+  \bicaption{球的阻力与雷诺数的关系。在我们的仿真中，球在雷诺数在Re=400,000 (阻力危机) 时，\cite{Tao-2018-b} 与我们的方法都展示出了一个突然的阻力下降，之后又稍有上升，与实际实验~\cite{Morrison-2013,Barati-2014} 一致。}{Drag of a sphere vs. Reynolds number. Just like real-life experiments~\cite{Morrison-2013,Barati-2014} exhibit a sudden drop in drag for a sphere at a Reynolds number around Re=400,000 (drag crisis), both \cite{Tao-2018-b} and our kinetic solver demonstrate a similar drop at roughly the same Re, followed by a partial drag recovery.}
+  \label{img:drag_comp}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/golf_ball_cd.png}
+  \bicaption{高尔夫球的阻力与雷诺数的关系。图中绘制了高尔夫球的阻力系数与雷诺数之间的关系，与真实实验~\cite{Bearman-1976,Aoki-2010} 相比，我们的仿真给出了十分相近的结果。注意高尔夫球阻力突然下降 (阻力危机) 的位置与先前图~\ref{img:drag_comp} 所给出的光滑球相比，雷诺数要小得多。}{Drag of golf ball vs. Reynolds number.Compared to the real-world experiments reported in~\cite{Bearman-1976} and~\cite{Aoki-2010} for the drag coefficient of golf ball as a function of the Reynolds number Re, our wind tunnel simulator provides very similar evaluations. Note that the drop in drag coefficient (drag crisis)  happens far earlier than in the case of a smooth sphere, as expected --- see Fig.~\ref{img:drag_comp}.}
+  \label{img:golf_ball_cd}
+\end{figure}
+
+% \paragraph{Drag crisis for a sphere}
+% As mentioned earlier, the phenomenon called drag crisis refers to the seemingly paradoxical fact that the drag coefficient of, say, a sphere, suddenly drops at a critical Reynolds number and only partially recovers as the Reynolds number keeps increasing, which is very challenging to correctly predict for a numerical solver without turbulence modeling. 
+% Because this drag crisis happens at high Re and depends on the surface property of the sphere (the effect occurs at lower Reynolds numbers when the sphere is rough than when it is smooth), experimental data is exceedingly difficult to gather accurately (in fact, Fig.~\ref{img:sphere_wake_comp}(c) was obtained at a lower Reynolds number by adding a trip wire to artificially create a higher effective Reynolds number), explaining the discrepancy between experiments such as \cite{Morrison-2013} and~\cite{Barati-2014}.
+% Our virtual wind tunnel manages to qualitatively reproduce the sudden drop in drag coefficient for a sphere as illustrated in Fig.~\ref{img:drag_comp} at about the correct Reynolds number, and with drag coefficients closer to the experimental values in general beyond the critical Reynolds number as compared to an LBM solver using the boundary treatment of \cite{Tao-2018-b} without entropy-based cumulant collision model.
+% Note that the drag prediction from our method is slightly shifted from the critical drag-crisis region, producing a larger deviation from the experimental data at Re=200,000. In this critical region (where even the two experimental curves differ), the numerical treatment of the surface --- and in particular of its roughness --- can easily alter drag prediction as discussed in~\cite{Geier-2017-b}.
+% One should also point out that, like many other state-of-the-art fluid flow solvers, we over-estimate the drag coefficient values for higher Reynolds numbers: while experiments seem to show a drop down to $C_\text{d}=0.1$, we reach $0.175$; but it remains better than the result of \cite{Tao-2018-b} which goes down to $0.2$ only.
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/golf_ball_vis.png}
+  \bicaption{光滑球与高尔夫球在Re=100,000时的对比。即使光滑球 (图中顶部子图) 与高尔夫球 (图中底部子图) 大小相同，只有表面的坑洞区别时，在我们的虚拟风洞测试中，也展现出完全不同的速度场与表面压力 ($C_\text{p}$) 场 (左图)。当我们使用染色粒子对流场进行被动追踪时，我们可以更清楚直观地看到这两者尾流所产生的区别 (右图)，以理解为什么高尔夫球相对光滑球可以飞得更远。}{Ping-pong vs. golf ball at Re=100,000. While a ping-pong ball (top) differs (up to scale) from a golf ball (bottom) only in the absence of tiny dimples on its surface, testing these two balls in our wind tunnel exhibits very different velocity and surface pressure ($C_\text{p}$) fields (left); consequently, the flows visualized via passively-advected dyed particles are dramatically different (right), providing a good intuition of why golf balls can travel much further.}
+  \label{img:golf_ball_vis}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/golf_ball_single_res.png}
+  \bicaption{多分辨率网格与单分辨率网格仿真的对比。多分辨率网格可以对边界层有更准确的捕捉，在这个例子中可以将高尔夫球表面的小坑洞中的流体准确解算 (左图)。与总格点数相同的单分辨率网格 (右图) 相比，我们可以看到完全不同模式的湍流尾流。图中通过颜色可视化的为速度的模值，单位为$m/s$。}{Multi- vs. single-resolution simulation. A multiresolution simulation better resolves the boundary layer flow going within the small dimples of a golf ball (left), while a single-resolution simulation with the same total number of grid nodes cannot (right). As a consequence, we witness a very different behavior of the turbulent wake when the velocity magnitude (with a colormap indicating its value in $m/s$) is visualized.}
+  \label{img:golf_ball_comp_single_res}
+\end{figure}
+  
+% \paragraph{Flight of a golf ball}
+% We also performed tests on a golf ball in a high-speed flow with our virtual wind tunnel.
+% The golf ball model we used has $362$ dimples (The PGA tour uses balls with a minimum of 322 and a maximum of 376 dimples), with a ratio of dimple depth to ball diameter equal to $0.007$.
+% As Fig.~\ref{img:golf_ball_cd} demonstrates, our evaluated drag coefficients are comparable to the published experimental values from~\cite{Bearman-1976} and~\cite{Aoki-2010}. We also use this golf ball case to show the ability of our solver to resolve small geometric features: as expected, the flows at $Re\!=\!100,000$ around a golf (\emph{dimpled}) ball vs. a ping-pong (\emph{smooth}) ball are drastically different, since dimples generate very small boundary layer vortices that interact with the surrounding flow, reducing the attachment of the laminar boundary layer to the surface of the golf ball.
+% This makes the overall flow separate farther around the back side of the golf ball, thereby forming a converging shape of the wake with reduced drag, compared to the wider wake with larger vortices for a smooth ball due to laminar boundary layer separation as depicted in Fig.~\ref{img:golf_ball_vis} with our solver via passively-advected colored particles. This converging shape is very similar to the wake of a ball close to drag crisis, explaining the drag reduction mechanism by a production of small-scale vortices around the solid boundary.
+% Note that our multiresolution simulation is key here in capturing this kind of details: a single resolution with the same total number of grid nodes fails to resolve the thin turbulent boundary layer created by the small dimples, forming different separation points of boundary layer flows and wake shapes, and thus grossly over-estimating the underlying drag coefficients, see Fig.~\ref{img:golf_ball_comp_single_res} (right). \vspace*{-1mm}
+
+% \paragraph{Aerodynamics of DrivAer car model}
+% Finally, we ran our virtual testing facility on three variants of the DrivAer model, a benchmark car model created at Technische Universit\"at M\"unchen to investigate automotive aerodynamics and validate numerical simulations~\cite{Heft-2011, Heft-2012}.
+% We tested three rear-end forms --- called Fastback, Notchback and Estateback respectively --- in our experiments. All meshes are digital models of a real car down to a 3mm accuracy, with detailed underbody, mirrors, but no engine bay flow,
+% while the domain resolution is chosen to balance accuracy and efficiency.
+% For each model, we tested the aerodynamic characteristics at $57.6 km/h$ based on our simulator in two typical scenarios used in industrial tests: without or with ground simulation (GS) --- that is, in the first case we assume that the ground is fixed and the wheels do not spin, while in the second case, the car has been put on a conveyor belt to simulate the road moving under the car, and the wheels are rotating on it. These two scenarios provide great insights on the various sources of numerical issues, showing that even the seemingly innocuous effects of a rotating wheel or a fixed ground can greatly affect wind tunnel testing and the resulting aerodynamic coefficients. We plot the resulting drag curves in time in Fig.~\ref{img:tum_validation_cd_curve}, showing that the drag begins to stabilize once the transient effects early in the simulation attenuates past the first second. The actual drag coefficient estimates are then obtained by averaging the values between $1.2s$ and $2s$, and compared to ground-truth values from~\cite{Heft-2012b} after a final calibration via mean shift as listed in Tab.~\ref{tab:drivaer_result}. 
+% Note that this mean shift was measured by computing the average deviation between a set of computed drag coefficients and their corresponding experimental data over different setups, which is a common engineering method to compensate for limited resolution and the resulting systematic failure to resolve the turbulent flow between the car body and the ground. 
+% Mean velocity and pressure corresponding to the same averaging range as above are also shown in Fig.~\ref{img:fastback}, where pressure on wheels are shown separately as insets to highlight the differences between the simulation with and without ground simulation --- clearly indicating that rotating wheels reduce drag due to their generation of small boundary layer vortices.
+% Expectedly, the case with no ground simulation is easier, and our virtual wind tunnel captures the drag coefficient values almost perfectly with an average error of $0.4\%$,
+% which is, based on the car companies we communicated with, far better than the industry standards requiring less than $3\%$ error in this case.
+% With ground simulation, our maximum error reaches $3.17\%$, still safely below the limit tolerated in the automotive industry, which is of 5\% in this more challenging case.
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/tum_validation_cd_curve.png}
+  \bicaption{汽车的阻力随时间的变化。我们画出我们仿真所给出的不同DrivAer汽车配置的阻力系数随时间的变化，包括有地面仿真与无地面仿真的情况。(GS表示有地面仿真，即汽车的轮胎旋转且地面运动的速度与轮胎的线速度一致。)}{Car drag over time. We plot the simulated drag coefficient in time for different DrivAer car configurations, with or without ground simulation (GS, meaning ground motion and rotating wheels are simulated).}
+  \label{img:tum_validation_cd_curve}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/tum_fastback.png}
+  \bicaption{DrivAer fastback汽车的空气动力仿真。我们对DrivAer fastback这样的标准测试车型进行气动仿真，图中展示了垂直的平均速度场截面，与模型表面的平均压力 (平均均指随时间平均)。轮胎在有地面仿真 (蓝色方框内) 与无地面仿真 (红色方框内) 时的平均表面压力可视化也在图中展示。}{DrivAer Fastback aerodynamic simulation.
+	A vertical cross-section shows the magnitude of the mean velocity flow around the DrivAer fastback benchmark car model, while the mean pressure over the model surface colors the mesh.
+	Mean pressure distributions without (red inset) and with (blue inset) ground simulation are also visualized on the wheels.}
+  \label{img:fastback}
+\end{figure}
+
+% \paragraph{Comparisons with industrial software suites.}
+% As mentioned early on, Siemens' StarCCM+~\cite{Siemens} and Dassault Syst{\`e}mes' PowerFLOW~\cite{powerflow} are two well-established commercial tools implementing respectively an FVM-based NS solver and an LBM-based solver, both running on CPU clusters for industrial users.
+% Because time-dependent unsteady flow simulation with StarCCM+ can take up to weeks of computations (having the wheels rotating require dynamic remeshing for such a solver), users often settle for a steady-state solution as a compromise, which does not closely match the real physical measurement process because boundary approximations of rotating objects are often employed.
+% PowerFLOW overcomes these difficulties and affords higher performance, although at the cost of relying on a larger CPU cluster than Siemens' solver due to the increase in the number of nodes needed, 
+% which often curbs its practical appeal.  
+% Instead, our virtual wind tunnel system inherits the benefits of kinetic solvers (and thus the advantages of PowerFLOW), but runs on GPU with far less stringent hardware requirements: case in point, 
+% with an NVIDIA A100 GPU having 6,912 CUDA cores, the simulation for drag prediction of the DrivAer Fastback model without ground simulation took only around 3 hours to complete, which is 10,356 GPU core hours per second of simulation.
+% James et al.~\shortcite{James-2018} recently reported a similar drag prediction on a Notchback model using PowerFLOW and StarCCM+, which require approximately 80 hours on 96 CPUs and 13 hours on 128 CPUs, respectively, to get a converged result.
+% This indicates that our efficiency is likely to be better using the same number of processor cores, assuming that each of their CPU had at least 8 cores --- although comparing performance across CPU clusters and GPUs is surely difficult.
+% More strikingly, the drag coefficients reported for PowerFLOW do not show an obvious difference with or without ground simulation, which contradicts experimental data. Other results have approximately around 3\% error compared to the experimental measurements reported in~\cite{Heft-2012b}.
+% We note that they used a model without side mirrors while we used a full car model, and no calibration information was provided.
+% Thus, formulating a more precise statement on how accurate our solver is in comparison to PowerFLOW and StarCCM+ still requires further testing, 
+% but our initial analysis of performance indicates that we are at least not worse, and likely better than existing commercial software --- and our maximal 3.17\% error on drag prediction with ground simulation and with both side mirrors and a detailed underbody (which naturally produce stronger turbulence) proves that our virtual testing facility clearly meets current industry standards.
+
+% \begin{table}[t]
+% 	\caption{\textbf{Drag estimation accuracy.} We compare our estimates of the drag coefficient $C_\text{d}$ for different DrivAer configurations with experimental data, with or without ground simulation (GS, meaning ground motion and rotating wheels are simulated).
+% 		\vspace*{-4.5mm}}
+% 	\begin{center}
+% 		{
+% 			\begin{tabular}{lccc}
+% 				%\hline
+% 				\emph{\small Car configurations} & \emph{\small Predicted $C_\text{d}$} & \emph{\small Measured $C_\text{d}$} & \emph{\small Relative Error} \\
+% 				%\midrule
+% 				\hline
+% 				Fastback w/o GS & 0.2849 & 0.284 & 0.32\%\\
+% 				Notchback w/o GS & 0.2851 & 0.286 & -0.31\%\\
+% 				Estateback w/o GS & 0.316 & 0.318 & -0.63\%\\
+% 				Fastback w/ GS & 0.2811 & 0.275 & 2.22\%\\				
+% 				Notchback w/ GS & 0.283 & 0.277 & 2.17\%\\				
+% 				Estateback w/ GS & 0.3089 & 0.319  & -3.17\%
+% 		\end{tabular}}
+% 	\end{center}
+% 	\vspace{-5.5mm}
+% 	\label{tab:drivaer_result}
+% \end{table}
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/vis_building.png}
+  \bicaption{建筑模型的气动仿真。我们的虚拟风洞系统可以对包含多个通道在内的建筑结构进行仿真。从结果中我们可以清晰地看到模型内部的流场。图中通过颜色可视化的水平截面为速度场模值。}{Aerodynamics of an architectural model. Our virtual wind tunnel can simulate the airflow passing through a building structure containing covered passages inside. Visualized here is the velocity field magnitude for a horizontal cross-section, where the internal flow is clearly visible.}
+  \label{img:vis_building}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/vis_plane.png}
+  \bicaption{波音787客机的气动仿真。我们在两个GPU上对缩比的波音787客机模型进行了高分辨率仿真，客机的攻角为$8^{\circ}$。客机表面通过颜色对表面压力场进行了可视化，并有从6个沿着机翼前缘不同位置发出的染色粒子对流体进行被动追踪。}{Aerodynamics of a Boeing-787 passenger aircraft. We conducted a high-resolution aerodynamic simulation on dual GPUs for a scaled aircraft model of Being 787 at an angle of attack of $8^{\circ}.$
+  The pressure field is color-mapped over the aircraft body surface, while passively-advected dyed particles injected from the six different locations along the leading edge of the main wing are visualized.}
+  \label{img:vis_plane}
+\end{figure}
+
+% \subsection{仿真结果}
+% In order to demonstrate our applicability not only to industrial design purposes but also as a tool for VFX animation of exquisitely complex flow patterns around models, we have performed a number of additional simulations. 
+% For instance, we conducted a high-resolution aerodynamic simulation of a scaled Being 787 aircraft model at an angle of attack of 8 degrees at relatively low speed (0.16 Mach) in Fig.~\ref{img:vis_plane}.
+% The model has a length of 6.16 meters and a wing span of 3.2 meters.
+% The simulation was conducted on two NVIDIA A100 GPUs, with the finest grid capturing details of 3.75 millimeters near the model boundary.
+% It took around 1.8 hours to run a simulation of 1.7 seconds.
+% We also simulated the airflow within a complex scaled architectural model containing covered hallways, where node flooding was necessary to select all the valid grid nodes, see Fig.~\ref{img:grid_construction}.
+% The model has a bounding box of size $4.34m\!\times\!1.06m\!\times\!3.76m$, within a domain of size $25m\!\times\!8m\!\times\!25m$.
+% It took 1.9 hours to complete a simulation of 3.5 seconds, see the resulting cross-section visualization of velocity in Fig.~\ref{img:vis_building}.
+% To further demonstrate the ability of our multiresolution testing facility to handle high geometric and topological complexity, we simulated a flow passing through an irregular pipe with nozzles on its surface (Fig.~\ref{img:vis_pipe}), where the nozzles connect the internal fluid region with the exterior.
+% The pipe model has a bounding box of size $1.3m\!\times\!2m\!\times\!0.83m$, within a domain of size $7.84m\!\times\!12m\!\times\!4.96m$.
+% The simulation took 0.9 hours to produce 6 seconds of simulation.
+% Visualized with smoke particles, it is clear that the flow goes into the pipe through the bottom left inlet and leaves the pipe through the nozzles as expected, highlighting our ability to automatically construct multiresolution grids on very complex models.
+% We hope to be able to quantitatively compare some of these results (plane, building) by acquiring higher quality model meshes together with validation datasets in the near future, in addition to the current visual demonstrations.
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/wei_crash_vis.png}
+  \bicaption{CG中最先进的LBM方法的发散结果。现有的CG领域中的LBM方法都依赖于中心矩碰撞模型~\cite{Li-2020,Lyu:2021}。由于中心矩中的不同阶数的矩相对并不独立，且高阶参数不一定准确，在使用多分辨率网格进行仿真时通常会得到发散结果，即使雷诺数并不足够高。这里展示了使用中心矩碰撞模型对$Re$=100,000时风吹过球的仿真结果。边界附近的速度求解错误 (左图) 最终导致整个求解结果发散 (右图中黑色区域)。}{Typical blowup of latest LBM solvers in CG. Existing LBM methods in CG mostly rely on central-moment collision models~\cite{Li-2020,Lyu:2021}. Due to the entangling of various orders of moments and improper high-order relaxation rates, they often blow up at low Reynolds numbers (here, $Re$=100,000) when simulating even a simple flow around the sphere with multiresolution grids, see black region (right), due to spurious velocities near the solid boundary (left).}
+  \label{img:wei_crash_vis}
+\end{figure}
+
+% \section{方法的局限性}
+% Our method is not without limitations.
+% First, as we have seen previously, our drag coefficient predictions are far better for a static setup (without GS) than for a dynamic one (with GS);
+% while this is true of many other solvers, how to improve dynamic boundary condition to have predictions of physical quantities with consistent error margins deserves further research.
+% Second, our handling of data structure for irregular domains is currently not optimal, so we are guessing that further improvements in terms of performance are possible.
+% Lastly, LBM solvers usually have higher memory usage than the corresponding NS solvers with similar accuracy  --- albeit for a far accrued efficiency.
+% How to reduce memory consumption is another aspect that needs further developments.
+
+% \section{总结}
+% While the state-of-the-art CG methods recently proposed~\cite{Li-2020,Lyu:2021} have significantly raised the bar for both efficiency and accuracy compared to other CG fluid solvers, they still have not reached a level of accuracy, scale, and even stability needed for industrial design simulations --- see Fig.~\ref{img:wei_crash_vis} for a comparison in a very simple case at a relatively low Reynolds number but with multiresolution simulation, in which previous LBM methods proposed in CG blow up. 
+% Conversely, methods in CFD have managed to propose ever-more accurate collision models and boundary treatment methods, but they mostly focused on the solver itself, ignoring many other important factors in a virtual wind tunnel system such as the non-trivial automatic multiresolution grid construction or efficient geometry handling, which are key to practical use in industrial design.
+% Our work not only bridges the gap in scale (through multiresolution) and accuracy (through our entropy-driven cumulant model and enhanced boundary treatment) necessary to reach engineering applications, but also significantly broadens the type of simulation that the VFX industry can benefit from: fluid flows over large-scale scenes and/or zoomed-in shots are easily handled with much higher efficiency than current NS solvers. Importantly, the ability to simulate low, high, or very high Reynolds numbers is a crucial benefit in making sequences that capture the proper scaling of turbulence, a feature that has often been lacking in previous graphics techniques.
+
+% In this paper, we developed a new multiresolution LBM-based fluid flow simulation technique to build an efficient and accurate virtual wind tunnel for physical evaluation of digital models. 
+% The improved accuracy and efficiency brought forth by our contributions based on the state-of-the-art techniques from both CG and CFD afford a unique opportunity to not only perform visual simulation of complex fluid dynamics for VFX, but also
+% design, preview, and assess the design of cars, planes, or buildings at subsonic weakly-compressible speeds prior to the construction of their full-scale mockup: our results allow for fine spatial resolution of flow fields near model boundaries to be made early in the design process for analysis and feedback, and consequently, it helps accelerate the design process.\smallskip   
+
+% Our work calls for a number of follow-up works. 
+% We handled dynamic objects in one-way coupling with restricted rotations and translations to build a virtual wind tunnel; pushing further the treatment of dynamic objects and allowing two-way coupling would offer a much more versatile toolbox for both engineers and animators to simulate quickly and accurately large-scale scenes and/or zoomed-in shots with much higher efficiency than many current NS solvers in CG field.
+% %REV: [B12] 
+% Currently we do not allow dynamic grid reconstruction, although it would keep a low memory usage --- but at the cost of slowing down the entire simulation.
+% Creating a \emph{virtual water tunnel}, maybe by building over the recent work of
+% \ifmakeAnon
+% \cite{Wei:2022, Wei:2023}
+% \else
+% \cite{Wei:2022}\fi, would also be a great challenge to generate even more complex simulations.
+% On the engineering side, we were able prove that a few key improvements made over recent LBM solvers presented in CG suffice to now open them up to industrial design audiences. 
+% While further advancing towards industrial-strength computational tools for flow simulation may bring us outside of the realm of CG, it is an exciting avenue for a number of reasons. 
+% First, it represents a \emph{rara avis} in CG, whose industrial impact outside of the entertainment industry has only sporadically happened. 
+% Second, it may also offer a number of opportunities to incorporate advanced graphics practices (e.g., in visualization) into industrial practices. Finally, it is an additional hint that the usual gap between graphics simulation and computational science \& engineering is further eroding, offering opportunity for collaborations across the two fields in the near future.

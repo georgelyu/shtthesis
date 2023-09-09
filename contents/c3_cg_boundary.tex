@@ -128,7 +128,7 @@
 我们的混合边界处理中需要许多的几何计算，如将流体点投影至固体表面，或将速度方向与固体边界进行求交等。我们还需要识别切削网格点，以及它们的状态 (属于流体区域或固体区域)。许多工作阐述了如何准确地进行这样的几何计算~\cite{Azevedo-2016,Robinson:2009}。但由于固体边界的形状可能十分复杂，这一过程可能非常耗时，不利于维持LBM高并行度的优势。
 为了在效率与精度间取得平衡，我们提出一系列的几何近似计算方法，以在不影响视觉可信度的情况下提升计算效率。
 
-\begin{figure}[htb]
+\begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.97\columnwidth]{figures/geometric_computing.png}
   \bicaption{高效几何近似计算。对于一个固体，我们首先对它的边界采样 (a)，然后切削网格点的投影点可以被近似为距其最近的采样点 (b)。为了检验某个速度方向 (图中标为黄色) 是否与固体边界相交，我们可以检查这个方向的两端是否有固体点存在。如果一端是固体点另一端是流体点，则我们认为其跨过了固体边界 (c) (图中绿色点为固体点，橘色点为流体点)。对于两端都是流体点的情况，我们检查这两个流体点投影点的法向，如果它们有类似的朝向 (d) 则认为该方向没有跨过边界，相反则认为其跨过边界 (e)。在GPU实现时，我们从所有的固体采样点出发，令每个固体采样点寻找其周围的流体切削网格点，而不是从流体点出发。}{Efficient geometric approximation. Given a solid geometry, we first sample its boundary (a); then the projected points of cut-cell nodes can be simply approximated by the nearest sample (b). To examine whether a link (yellow) crosses the solid boundary, we first check if solid nodes are involved. If the ends of the link are fluid and solid nodes, then it crosses the solid boundary (c) (green cut-cell nodes are inside the solid, whereas orange ones are in the fluid). For links connecting fluid nodes, we check the normals of the two projected cut-cell nodes forming the link; if the two normals have the same orientation (d), the link does not cross the solid boundary; otherwise, it intersects the solid boundary (e). For GPU implementation, we parallelize over solid samples instead of cut-cell nodes, where each solid sample will check its surrounding region of cut-cell nodes.}
@@ -164,29 +164,23 @@ Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心�
 所以我们在这一过程中，将固体采样点作为并行单元。对于每一个采样点，我们计算该点到周围的切削网格点的距离 (见图~\ref{img:geometric-computing} (f))，并且比较这个距离与切削网格点当前记录的最近点的距离。如果距离更小的话则更新该采样点为最近点。因为多个线程可能会同时访问同一个流体点，这一过程需要使用原子比较计算。注意公式~\ref{eq:is_in_fluid} 依然需要满足，所以切削网格点状态可以被同时识别。
 这样的好处是，每个固体采样点附近一定存在切削网格点，并且数量接近。这样可以大幅提升GPU的负载均衡，减少无用的线程造成的线程开销，提升GPU占用率。
 
-\section{对比与仿真结果}
-\subsection{对比}
-此节中我们将我们的方法与图形学中近期提出的LBM仿真方法~\cite{Li-2020} 进行定量与定性的对比，包括与实际实验的对比。我们还针对计算效率，讨论基于Li等~\citeyear{Li-2020} 的性能改进~\cite{Chen-2021} 与我们方法的比较。
-
-\paragraph{与图形学中现有方法的对比}
-最近，Li等~\citeyear{Li-2020} 提出了一个基于动理学方法的双向流固耦合湍流求解方法，该方法使用DI-IBM处理固体边界。然而这一方法有一定的局限性。首先因为DI-IBM在边界两侧施加惩罚力，其在求解亚网格物体的流固耦合时，会有流体穿透的现象。图~\ref{img:comparison_with_ib} 展示了一个三维的喷射流打向一个薄板，其中图 (a) 使用了Li等~\citeyear{Li-2020} 的方法，并出现了不应该存在的流体穿透现象 (图中红框)。图 (b) 使用了我们的方法，没有产生类似的现象。
-
-另外，DI-IBM有精度不足的问题，使得在湍流仿真时得不到正确结果，尤其是在固体边界层上。我们对一个向前运动的汽车模型进行气流仿真来说明这一问题，见图~\ref{img:comparsion_car_ib_ours}。对于汽车外形来说，气流的分离点一般位于汽车尾部，并且可以通过扰流板等进一步影响尾流走向 (如图~\ref{img:comparsion_car_design} (d) 中的风洞实验)。但仿真结果显示，DI-IBM预测的边界分离点在车顶，完全不符合实际风洞实验，而我们的方法可以正确预测边界的分离点 (两次仿真除边界处理外使用同样的参数设置)。
-
-为了展示如扰流板这样的小且薄的结构对汽车周围流场的影响，我们还在图~\ref{img:comparsion_car_design}中展示了有或无扰流板时汽车流场的仿真结果。从结果中我们可以看到，在添加了扰流板后，汽车的尾流发生了明显的变化。扰流板破坏了车身尾部表面的气流，产生湍流的同时减少了车辆尾部的升力，从而提升了车辆在高速时的操控性。这两个例子展示出了我们的方法针对于计算机图形学中已有LBM方法的优势。
-\begin{figure}[htb]
+\begin{figure}[!htbp]
   \centering
-    \includegraphics[width=0.99\columnwidth]{figures/result_thin_shell_sub_grid.png}
-  \bicaption{烟雾经过层叠的板子。烟雾吹过一系列下落的薄板。虽然薄板在分开时烟雾可以通过，当它们层叠在一起时却形成一个密闭的障碍物。我们边界处理中的亚网格近似可以同时处理这两种不同情况，当板子加速靠近时，中间的流体会被加速，而它们紧贴时会成为一个厚的物体。}{Smoke flow through stacked plates. Smoke is blown towards a falling stack of thin plates. While smoke freely flows between separate plates, they become an airtight obstacle when they are stacked on top of each other. Our boundary treatment based on subgrid approximation deals with both cases seamlessly: plates getting closer accelerate the flow in between them, while tightly stacked plates are treated as thick solids.}
-  \label{img:result-thin-shell-sub-grid}
+    \includegraphics[width=0.99\columnwidth]{figures/comparsion_car_design.png}
+  \bicaption{汽车的空气动力学设计。通过我们的方法对没有尾翼的汽车进行仿真 (a)，其结果与一个相似的车辆模型在风洞可视化的结果匹配 (b)。之后添加一个小型的扰流板 (图中红色方框) 到汽车尾部之后，仿真中的尾流发生显著变化 (c)，与带有扰流板的风洞测试相似 (d)。这展示出我们的方法可以快速、有效地为气动外形设计服务。图中的速度模值单位为$km/h$。图 (b) 与 (d) 的版权来自 Feltham~(\citeyear{youtube_2014})。}{Aerodynamic design of a car model. Simulating the airflow around a car model without a spoiler using our solver (a) matches the wind tunnel visualization for a similar car model (b); A small and thin spoiler (in red box) added on the back of the car model (c) changes the wake flow of the car model in our simulation quite significantly, in line with a wind-tunnel test of a car model with a spoiler (d) --- indicating that our solver offers an efficient, yet predictive tool of air flows for computational shape design. The velocity magnitude is measured in $km/h$. Image (b) and (d) courtesy of Feltham~(\citeyear{youtube_2014}).}
+  \label{img:comparsion_car_design}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/car_wind_tunnel.png}
   \bicaption{车的风洞测试。车周围的气流可视化展示了车身的设计使得气流直到后备箱才发生边界层分离，这样可以有效减少风阻与震动。图片版权来自\textit{Auto Motor und Sport}, \copyright Frank Herzog/Sportauto.}{Wind-tunnel test of a car. A wind tunnel visualization of the airflow around a car shows that the design of the body delays boundary layer separation until the trunk, which reduces drag and vibration in practice. Image courtesy of \textit{Auto Motor und Sport}, \copyright Frank Herzog/Sportauto.}
   \label{img:car_wind_tunnel}
 \end{figure}
+
+\section{对比与仿真结果}
+\subsection{对比}
+此节中我们将我们的方法与图形学中近期提出的LBM仿真方法~\cite{Li-2020} 进行定量与定性的对比，包括与实际实验的对比。我们还针对计算效率，讨论基于Li等~\citeyear{Li-2020} 的性能改进~\cite{Chen-2021} 与我们方法的比较。
 
 \begin{figure}[htb]
   \centering
@@ -195,28 +189,28 @@ Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心�
   \label{img:comparsion_car_ib_ours}
 \end{figure}
 
-\paragraph{与实际实验的对比}
-为了进一步验证我们方法在有亚网格物体时边界处理的精度，我们与现实世界中的实验进行对比。
-首先我们与三角翼的风洞实验进行比较。该三角翼的后掠角度为$75^\circ$，攻角为$20^\circ$ (见图~\ref{img:comparison_delta_wing} (a))。在实验中，三角翼上方会产生稳定的螺旋涡流结构，提升气动升力 (这种升力被称为涡升力~\cite{anderson2010aircraft})。这种结构被广泛使用于现代飞行器的设计中，如图~\ref{img:teaser_concorde} 中的协和客机。该实验的可视化可见图~\ref{img:comparison_delta_wing} (b)~\cite{Delery:2001}。我们的仿真结果在视觉上与实验结果相匹配，展示出相似的螺旋涡流结构。除去这一定性的对比实验，我们还对旋翼的气动性能进行了定量分析。我们参照一项最近的专利~\cite{lin2020screw} 中的描述重建了旋翼模型，并测量旋翼在旋转时的推力 (计算方法参照~\cite{leishman_2016})，与专利中的数据对比。图~\ref{img:DJI_thrust_compare} (a) 展示了不同转速下的计算误差，显示出较好的一致性。值得注意的是，随着转速的提升，相对误差会升高。这一点的主要原因是在LBM中，随着参照速度的提升，LBM空间下粘度在不断减小，以至于我们在测试时使用的32位浮点数已无法有效保证碰撞过程的计算精度。我们还对收敛性进行了测试，即在固定转速下提升分辨率，结果可见图~\ref{img:DJI_thrust_compare} (b)。这一结果显示了我们方法误差随分辨率的收敛性。
-
-\begin{figure}[htb]
+\begin{figure}[!htb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/comparison_delta_wing.png}
   \bicaption{三角翼仿真。通过我们的方法得到的薄板三角翼仿真结果 (左图) 与实际实验~\cite{Delery:2001} (右图) 的对比，展示出相同的前缘涡旋结构，表面我们的方法在薄结构边界层上的准确性。}{Delta-wing simulation. The airflow over a thin-shell delta-wing simulated with our hybrid coupling approach (left) matches experimental visualizations from~\cite{Delery:2001} (right), exhibiting the same spiral vortex structure near the leading edge of the wing and demonstrating the accuracy of our solver in capturing boundary layer flows around thin structures.}
   \label{img:comparison_delta_wing}
 \end{figure}
 
+\paragraph{与图形学中现有方法的对比}
+最近，Li等~\citeyear{Li-2020} 提出了一个基于动理学方法的双向流固耦合湍流求解方法，该方法使用DI-IBM处理固体边界。然而这一方法有一定的局限性。首先因为DI-IBM在边界两侧施加惩罚力，其在求解亚网格物体的流固耦合时，会有流体穿透的现象。图~\ref{img:comparison_with_ib} 展示了一个三维的喷射流打向一个薄板，其中图 (a) 使用了Li等~\citeyear{Li-2020} 的方法，并出现了不应该存在的流体穿透现象 (图中红框)。图 (b) 使用了我们的方法，没有产生类似的现象。
+
+另外，DI-IBM有精度不足的问题，使得在湍流仿真时得不到正确结果，尤其是在固体边界层上。我们对一个向前运动的汽车模型进行气流仿真来说明这一问题，见图~\ref{img:comparsion_car_ib_ours}。对于汽车外形来说，气流的分离点一般位于汽车尾部，并且可以通过扰流板等进一步影响尾流走向 (如图~\ref{img:comparsion_car_design} (d) 中的风洞实验)。但仿真结果显示，DI-IBM预测的边界分离点在车顶，完全不符合实际风洞实验，而我们的方法可以正确预测边界的分离点 (两次仿真除边界处理外使用同样的参数设置)。
+
+为了展示如扰流板这样的小且薄的结构对汽车周围流场的影响，我们还在图~\ref{img:comparsion_car_design}中展示了有或无扰流板时汽车流场的仿真结果。从结果中我们可以看到，在添加了扰流板后，汽车的尾流发生了明显的变化。扰流板破坏了车身尾部表面的气流，产生湍流的同时减少了车辆尾部的升力，从而提升了车辆在高速时的操控性。这两个例子展示出了我们的方法针对于计算机图形学中已有LBM方法的优势。
+
+\paragraph{与实际实验的对比}
+为了进一步验证我们方法在有亚网格物体时边界处理的精度，我们与现实世界中的实验进行对比。
+首先我们与三角翼的风洞实验进行比较。该三角翼的后掠角度为$75^\circ$，攻角为$20^\circ$ (见图~\ref{img:comparison_delta_wing} (a))。在实验中，三角翼上方会产生稳定的螺旋涡流结构，提升气动升力 (这种升力被称为涡升力~\cite{anderson2010aircraft})。这种结构被广泛使用于现代飞行器的设计中，如图~\ref{img:teaser_concorde} 中的协和客机。该实验的可视化可见图~\ref{img:comparison_delta_wing} (b)~\cite{Delery:2001}。我们的仿真结果在视觉上与实验结果相匹配，展示出相似的螺旋涡流结构。除去这一定性的对比实验，我们还对旋翼的气动性能进行了定量分析。我们参照一项最近的专利~\cite{lin2020screw} 中的描述重建了旋翼模型，并测量旋翼在旋转时的推力 (计算方法参照~\cite{leishman_2016})，与专利中的数据对比。图~\ref{img:DJI_thrust_compare} (a) 展示了不同转速下的计算误差，显示出较好的一致性。值得注意的是，随着转速的提升，相对误差会升高。这一点的主要原因是在LBM中，随着参照速度的提升，LBM空间下粘度在不断减小，以至于我们在测试时使用的32位浮点数已无法有效保证碰撞过程的计算精度。我们还对收敛性进行了测试，即在固定转速下提升分辨率，结果可见图~\ref{img:DJI_thrust_compare} (b)。这一结果显示了我们方法误差随分辨率的收敛性。
+
 \paragraph{性能对比}
 在Li等~(\citeyear{Li-2020}) 与Chen等~(\citeyear{Chen-2021}) 中，作者已经通过对比，说明了动理学方法的计算效率是显著优于N-S方法的。这种优势在湍流流固耦合仿真中更加明显，因为需要的时间步长更小。由于我们的方法与这些工作的框架相同，结合上述的各项优化，使得我们的方法在性能上更有优势。我们在同一张NVIDIA RTX 3090 GPU上，进行了多个分辨率的对比，结果显示我们的方法在所有的分辨率上都有显著提升 (见图~\ref{img:Performance})。通过代码性能分析，我们分析出两个使性能得以提升的主要因素：第一个是基于LU分解的碰撞运算符简化~\cite{fei2018three} 显著提升了GPU占用率，第二个是使用了几何近似优化之后，我们的混合边界处理比起之前工作使用的DI-IBM，计算量要更小。这两点使得我们的GPU计算效率得以提升。
 
-\begin{figure}[htb]
-  \centering
-    \includegraphics[width=0.99\columnwidth]{figures/comparsion_car_design.png}
-  \bicaption{汽车的空气动力学设计。通过我们的方法对没有尾翼的汽车进行仿真 (a)，其结果与一个相似的车辆模型在风洞可视化的结果匹配 (b)。之后添加一个小型的扰流板 (图中红色方框) 到汽车尾部之后，仿真中的尾流发生显著变化 (c)，与带有扰流板的风洞测试相似 (d)。这展示出我们的方法可以快速、有效地为气动外形设计服务。图中的速度模值单位为$km/h$。图 (b) 与 (d) 的版权来自 Feltham~(\citeyear{youtube_2014})。}{Aerodynamic design of a car model. Simulating the airflow around a car model without a spoiler using our solver (a) matches the wind tunnel visualization for a similar car model (b); A small and thin spoiler (in red box) added on the back of the car model (c) changes the wake flow of the car model in our simulation quite significantly, in line with a wind-tunnel test of a car model with a spoiler (d) --- indicating that our solver offers an efficient, yet predictive tool of air flows for computational shape design. The velocity magnitude is measured in $km/h$. Image (b) and (d) courtesy of Feltham~(\citeyear{youtube_2014}).}
-  \label{img:comparsion_car_design}
-\end{figure}
-
-\begin{figure}[htb]
+\begin{figure}[!tbp]
   \centering
     \includegraphics[width=0.93\columnwidth]{figures/performance.png}
   \bicaption{性能对比。我们将我们的方法 (绿色) 与Li等~(\citeyear{Li-2020})、Chen等~(\citeyear{Chen-2021}) 中的动理学求解方法 (红色) 进行比较，比较用例为图~\ref{img:comparsion_car_ib_ours} 中所示的汽车仿真，仿真时长为1秒。在同一张NVIDIA RTX 3090 GPU上得到的测试结果显示我们的方法在所有分辨率上都有显著的性能提升。}{Performance comparison. We compare the efficiency of the kinetic solver from~\cite{Li-2020,Chen-2021} (red) with our kinetic solver (green) based on one second of simulation of the car model shown in Fig.~\ref{img:comparsion_car_ib_ours} and both executed on a same NVIDIA RTX 3090 GPU, showing significant performance improvement for all grid resolutions.}
@@ -224,43 +218,56 @@ Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心�
 \end{figure}
 
 \subsection{仿真结果}
-下面我们展示一些列的仿真结果。这些仿真结果都于一个14核Intel Xeon E5-2690 CPU、128 GB内存、NVIDIA RTX 3090的工作站上运行得到。我们通过一系列的单向与双向流固耦合算例，对一系列的复杂几何进行测试，以显示我们的方法处理不同类型物体的能力。我们还展示了一些可交互的仿真、与离线的高分辨率大规模仿真。
+下面我们展示一系列的仿真结果。这些仿真结果都于一个14核Intel Xeon E5-2690 CPU、128 GB内存、NVIDIA RTX 3090的工作站上运行得到。我们通过一系列的单向与双向流固耦合算例，对一系列的复杂几何进行测试，以显示我们的方法处理不同类型物体的能力。我们还展示了一些可交互的仿真、与离线的高分辨率大规模仿真。
 
-\begin{figure}[htb]
-  \centering
-    \includegraphics[width=0.99\columnwidth]{figures/result_rotating_torus.png}
-  \bicaption{旋转的圆环。一个非常细的圆环沿着一个垂直轴旋转，在两侧发出黄色和橘色的烟雾，展示出圆环旋转所带出的湍流。}{Rotating ring. A very thin ring rotating along a vertical axis and emitting yellow and orange smoke particles is enough to create a turbulent wake as evidenced by the volutes of smoke resulting from the motion.}
-  \label{img:result-rotating-torus}
-\end{figure}
-
-\begin{figure}[htb]
-  \centering
-    \includegraphics[width=0.99\columnwidth]{figures/result_wind_turbine.png}
-  \bicaption{风力涡轮机的仿真。常速的风吹过一个有三个扇叶的风力涡轮机，驱动涡轮机旋转，并由扇叶上产生的烟雾对涡旋尾流结构进行可视化。这个双向的流固耦合结果考虑了轴上的摩擦力来限制了最大的角速度。扇叶角速度随时间的变化可见底部的小图。}{Turbine. A large turbine emitting colored smoke particles at the three propellers of its large blade is simulated with a constant incoming air flow making it turn, creating a spiral vortex trail. This two-way coupling example also involves friction on the axis of the turbine to limit its maximum angular velocity, resulting in a time-varying but converging curve of angular velocity of the turbine shown in the bottom inset.}
-  \label{img:result-wind-turbine}
-\end{figure}
-
-\begin{figure}[htb]
-  \centering
-    \includegraphics[width=0.99\columnwidth]{figures/teaser_concorde.jpg}
-  \bicaption{飞机气动仿真。通过对协和客机翼面的气流仿真，我们展示出我们的方法可以同时处理含有薄板、细棒的薄物体以及厚物体的复杂几何。}{Aerodynamic simulation of an airplane. By simulting the flow over the wing of the Concorde airplane, we demonstrate that our method can handle complex solids containing thin shells, rods and thick objects.}
-  \label{img:teaser_concorde}
-\end{figure}
-
-\begin{figure}[htb]
+\begin{figure}[!tbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/result_tube.png}
   \bicaption{旋转的薄圆柱面。一个薄圆柱面分别在高粘度 (顶图) 与低粘度 (底图) 流体中绕轴旋转。在圆柱面内部和外部分别有烟雾粒子对流场进行可视化 (内部为蓝色，外部为红色)。左图与右图分别展示仿真在4s与7s后的烟雾形态。}{Rotating cylindrical thin shell. A cylindrical thin shell rotating around its axis in a very high (top) and very low viscosity (bottom) fluid respectively, where smoke particles scattered inside (blue) and outside (red) the thin-shell cylinder are advected in the flow (left: after 4 seconds; right: after 7 seconds) to demonstrate that boundary layers are well resolved.}
   \label{img:result-tube}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[!tbp]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/result_thin_shell_sub_grid.png}
+  \bicaption{烟雾经过层叠的板子。烟雾吹过一系列下落的薄板。虽然薄板在分开时烟雾可以通过，当它们层叠在一起时却形成一个密闭的障碍物。我们边界处理中的亚网格近似可以同时处理这两种不同情况，当板子加速靠近时，中间的流体会被加速，而它们紧贴时会成为一个厚的物体。}{Smoke flow through stacked plates. Smoke is blown towards a falling stack of thin plates. While smoke freely flows between separate plates, they become an airtight obstacle when they are stacked on top of each other. Our boundary treatment based on subgrid approximation deals with both cases seamlessly: plates getting closer accelerate the flow in between them, while tightly stacked plates are treated as thick solids.}
+  \label{img:result-thin-shell-sub-grid}
+\end{figure}
+
+\begin{figure}[!tbp]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/result_blowing_leaves.png}
+  \bicaption{风吹叶子的仿真。在这个双向流固耦合结果中，一阵风从地面吹起将树叶吹向空中。}{Wind blowing leaves. In this two-way coupling example, a puff of wind from the ground drives a bunch of dried-up leaves up in the air.}
+  \label{img:result-blowing-leaves}
+\end{figure}
+
+\begin{figure}[!tbp]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/result_rotating_torus.png}
+  \bicaption{旋转的圆环。一个非常细的圆环沿着一个垂直轴旋转，在两侧发出黄色和橘色的烟雾，展示出圆环旋转所带出的湍流。}{Rotating ring. A very thin ring rotating along a vertical axis and emitting yellow and orange smoke particles is enough to create a turbulent wake as evidenced by the volutes of smoke resulting from the motion.}
+  \label{img:result-rotating-torus}
+\end{figure}
+
+\begin{figure}[!tbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/result_thin_rod_sub_grid.png}
   \bicaption{发梳仿真。一个包含着上百根硬毛地发梳 (左图) 在旋转的同时从左向右平移，带动周围气流运动。与有硬毛的情况 (右图) 相比，没有硬毛时的发梳 (中图) 运动产生的尾流更加平滑，涡旋也更大。这个结果展示了我们的边界处理方法，包括亚网格近似，处理复杂几何的能力。}{Hair brush. The translating and rotating motion of a hair brush containing hundreds of bristles (left) creates fine vortices in its wake as well as around the bristles (right) as evidenced by the evolution of the smoke passing around it, properly capturing the intricate fluid-solid interaction engendered by this complex geometry. Compared to the coupling with bristles (right), the smoke near the hair brush without bristles (middle) is much smoother, and the wake flows contain relatively large vortices, indicating the efficacy of subgrid approximation in handling such complex solid shapes.}
   \label{img:result-thin-rod-sub-grid}
 \end{figure}
 
+\begin{figure}[!tbp]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/result_wind_turbine.png}
+  \bicaption{风力涡轮机的仿真。常速的风吹过一个有三个扇叶的风力涡轮机，驱动涡轮机旋转，并由扇叶上产生的烟雾对涡旋尾流结构进行可视化。这个双向的流固耦合结果考虑了轴上的摩擦力来限制了最大的角速度。扇叶角速度随时间的变化可见底部的小图。}{Turbine. A large turbine emitting colored smoke particles at the three propellers of its large blade is simulated with a constant incoming air flow making it turn, creating a spiral vortex trail. This two-way coupling example also involves friction on the axis of the turbine to limit its maximum angular velocity, resulting in a time-varying but converging curve of angular velocity of the turbine shown in the bottom inset.}
+  \label{img:result-wind-turbine}
+\end{figure}
+
+\begin{figure}[!tbp]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/teaser_concorde.jpg}
+  \bicaption{飞机气动仿真。通过对协和客机翼面的气流仿真，我们展示出我们的方法可以同时处理含有薄板、细棒的薄物体以及厚物体的复杂几何。}{Aerodynamic simulation of an airplane. By simulting the flow over the wing of the Concorde airplane, we demonstrate that our method can handle complex solids containing thin shells, rods and thick objects.}
+  \label{img:teaser_concorde}
+\end{figure}
 \paragraph{与薄板的耦合}
 我们首先构造一个薄圆柱面，使得厚度远小于网格大小，之后令圆柱面旋转，产生剪切流 (见图~\ref{img:result-tube})。我们在低雷诺数 (高粘度) 与高雷诺数 (低粘度) 分别进行了测试，并展示出完全不同的流场特性。我们还测试了多个薄板相叠的算例。这些薄板最初是分开的，之后逐渐叠落在一起。我们的亚网格近似使得我们的方法可以仿真从起初分离的薄板到叠在形成一个固体的整个过程，而无需任何调整。结果可见图~\ref{img:result-thin-shell-sub-grid}。我们最后展示一个双向耦合的结果，仿真一阵风从地面吹起树叶的过程。树叶一开始被风吹起后，缓慢地落回地面，并因风产生旋转。结果可见图~\ref{img:result-blowing-leaves}。
 
@@ -270,31 +277,24 @@ Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心�
 \paragraph{与复杂物体耦合}
 一个更复杂但非常常见的情况是厚物体与薄物体同时存在，并共同构成一个复杂物体。我们的边界处理可以有效并统一地处理这种情况。图~\ref{img:result-wind-turbine} 展示了通过风带动一个三扇叶风力涡轮机模型旋转的仿真结果。这里风在带动扇叶旋转的同时，扇叶也影响空气流动，展现了我们方法处理复杂物体的双向耦合。图~\ref{img:teaser_concorde} 展示了协和式客机以攻角20度姿态在空中飞行的仿真结果。对于飞机这样的复杂物体，许多部件对于网格都是亚网格大小的，尤其是机翼部分。在这两次仿真中，得到的结果都与期望相符。
 
-\begin{figure}[htb]
-  \centering
-    \includegraphics[width=0.99\columnwidth]{figures/result_blowing_leaves.png}
-  \bicaption{风吹叶子的仿真。在这个双向流固耦合结果中，一阵风从地面吹起将树叶吹向空中。}{Wind blowing leaves. In this two-way coupling example, a puff of wind from the ground drives a bunch of dried-up leaves up in the air.}
-  \label{img:result-blowing-leaves}
-\end{figure}
-
 \paragraph{快速仿真以进行交互式设计}
 我们的流固耦合算法可足够高效，以进行交互式产品设计与测试。作为示例，我们在$200\!\times\!200\!\times\!200$分辨率下对一个旋翼旋转的情况进行仿真。图~\ref{img:result-design} 展示了仿真中的速度场截面。完成1/100 s的仿真所需的计算时间为0.4 s。这个时间包括数据的读取与可视化 (截面可视化在CPU上完成)。这意味着类似旋翼这类的产品可以使用我们的算法进行快速的气动性能评估，并可基于此优化设计。
 
-\begin{figure}[htb]
+\begin{figure}[!tbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/result_design.png}
   \bicaption{快速交互设计。我们通过GUI操作模拟系统，来快速生成仿真结果。图中示例为一个快速旋转的旋翼，我们可以通过可视化即时的看到尾流情况。这样的快速交互式仿真可以用来辅助产品设计与验证。}{Fast simulation for interactive design. We operated our GUI-based simulation system to produce a quick preliminary result of a fast rotating rotor-blade where turbulent wake flows can be observed interactively, which is very useful for efficient product design and verification.}
   \label{img:result-design}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[!tbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/DJI_compare.png}
   \bicaption{推力的验证。我们通过旋翼旋转的气动仿真来测试旋翼的推力。我们在$288\!\times\!324\!\times\!288$分辨率下测试不同转速的误差结果见左图。右图为固定3600 rpm转速时，相对误差的收敛情况。注意我们采用的分辨率并不是非常高，所以结果的精度依然有提升空间。}{Thrust evaluation. From the simulation of the coupling between a rotating drone blade and the surrounding air, we can compute the estimated thrust values at different rotation speeds with a grid resolution of $288\!\times\!324\!\times\!288$ (left). The relative errors of our thrust value at 3600 rpm w.r.t. experimental measurements as the grid resolution increases (right) indicates convergence of our solver. Note that the tested grid resolutions are not very high, and more accurate results are expected for higher grid resolutions.}
   \label{img:DJI_thrust_compare}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[!tbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/result_city.png}
   \bicaption{气流经过城市街区的高分辨率仿真。我们对气流经过城市街区进行高分辨率仿真 (($889\times333\times556$))，建筑中包含诸多细且尖锐的结构。一层相对薄的烟雾从左侧注入，在建筑间产生涡流细节。}{High-resolution simulation of airflow through a city neighborhood. We simulate the airflow passing around and over buildings using a high resolution grid ($889\times333\times556$), where the buildings contain both thin and sharp structures. A layer of smoke particles with relatively small thickness is coming from the left, creating fine vortical structures behind and in between the buildings.}

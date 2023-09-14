@@ -191,7 +191,7 @@ Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心�
 
 \paragraph{二维泰勒-库埃特 (Taylor-Couette) 流仿真}
 我们首先对二维泰勒-库埃特流进行仿真。这是一个经典的二维流体基准测试，具体来说，测试的场景为两个同心圆 (厚度可不计) 分别以各自的速度旋转~\cite{xu2006immersed}。即在这个场景中，这两个圆既为薄物体，又为动态边界，所以十分适合对我们的方法进行精度的测试。该测试场景的示意可见图~\ref{img:taylor-couette-setting-2d} (a)。
-两个圆的半径分别为$r_1 \!=\! 0.5$、$r_2 \!=\! 1.0$，角速度为$\Omega_1 \!=\! 1.0$、$\Omega_2 \!=\! -1.0$。雷诺数为$\text{Re} \!=\! 10$，对应运动粘度为$\nu \!=\! 0.1$。
+两个圆的半径分别为$r_1 \!=\! 0.5$、$r_2 \!=\! 1.0$，角速度为$\Omega_1 \!=\! 1.0$、$\Omega_2 \!=\! -1.0$。雷诺数为$\text{Re} \!=\! 10$，对应运动黏度为$\nu \!=\! 0.1$。
 在这样的设置下，两个圆之间的圆环会产生流场，并且这个流场存在解析解$\bm{u}^\text{ref}\!=\!(u_x^\text{ref},u_y^\text{ref})$。我们以两个圆的圆心为坐标轴原点，对于任意一个点$(x,y)$，我们可以用$r\!=\!\sqrt{x^2+y^2}$衡量该点到圆心的距离。那么对于$r\!\in\![r_1, r_2]$的点，流场的解析解为
 \begin{equation}
 u_x^\text{ref} = -\bigl(A + \frac{B}{r^2}\bigr)y, \hspace{4mm} u_y^\text{ref} = \bigl(A + \frac{B}{r^2}\bigr)x\;,
@@ -226,7 +226,7 @@ A = \frac{\Omega_2 r_2^2 - \Omega_1 r_1^2}{r_2^2 - r_1^2}, \hspace{4mm} B= \frac
 \end{figure}
 
 \paragraph{与基于切削网格的二维N-S求解器的对比}
-CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的流固耦合方法。其中基于切削网格的方法是精度与计算效率均相对较高的方法。于是我们与~\cite{Azevedo-2016} 中的基于切削网格的N-S方法进行对比。该方法在切削网格构造了类似有限体积法中的网格以提升精度。我们使用该方法与我们的方法分别仿真了一个二维的薄板以角速度$\omega_s = 3\text{rad}/s$旋转的场景，并将得到的速度场展示在图~\ref{img:cut-cell-based-NS-solver} 中。由于Azevedo等~(\citeyear{Azevedo-2016}) 求解的是无粘度的欧拉方程，我们在我们的方法中也将粘度设为0 ($\nu\!=\!0$)。虽然Azevedo等的方法得到了不错的结果，但是在流场中只有大涡，即使流体本身是无粘的。我们注意到目前也有一些更加精准的N-S求解器，如~\cite{zehnder2018advection,qu2019efficient}，但这些方法的计算效率是显著不如动理学方法的~\cite{Li-2020}。从上述分析可得，我们的方法拥有较为独特的优势，即提供了更为精准且高效的湍流仿真，同时可以对不同类型的复杂几何进行耦合。
+CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的流固耦合方法。其中基于切削网格的方法是精度与计算效率均相对较高的方法。于是我们与~\cite{Azevedo-2016} 中的基于切削网格的N-S方法进行对比。该方法在切削网格构造了类似有限体积法中的网格以提升精度。我们使用该方法与我们的方法分别仿真了一个二维的薄板以角速度$\omega_s = 3\text{rad}/s$旋转的场景，并将得到的速度场展示在图~\ref{img:cut-cell-based-NS-solver} 中。由于Azevedo等~(\citeyear{Azevedo-2016}) 求解的是无黏度的欧拉方程，我们在我们的方法中也将黏度设为0 ($\nu\!=\!0$)。虽然Azevedo等的方法得到了不错的结果，但是在流场中只有大涡，即使流体本身是无粘的。我们注意到目前也有一些更加精准的N-S求解器，如~\cite{zehnder2018advection,qu2019efficient}，但这些方法的计算效率是显著不如动理学方法的~\cite{Li-2020}。从上述分析可得，我们的方法拥有较为独特的优势，即提供了更为精准且高效的湍流仿真，同时可以对不同类型的复杂几何进行耦合。
 
 \begin{figure}[!htbp]
   \centering
@@ -266,7 +266,7 @@ CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的
 
 \paragraph{与实际实验的对比}
 为了进一步验证我们方法在有亚网格物体时边界处理的精度，我们与现实世界中的实验进行对比。
-首先我们与三角翼的风洞实验进行比较。该三角翼的后掠角度为$75^\circ$，攻角为$20^\circ$ (见图~\ref{img:comparison_delta_wing} (a))。在实验中，三角翼上方会产生稳定的螺旋涡流结构，提升气动升力 (这种升力被称为涡升力~\cite{anderson2010aircraft})。这种结构被广泛使用于现代飞行器的设计中，如图~\ref{img:teaser_concorde} 中的协和客机。该实验的可视化可见图~\ref{img:comparison_delta_wing} (b)~\cite{Delery:2001}。我们的仿真结果在视觉上与实验结果相匹配，展示出相似的螺旋涡流结构。除去这一定性的对比实验，我们还对旋翼的气动性能进行了定量分析。我们参照一项最近的专利~\cite{lin2020screw} 中的描述重建了旋翼模型，并测量旋翼在旋转时的推力 (计算方法参照~\cite{leishman_2016})，与专利中的数据对比。图~\ref{img:DJI_thrust_compare} (a) 展示了不同转速下的计算误差，显示出较好的一致性。值得注意的是，随着转速的提升，相对误差会升高。这一点的主要原因是在LBM中，随着参照速度的提升，LBM空间下粘度在不断减小，以至于我们在测试时使用的32位浮点数已无法有效保证碰撞过程的计算精度。我们还对收敛性进行了测试，即在固定转速下提升分辨率，结果可见图~\ref{img:DJI_thrust_compare} (b)。这一结果显示了我们方法误差随分辨率的收敛性。
+首先我们与三角翼的风洞实验进行比较。该三角翼的后掠角度为$75^\circ$，攻角为$20^\circ$ (见图~\ref{img:comparison_delta_wing} (a))。在实验中，三角翼上方会产生稳定的螺旋涡流结构，提升气动升力 (这种升力被称为涡升力~\cite{anderson2010aircraft})。这种结构被广泛使用于现代飞行器的设计中，如图~\ref{img:teaser_concorde} 中的协和客机。该实验的可视化可见图~\ref{img:comparison_delta_wing} (b)~\cite{Delery:2001}。我们的仿真结果在视觉上与实验结果相匹配，展示出相似的螺旋涡流结构。除去这一定性的对比实验，我们还对旋翼的气动性能进行了定量分析。我们参照一项最近的专利~\cite{lin2020screw} 中的描述重建了旋翼模型，并测量旋翼在旋转时的推力 (计算方法参照~\cite{leishman_2016})，与专利中的数据对比。图~\ref{img:DJI_thrust_compare} (a) 展示了不同转速下的计算误差，显示出较好的一致性。值得注意的是，随着转速的提升，相对误差会升高。这一点的主要原因是在LBM中，随着参照速度的提升，LBM空间下黏度在不断减小，以至于我们在测试时使用的32位浮点数已无法有效保证碰撞过程的计算精度。我们还对收敛性进行了测试，即在固定转速下提升分辨率，结果可见图~\ref{img:DJI_thrust_compare} (b)。这一结果显示了我们方法误差随分辨率的收敛性。
 
 \begin{figure}[!htbp]
   \centering
@@ -284,7 +284,7 @@ CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/result_tube.png}
-  \bicaption{旋转的薄圆柱面。一个薄圆柱面分别在高粘度 (顶图) 与低粘度 (底图) 流体中绕轴旋转。在圆柱面内部和外部分别有烟雾粒子对流场进行可视化 (内部为蓝色，外部为红色)。左图与右图分别展示仿真在4s与7s后的烟雾形态。}{Rotating cylindrical thin shell. A cylindrical thin shell rotating around its axis in a very high (top) and very low viscosity (bottom) fluid respectively, where smoke particles scattered inside (blue) and outside (red) the thin-shell cylinder are advected in the flow (left: after 4 seconds; right: after 7 seconds) to demonstrate that boundary layers are well resolved.}
+  \bicaption{旋转的薄圆柱面。一个薄圆柱面分别在高黏度 (顶图) 与低黏度 (底图) 流体中绕轴旋转。在圆柱面内部和外部分别有烟雾粒子对流场进行可视化 (内部为蓝色，外部为红色)。左图与右图分别展示仿真在4s与7s后的烟雾形态。}{Rotating cylindrical thin shell. A cylindrical thin shell rotating around its axis in a very high (top) and very low viscosity (bottom) fluid respectively, where smoke particles scattered inside (blue) and outside (red) the thin-shell cylinder are advected in the flow (left: after 4 seconds; right: after 7 seconds) to demonstrate that boundary layers are well resolved.}
   \label{img:result-tube}
 \end{figure}
 
@@ -303,7 +303,7 @@ CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的
 \end{figure}
 
 \paragraph{与薄板的耦合}
-我们首先构造一个薄圆柱面，使得厚度远小于网格大小，之后令圆柱面旋转，产生剪切流 (见图~\ref{img:result-tube})。我们在低雷诺数 (高粘度) 与高雷诺数 (低粘度) 分别进行了测试，并展示出完全不同的流场特性。我们还测试了多个薄板相叠的算例。这些薄板最初是分开的，之后逐渐叠落在一起。我们的亚网格近似使得我们的方法可以仿真从起初分离的薄板到叠在形成一个固体的整个过程，而无需任何调整。结果可见图~\ref{img:result-thin-shell-sub-grid}。我们最后展示一个双向耦合的结果，仿真一阵风从地面吹起树叶的过程。树叶一开始被风吹起后，缓慢地落回地面，并因风产生旋转。结果可见图~\ref{img:result-blowing-leaves}。
+我们首先构造一个薄圆柱面，使得厚度远小于网格大小，之后令圆柱面旋转，产生剪切流 (见图~\ref{img:result-tube})。我们在低雷诺数 (高黏度) 与高雷诺数 (低黏度) 分别进行了测试，并展示出完全不同的流场特性。我们还测试了多个薄板相叠的算例。这些薄板最初是分开的，之后逐渐叠落在一起。我们的亚网格近似使得我们的方法可以仿真从起初分离的薄板到叠在形成一个固体的整个过程，而无需任何调整。结果可见图~\ref{img:result-thin-shell-sub-grid}。我们最后展示一个双向耦合的结果，仿真一阵风从地面吹起树叶的过程。树叶一开始被风吹起后，缓慢地落回地面，并因风产生旋转。结果可见图~\ref{img:result-blowing-leaves}。
 
 \begin{figure}[!htbp]
   \centering

@@ -408,21 +408,26 @@ k_{\alpha \beta \gamma}^{*}=\tilde{\omega}_{\alpha \beta \gamma} k_{\alpha \beta
 m_{\alpha \beta \gamma} =\sum_{i,j,k} (i-u_x)^{\alpha} (j-u_y)^{\alpha} (k-u_z)^{\alpha} f_{ijk},
 \end{equation}
 其中$i, j, k \in \{-1, 0, 1\}$表示离散速度的方向，$\alpha, \beta, \gamma \in \{0, 1, 2\}$表示不同维度的阶数，$\boldsymbol{u}=\{u_x, u_y, u_z\}$表示宏观速度。因为中心矩变换是线性的，所以这个变换其实可以用一个矩阵$M$表示，则反向的变换可以用$M^{-1}$表示。但是我们注意到采用~\cite{Geier-2015}中的分方向的做法可以减少相当部分的计算量：
-\begin{align*}
+\begin{align}
+    \begin{split}
 m_{i j \mid \gamma} & =\sum_{k} f_{ijk}(k-u_z)^{\gamma}, \\
 m_{i \mid \beta \gamma} & =\sum_{j} m_{i j \mid \gamma}(j-u_y)^{\beta}, \\
 m_{\alpha \beta \gamma} & =\sum_{i} m_{i \mid \beta \gamma}(i-u_x)^{\alpha}.
-\end{align*}
+\end{split}
+\end{align}
 
 得到中心矩后，第二个阶段为“前向累积量变换”。对于3阶及以下的累积量，其和中心矩相同：
-\begin{align*}
+\begin{align}
+    \begin{split}
 & k_{110}=m_{110}, \\
 & k_{200}=m_{200}, \\
 & k_{120}=m_{120}, \\
 & k_{111}=m_{111} .
-\end{align*}
+\end{split}
+\end{align}
 对于$k_{101}$与$k_{020}$等同阶的累积量，可以将上述的对应公式的变量下标交换位置得到。4阶及以上的累积量可通过如下公式得到：
-\begin{align*}
+\begin{align}
+    \begin{split}
 k_{211} & =m_{211}-\left(m_{200} m_{011}+2 m_{110} m_{101}\right) / \rho \\
 k_{220} & =m_{220}-\left(m_{200} m_{020}+2 m_{110}^{2}\right) / \rho \\
 k_{122} & =m_{122}-\left(m_{002} m_{120}+m_{020} m_{102}+4 m_{011} m_{111}+2\left(m_{101} m_{021}+m_{110} m_{012}\right)\right) / \rho \\
@@ -431,31 +436,38 @@ k_{222} & =m_{222}-\left(4 m_{111}^{2}+m_{200} m_{022}+m_{020} m_{202}+m_{002} m
 &\quad \left.+2\left(m_{120} m_{102}+m_{210} m_{012}+m_{201} m_{021}\right)\right) / \rho \\
 &\quad +\left(16 m_{110} m_{101} m_{011}+4\left(m_{101}^{2} m_{020}+m_{011}^{2} m_{200}+m_{110}^{2} m_{002}\right)\right. \\
 &\quad \left.+2 m_{200} m_{020} m_{002}\right) / \rho^{2} ,
-\end{align*}
+\end{split}
+\end{align}
 对于同阶的累积量，同样可以将上述的对应公式的变量下标交换位置得到。
 
 第三个阶段是“碰撞”。首先二阶累积量的碰撞公式如下：
-\begin{align*}
+\begin{align}
+    \begin{split}
 & k_{110}^{*}=\left(1-\omega_{1}\right) k_{110}, \\
 & k_{101}^{*}=\left(1-\omega_{1}\right) k_{101}, \\
 & k_{011}^{*}=\left(1-\omega_{1}\right) k_{011} ,
-\end{align*}
+\end{split}
+\end{align}
 其中含星号的变量代表碰撞后的变量。这些累积量的平衡态为0，所以被省去。而由于格子离散化时的各向异性，有些累积量并不为0：
-\begin{align*}
+\begin{align}
+    \begin{split}
 k_{200}^{*}-k_{020}^{*} & =\left(1-\omega_{1}\right)\left(k_{200}-k_{020}\right)-3 \rho\left(1-\frac{\omega_{1}}{2}\right)\left({u_x}^{2} \frac{\partial u_x}{\partial x}-{u_y}^{2} \frac{\partial u_y}{\partial y}\right), \\
 k_{200}^{*}-k_{002}^{*} & =\left(1-\omega_{1}\right)\left(k_{200}-k_{002}\right)-3 \rho\left(1-\frac{\omega_{1}}{2}\right)\left({u_x}^{2} \frac{\partial u_x}{\partial x}-{u_z}^{2} \frac{\partial u_z}{\partial z}\right), \\
 k_{200}^{*}+k_{020}^{*}+k_{002}^{*} & =\kappa_{000} \omega_{2}+\left(1-\omega_{2}\right)\left(k_{200}+k_{020}+k_{002}\right) \\
 &\quad -3 \rho\left(1-\frac{\omega_{2}}{2}\right)\left({u_x}^{2} \frac{\partial u_x}{\partial x}+{u_y}^{2} \frac{\partial u_y}{\partial y}+{u_z}^{2} \frac{\partial u_z}{\partial z}\right) ,
-\end{align*}
+\end{split}
+\end{align}
 其中速度的梯度部分可由二阶的累积量计算得到：
-\begin{align*}
+\begin{align}
+    \begin{split}
 \frac{\partial u_x}{\partial x} & =-\frac{\omega_{1}}{2 \rho}\left(2 k_{200}-k_{020}-k_{002}\right)-\frac{\omega_{2}}{2 \rho}\left(k_{200}+k_{020}+k_{002}-\kappa_{000}\right), \\
 \frac{\partial u_y}{\partial y} & =\frac{\partial u_x}{\partial x}+\frac{3 \omega_{1}}{2 \rho}\left(k_{200}-k_{020}\right), \\
 \frac{\partial u_z}{\partial z} & =\frac{\partial u_x}{\partial x}+\frac{3 \omega_{1}}{2 \rho}\left(k_{200}-k_{002}\right), \\
 \frac{\partial u_y}{\partial x}+\frac{\partial u_x}{\partial y} & =-\frac{3 \omega_{1}}{\rho} k_{110}, \\
 \frac{\partial u_z}{\partial x}+\frac{\partial u_x}{\partial z} & =-\frac{3 \omega_{1}}{\rho} k_{101}, \\
 \frac{\partial u_z}{\partial y}+\frac{\partial u_y}{\partial z} & =-\frac{3 \omega_{1}}{\rho} k_{011}.
-\end{align*}
+\end{split}
+\end{align}
 剩余部分的碰撞公式为：
 \begin{align*}
 k_{120}^{*}+k_{102}^{*} & =\left(1-\omega_{3}\right)\left(k_{120}+k_{102}\right), \\
@@ -477,27 +489,33 @@ k_{112}^{*} & =-\frac{1}{3}\left(\frac{1}{\omega_{1}}-\frac{1}{2}\right) \omega_
 k_{221}^{*} & =\left(1-\omega_{9}\right) k_{221}, \\
 k_{212}^{*} & =\left(1-\omega_{9}\right) k_{212}, \\
 k_{122}^{*} & =\left(1-\omega_{9}\right) k_{122}, \\
-k_{222}^{*} & =\left(1-\omega_{10}\right) k_{222} .
+k_{222}^{*} & =\left(1-\omega_{10}\right) k_{222} . \\
+\stepcounter{equation}\tag{\theequation}
 \end{align*}
 可以看到，4阶的累积量中有$A$和$B$两个参数变量，这两个参数变量源于~\cite{Geier-2017}中的对4阶累积量参数化，这个参数化的目的是消除线性的领头误差 (linearized leading error)，从而提高求解精度。在优化后，三阶累积量的松弛系数与$A$、$B$可以被确定为
-\begin{align*}
+\begin{align}
+    \begin{split}
 \omega_{3} =& \frac{8\left(\omega_{1}-2\right)\left(\omega_{2}\left(3 \omega_{1}-1\right)-5 \omega_{1}\right)}{8\left(5-2 \omega_{1}\right) \omega_{1}+\omega_{2}\left(8+\omega_{1}\left(9 \omega_{1}-26\right)\right)} \\
 \omega_{4} =& \frac{8\left(\omega_{1}-2\right)\left(\omega_{1}+\omega_{2}\left(3 \omega_{1}-7\right)\right)}{\omega_{2}\left(56-42 \omega_{1}+9 \omega_{1}^{2}\right)-8 \omega_{1}} \\
 \omega_{5} =& \frac{24\left(\omega_{1}-2\right)\left(4 \omega_{1}^{2}+\omega_{1} \omega_{2}\left(18-13 \omega_{1}\right)+\omega_{2}^{2}\left(2+\omega_{1}\left(6 \omega_{1}-11\right)\right)\right)}{16 \omega_{1}^{2}\left(\omega_{1}-6\right)-2 \omega_{1} \omega_{2}\left(216+5 \omega_{1}\left(9 \omega_{1}-46\right)\right)+\omega_{2}^{2}\left(\omega_{1}\left(3 \omega_{1}-10\right)\left(15 \omega_{1}-28\right)-48\right)}, \\
 A =& \frac{4 \omega_{1}^{2}+2 \omega_{1} \omega_{2}\left(\omega_{1}-6\right)+\omega_{2}^{2}\left(\omega_{1}\left(10-3 \omega_{1}\right)-4\right)}{\left(\omega_{1}-\omega_{2}\right)\left(\omega_{2}\left(2+3 \omega_{1}\right)-8 \omega_{1}\right)}, \\
 B = & \frac{4 \omega_{1} \omega_{2}\left(9 \omega_{1}-16\right)-4 \omega_{1}^{2}-2 \omega_{2}^{2}\left(2+9 \omega_{1}\left(\omega_{1}-2\right)\right)}{3\left(\omega_{1}-\omega_{2}\right)\left(\omega_{2}\left(2+3 \omega_{1}\right)-8 \omega_{1}\right)} .
-\end{align*}
+\end{split}
+\end{align}
 由于$\omega_{2}$在累积量碰撞模型中是用来控制体积黏度 (bulk viscosity) 的，为了简化，我们可以将$\omega_{2}$设置为1，则上述公式简化为
-\begin{align*}
+\begin{align}
+    \begin{split}
     \omega_{3} =& \frac{8\left(\omega_{1}-2\right)\left(1+2 \omega_{1}\right)}{-8-14\omega_{1}+7\omega_{1}^2} \\
     \omega_{4} =& \frac{8\left(\omega_{1}-2\right)\left(4 \omega_{1}-7\right)}{56-50\omega_{1}+9\omega_{1}^2} \\
     \omega_{5} =& \frac{24\left(\omega_{1}-2\right)\left(-2-7\omega_{1}+3\omega_{1}^2\right)}{48+152\omega_{1}-130\omega_{1}^2+29\omega_{1}^3}, \\
     A =& \frac{4+2\omega_{1}-3\omega_{1}^2}{2-7\omega_{1}+5\omega_{1}^2}, \\
     B =& \frac{4+28\omega_{1}-14\omega_{1}^2}{6-21\omega_{1}+15\omega_{1}^2} .
-\end{align*}
+\end{split}
+\end{align}
 
 第四个阶段是“后向累积量变换”：
-\begin{align*}
+\begin{align}
+    \begin{split}
 m_{211}^{*}= & k_{211}^{*}+\left(m_{200}^{*} m_{011}^{*}+2 m_{110}^{*} m_{101}^{*}\right) / \rho \\
 m_{220}^{*}= & k_{220}^{*}+\left(m_{200}^{*} m_{020}^{*}+2 m_{110}^{* 2}\right) / \rho \\
 m_{122}^{*}= & k_{122}^{*}+\left(m_{002}^{*} m_{120}^{*}+m_{020}^{*} m_{102}^{*}+4 m_{011}^{*} m_{111}^{*}+2\left(m_{101}^{*} m_{021}^{*}+m_{110}^{*} m_{012}^{*}\right)\right) / \rho \\
@@ -506,7 +524,8 @@ m_{222}^{*}= & k_{222}^{*}+\left(4 m_{111}^{* 2}+m_{200}^{*} m_{022}^{*}+m_{020}
 & \left.+2\left(m_{120}^{*} m_{102}^{*}+m_{210}^{*} m_{012}^{*}+m_{201}^{*} m_{021}^{*}\right)\right) / \rho \\
 & -\left(16 m_{110}^{*} m_{101}^{*} m_{011}^{*}+4\left(m_{101}^{* 2} m_{020}^{*}+m_{011}^{* 2} m_{200}^{*}+m_{110}^{* 2} m_{002}^{*}\right)\right. \\
 & \left.+2 m_{200}^{*} m_{020}^{*} m_{002}^{*}\right) / \rho^{2} .
-\end{align*}
+\end{split}
+\end{align}
 这是“前向累积量变换”的逆过程，对于同阶的累积量，可以将上述的对应公式的变量下标交换位置得到。
 
 第五个阶段是“后向中心矩变换”。这里我们同样采用~\cite{Geier-2015}中的做法来减少计算量：
@@ -515,7 +534,7 @@ m_{222}^{*}= & k_{222}^{*}+\left(4 m_{111}^{* 2}+m_{200}^{*} m_{022}^{*}+m_{020}
     & m_{\overline{1} \mid \beta \gamma}^{*}=\left(m_{0 \beta \gamma}^{*}\left(u_x^{2}-u_x\right)+m_{1 \beta \gamma}^{*}(2 u_x-1)+m_{2 \beta \gamma}^{*}\right) / 2, \\
     & m_{1 \mid \beta \gamma}^{*}=\left(m_{0 \beta \gamma}^{*}\left(u_x^{2}+u_x\right)+m_{1 \beta \gamma}^{*}(2 u_x+1)+m_{2 \beta \gamma}^{*}\right) / 2, \\
     & m_{i 0 \mid \gamma}^{*}=m_{i \mid 0 \gamma}^{*}\left(1-u_y^{2}\right)-2u_y m_{i \mid 1 \gamma}^{*}-m_{i \mid 2 \gamma}^{*}, \\
-    & m_{i \overline{1} \mid \gamma}^{*}=\left(m_{i \mid 0 \gamma}^{*}\left(u_y^{2}-u_y\right)+m_{i \mid 1 \gamma}^{*}(2 u_y-1)+m_{i \mid 2 \gamma}^{*}\right) / 2, \\
+    & m_{i \overline{1} \mid \gamma}^{*}=\left(m_{i \mid 0 \gamma}^{*}\left(u_y^{2}-u_y\right)+m_{i \mid 1 \gamma}^{*}(2 u_y-1)+m_{i \mid 2 \gamma}^{*}\right) / 2, \stepcounter{equation}\tag{\theequation} \\
     & m_{i 1 \mid \gamma}^{*}=\left(m_{i \mid 0 \gamma}^{*}\left(u_y^{2}+u_y\right)+m_{i \mid 1 \gamma}^{*}(2 u_y+1)+m_{i \mid 2 \gamma}^{*}\right) / 2, \\
     & f_{i j 0}^{*}=m_{i j \mid 0}^{*}\left(1-u_z^{2}\right)-2u_z m_{i j \mid 1}^{*}-m_{i j \mid 2}^{*}, \\
     & f_{i j \overline{1}}^{*}=\left(m_{i j \mid 0}^{*}\left(u_z^{2}-u_z\right)+m_{i j \mid 1}^{*}(2 u_z-1)+m_{i j \mid 2}^{*}\right) / 2, \\
@@ -565,4 +584,4 @@ f_{j}(\bm{x},t+1) = f_{j'}(\bm{x},t) - 6 w_{j}\rho\bm{u}_s \cdot \bm{c}_{j}\;,
 \end{equation}
 其中$q=\|\mathbf{x}_B - \mathbf{x}_W\|/\|\bm{c}_i\|$是边界点到边界的归一化距离。
 
-在引入基于距离的插值后，反弹边界可以达到二阶精度，但是依然有一些问题。首先是公式~\ref{eq:ibb_2001} 引入了邻居点参与计算，对于GPU实现会降低数据访问效率。其次，当处理复杂外形的几何时，格点可能处于两个边界之间，导致找不到邻居点从而无法完成边界处理。最后，如第~\ref{sec:1_related_works_LBM} 节所介绍的，IBB在Bouzidi等~(\citeyear{Bouzidi-2001}) 提出这一方法后逐渐发展成为了一类方法，之后的工作提出了诸多不同的构造形式，甚至参数化的构造。这些不同的构造的性能与精度均有所区别。关于这一部分我们将在第\ref{sec:sig23}章中继续讨论。
+在引入基于距离的插值后，反弹边界可以达到二阶精度，但是依然有一些问题。首先是公式~\ref{eq:ibb_2001} 引入了邻居点参与计算，对于GPU实现会降低数据访问效率。其次，当处理复杂外形的几何时，格点可能处于两个边界之间，导致找不到邻居点从而无法完成边界处理。最后，如第~\ref{sec:1_related_works_LBM} 节所介绍的，IBB在Bouzidi等~(\citeyear{Bouzidi-2001}) 提出这一方法后逐渐发展成为了一类方法，之后的工作提出了诸多不同的构造形式，甚至参数化的构造。这些不同的构造的性能与精度均有所区别。关于这一部分我们将在第~\ref{sec:sig23} 章中继续讨论。

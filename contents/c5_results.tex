@@ -1,4 +1,4 @@
-\chapter{仿真结果}
+\chapter{实验与仿真结果}
 \label{sec:results}
 
 在本章中，我们展示我们的流体仿真方法在不同领域中的应用。其中，通过第~\ref{sec:siga21} 章中的方法得到的结果均于一个14核Intel CPU、128 GB内存、NVIDIA RTX 3090的工作站上仿真获得；通过第~\ref{sec:sig23} 章中的方法得到的结果均于一个20核Intel CPU、128 GB内存、NVIDIA A100 GPU的工作站上仿真获得。
@@ -229,7 +229,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
   
 \begin{table}[!htbp]
     \centering
-  \bicaption{DrivAer汽车模型的阻力计算精度。我们对我们仿真得到的不同DrivAer车型配置的阻力系数$C_\text{d}$与实验值进行了比较。GS表明地面仿真，即有GS时地面运动且轮胎旋转。}{Drag estimation accuracy of DrivAer car model. We compare our estimates of the drag coefficient $C_\text{d}$ for different DrivAer configurations with experimental data, with or without ground simulation (GS, meaning ground motion and rotating wheels are simulated).}
+  \bicaption[DrivAer汽车模型的阻力计算精度]{DrivAer汽车模型的阻力计算精度。我们对我们仿真得到的不同DrivAer车型配置的阻力系数$C_\text{d}$与实验值进行了比较。GS表明地面仿真，即有GS时地面运动且轮胎旋转。}{Drag estimation accuracy of DrivAer car model. We compare our estimates of the drag coefficient $C_\text{d}$ for different DrivAer configurations with experimental data, with or without ground simulation (GS, meaning ground motion and rotating wheels are simulated).}
   \begin{tabular}{*{4}{c}}
         \toprule
     车型配置 & 仿真所得$C_\text{d}$ & 实际实验所得$C_\text{d}$ & 相对误差 \\
@@ -308,6 +308,6 @@ James等~(\citeyear{James-2018}) 使用PowerFLOW与StarCCM+分别对DrivAer的�
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/landing_gear_frequency.png}
-  \bicaption[LAGOON起落架轮胎采样点的功率谱密度]{LAGOON起落架轮胎采样点的功率谱密度。在右轮胎上的采样点K1 (a) 测得压力序列后进行信号分析，得到该点的功率谱密度 (b)。其中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\cite{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约$1000Hz$与$1500Hz$出现的声调，与实验相吻合。}{Power spectral density of a sample point on the LAGOON landing gear tire. We mearsure the pressure sequence from a sample point K1 on the right tire (a) and obtain its power spectral density via signal analysis (b). Blue curve shows our mearsurement and red curve shows the result from CEPRA19 wind tunnel testing. It demonstrates that we can successfully predict the tonal emergence at about $1000Hz$ and $1500Hz$, which matches the experiment.}
+  \bicaption[LAGOON起落架轮胎采样点的功率谱密度]{LAGOON起落架轮胎采样点的功率谱密度。在右轮胎上的采样点K1 (a) 测得压力序列后进行信号分析，得到该点的功率谱密度 (b)。其中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\cite{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 Hz与1500 Hz出现的声调，与实验相吻合。}{Power spectral density of a sample point on the LAGOON landing gear tire. We mearsure the pressure sequence from a sample point K1 on the right tire (a) and obtain its power spectral density via signal analysis (b). Blue curve shows our mearsurement and red curve shows the result from CEPRA19 wind tunnel testing. It demonstrates that we can successfully predict the tonal emergence at about 1000 Hz and 1500 Hz, which matches the experiment.}
   \label{img:landing_gear_frequency}
 \end{figure}

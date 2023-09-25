@@ -13,7 +13,14 @@
     \label{img:cfd_impact_on_planes}
 \end{figure}
 
-而CFD的发展也带动了流体仿真 (fluid simulation) 技术本身在其它学科中的应用。如20世纪80年代，计算气动声学 (Computational Aeroacoustics，CAA) 学科作为气动声学的分支开始建立，以使用数值方法分析湍流产生的噪声。20世纪90年代，基于物理的流体动画 (physically-based fluid animation) 技术开始在计算机图形学 (Computer Graphics，CG) 中出现，并被大量应用于娱乐工业。虽然这些领域的侧重点各有不同，但由于其本质对流体仿真技术的需求和发展，这些学科之间的边界也开始逐渐模糊。
+而随着小型机及个人电脑的出现，计算机开始普及。计算成本的降低使得计算流体力学所发展的流体仿真 (fluid simulation) 技术得以应用至更多领域，并带动相关学科的发展。1992年气动声学 (aeroacoustics) 领域的开创者詹姆斯·莱特希尔 (James Lighthill) 预言计算机仿真会为气动声学带来第二个黄金时代~\cite{hardin1993computational}。随后，计算气动声学 (Computational Aeroacoustics，CAA) 学科作为气动声学的分支开始建立，以使用数值方法分析湍流产生的噪声。虽然学科的发展时间并不长，但随着人们对噪声问题的愈发关注，计算气动声学已成为研究噪声源、噪声产生机理和控制方法的一类主要方法~\cite{RN177}。而同样在20世纪90年代，基于物理的流体动画 (physically-based fluid animation) 技术开始在计算机图形学 (Computer Graphics，CG) 中出现，并被广泛应用于娱乐工业的游戏及视觉特效制作中。其中有多个流体仿真技术由于其对电影产业的杰出贡献获得奥斯卡技术成就奖 (Academy Award for Technical Achievement)，包括Maya“流体效果” (Fluid Effects) 系统、工业光魔 (Industrial Light \& Magic, ILM) 的Plume流体仿真系统 (见图~\ref{img:star_wars}) 等。虽然这些领域的侧重点各有不同，但由于其本质对流体仿真技术的需求和发展，这些学科之间的边界也开始逐渐模糊。
+
+\begin{figure}[htbp]
+  \centering
+    \includegraphics[width=0.95\columnwidth]{figures/star_wars.png}
+  \bicaption[流体仿真技术在电影工业中的运用]{流体仿真技术在电影工业中的运用。图中展示了《星球大战：最后的绝地武士》(Star Wars: The Last Jedi) 影片中一些通过仿真得到的特效镜头，这些仿真由工业光魔的Plume流体仿真系统实现，该系统在2014年获得奥斯卡技术成就奖。图片来自~\cite{10.1145/3214745.3214778}。}{Application of fluid simulation technique in motion picture industry. The figure demonstrates some effects simulation shots in Star Wars: The Last Jedi using ILM's Plume fluid simulation system, for which ILM received the Academy Award for Technical Achievement in 2014. Image from~\cite{10.1145/3214745.3214778}.}
+  \label{img:star_wars}
+\end{figure}
 
 现有的流体仿真技术虽被广泛地应用于多个领域，但其依然存在许多缺陷。目前主流的流体仿真方法依然是从宏观层面对纳维-斯托克斯 (Navier-Stokes，N-S) 方程进行求解，这些方法的一个主要问题是很难以合理的计算成本获得足够精确的解。如求解层流与湍流的过渡、湍流的流场动态、湍流的边界层分离等问题时，获得的解的精度与计算成本是非常相关的。美国国家航空航天局 (National Aeronautics and Space Administration，NASA) 最近的一项研究就突出了高性能计算 (High-Performance Computing，HPC) 平台对现今CFD在航空航天应用中的重要性~\cite{slotnick2014cfd}。而随着新的硬件架构，如图形处理单元 (Graphics Processing Unit，GPU)，的算力提升，其在科学计算中的应用也越来越广泛。GPU架构相比传统HPC平台中的处理器架构，可以大幅降低并行代码的运行时间，从而提升计算效率。然而目前的不可压N-S求解器中需要求解泊松 (Poisson) 方程，这样的全局求解会大幅降低GPU的计算效率，也是传统流体仿真方法应用于GPU架构的一大阻碍。
 

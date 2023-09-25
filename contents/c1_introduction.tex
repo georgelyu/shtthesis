@@ -8,31 +8,35 @@
 
 \begin{figure}[htbp]
     \centering
-      \includegraphics[width=0.95\columnwidth]{figures/cfd_impact_on_planes.png}
+      \includegraphics[width=0.99\columnwidth]{figures/cfd_impact_on_planes.png}
     \bicaption[计算流体力学在飞机设计中的作用]{计算流体力学在飞机设计中的作用。绿色表示计算流体力学对该部分的设计有较强影响，紫色表示有部分影响，红色表示有应用潜力。图片来自~\cite{spalart_venkatakrishnan_2016}。}{CFD influence on aircraft design. The green areas have a strong impact. The purple areas have some impact. The opportunities for the future are in red. Image from~\cite{spalart_venkatakrishnan_2016}.}
     \label{img:cfd_impact_on_planes}
 \end{figure}
 
-而随着小型机及个人电脑的出现，计算机开始普及。计算成本的降低使得计算流体力学所发展的流体仿真 (fluid simulation) 技术得以应用至更多领域，并带动相关学科的发展。1992年气动声学 (aeroacoustics) 领域的开创者詹姆斯·莱特希尔 (James Lighthill) 预言计算机仿真会为气动声学带来第二个黄金时代~\cite{hardin1993computational}。随后，计算气动声学 (Computational Aeroacoustics，CAA) 学科作为气动声学的分支开始建立，以使用数值方法分析湍流产生的噪声。虽然学科的发展时间并不长，但随着人们对噪声问题的愈发关注，计算气动声学已成为研究噪声源、噪声产生机理和控制方法的一类主要方法~\cite{RN177}。而同样在20世纪90年代，基于物理的流体动画 (physically-based fluid animation) 技术开始在计算机图形学 (Computer Graphics，CG) 中出现，并被广泛应用于娱乐工业的游戏及视觉特效制作中。其中有多个流体仿真技术由于其对电影产业的杰出贡献获得奥斯卡技术成就奖 (Academy Award for Technical Achievement)，包括Maya“流体效果” (Fluid Effects) 系统、工业光魔 (Industrial Light \& Magic, ILM) 的Plume流体仿真系统 (见图~\ref{img:star_wars}) 等。虽然这些领域的侧重点各有不同，但由于其本质对流体仿真技术的需求和发展，这些学科之间的边界也开始逐渐模糊。
+随着小型机及个人电脑的出现，计算成本的降低使得计算流体力学所发展的流体仿真技术得以应用至更多领域，并带动相关学科的发展。1992年气动声学 (aeroacoustics) 领域的开创者詹姆斯·莱特希尔 (James Lighthill) 预言计算机仿真会为气动声学带来第二个黄金时代~\cite{hardin1993computational}。随后，计算气动声学 (Computational Aeroacoustics，CAA) 学科作为气动声学的分支开始建立，以使用数值方法分析湍流产生的噪声。随着人们对噪声问题的愈发关注，计算气动声学已成为研究噪声源、噪声产生机理和控制方法的一类主要方法~\cite{RN177}。而同样在20世纪90年代，基于物理的流体动画 (physically-based fluid animation) 技术开始在计算机图形学 (Computer Graphics，CG) 中出现，并被广泛应用于娱乐工业的游戏及视觉特效制作中。其中有多个流体仿真技术由于其对电影产业的杰出贡献获得奥斯卡技术成就奖 (Academy Award for Technical Achievement)，包括Maya“流体效果” (Fluid Effects) 系统、工业光魔 (Industrial Light \& Magic, ILM) 的Plume流体仿真系统 (见图~\ref{img:star_wars}) 等。相比计算流体力学更多关注计算精度和问题本质，视觉特效则需要复杂效果和表现力~\cite{C1}。这也使得两个领域的流体仿真方法一定程度上有所分化。
 
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=0.95\columnwidth]{figures/star_wars.png}
+    \includegraphics[width=0.99\columnwidth]{figures/star_wars.png}
   \bicaption[流体仿真技术在电影工业中的运用]{流体仿真技术在电影工业中的运用。图中展示了《星球大战：最后的绝地武士》(Star Wars: The Last Jedi) 影片中一些通过仿真得到的特效镜头，这些仿真由工业光魔的Plume流体仿真系统实现，该系统在2014年获得奥斯卡技术成就奖。图片来自~\cite{10.1145/3214745.3214778}。}{Application of fluid simulation technique in motion picture industry. The figure demonstrates some effects simulation shots in Star Wars: The Last Jedi using ILM's Plume fluid simulation system, for which ILM received the Academy Award for Technical Achievement in 2014. Image from~\cite{10.1145/3214745.3214778}.}
   \label{img:star_wars}
 \end{figure}
 
 现有的流体仿真技术虽被广泛地应用于多个领域，但其依然存在许多缺陷。目前主流的流体仿真方法依然是从宏观层面对纳维-斯托克斯 (Navier-Stokes，N-S) 方程进行求解，这些方法的一个主要问题是很难以合理的计算成本获得足够精确的解。如求解层流与湍流的过渡、湍流的流场动态、湍流的边界层分离等问题时，获得的解的精度与计算成本是非常相关的。美国国家航空航天局 (National Aeronautics and Space Administration，NASA) 最近的一项研究就突出了高性能计算 (High-Performance Computing，HPC) 平台对现今CFD在航空航天应用中的重要性~\cite{slotnick2014cfd}。而随着新的硬件架构，如图形处理单元 (Graphics Processing Unit，GPU)，的算力提升，其在科学计算中的应用也越来越广泛。GPU架构相比传统HPC平台中的处理器架构，可以大幅降低并行代码的运行时间，从而提升计算效率。然而目前的不可压N-S求解器中需要求解泊松 (Poisson) 方程，这样的全局求解会大幅降低GPU的计算效率，也是传统流体仿真方法应用于GPU架构的一大阻碍。
 
+面临这种物理精度与性能之间的矛盾，计算机图形学中的流体仿真方法更多倾向于在保证视觉真实感的前提下提升效率。除了使用自适应网格或硬件加速等常规方法外，典型的提升效率的方法还包括使用简化模型~\cite{doi.org/10.1111/cgf.12825} 或数据驱动方法~\cite{10.1145/2816795.2818129}、在粗糙网格下添加高精度细节，如湍流合成~\cite{10.1145/1360612.1360649}和多层次解算~\cite{10.1145/1833349.1778785}等。但这些方法牺牲了一定的物理精度，且很多方法只可应用于某一个具体场景下的流体仿真，并不能成为较为通用的流体仿真方法。
+
 此外，目前的流体仿真方法还十分缺乏高度的自动化技术，包括自动的几何网格与计算网格的生成。传统的CFD方法对几何网格的质量要求十分严格，不满足要求的几何网格经常会造成流体仿真结果的发散。在工业制造领域，人工制作这样的网格可能需要工程师数日的时间，对于整体的仿真效率有很大影响。此外，自适应的计算网格对于流体仿真的精度也有着重要影响。自适应计算网格可以提升复杂区域网格的分辨率，降低对流体动态影响较小的区域的分辨率，以在提升精度的同时大幅减少计算资源的使用。高效、自动化的自适应计算网格构建，对提升整体的仿真效率，也是十分关键的。而这些对于传统流体仿真方法均是十分有挑战性的问题。
 
-针对这些问题，格子玻尔兹曼方法 (Lattice Boltzmann Method, LBM) 作为一个较新的流体仿真方法，开始受到重视。从其方法被提出~\cite{PhysRevLett.61.2332} 至今三十多年的时间过去，其求解流体的能力不断被发展和验证，并成为一个可以替代传统的求解N-S方程的流体仿真方法~\cite{ARUMUGAPERUMAL2015955}。LBM通过求解格子玻尔兹曼方程 (Lattice Boltzmann Equation, LBE)，从介观层面 (即微观粒子在统计上的分布) 进行流体仿真。在这一过程中，LBM可以通过每个离散点局部的求解来迭代时间步长，即无需施加全局的约束，这一点使得LBM非常适合大规模并行计算。并且，LBE只包含一阶偏微分方程，而N-S方程则包含二阶偏微分方程。这不仅使LBM的实现更简洁，也使LBM相比传统的N-S方法有着非常高的求解效率与精度。而LBE可以通过查普曼-恩斯科格 (Chapman-Enskog) 分析与N-S方程建立联系，从而证明LBE在弱可压流体中，与N-S方程在宏观上等同~\cite{Y.H.Qian_1993}，这保证了LBM的理论精度。
+针对这些问题，格子玻尔兹曼方法 (Lattice Boltzmann Method, LBM) 作为一个较新的流体仿真方法，开始受到重视。从该方法被提出~\cite{PhysRevLett.61.2332} 至今三十多年的时间过去，其求解流体的能力不断被发展和验证，并成为一个可以替代传统的求解N-S方程的流体仿真方法~\cite{ARUMUGAPERUMAL2015955}。LBM通过求解格子玻尔兹曼方程 (Lattice Boltzmann Equation, LBE)，从介观层面 (即微观粒子在统计上的分布) 进行流体仿真。在这一过程中，LBM可以通过每个离散点局部的求解来迭代时间步长，即无需施加全局的约束，这一点使得LBM非常适合大规模并行计算。并且，LBE只包含一阶偏微分方程，而N-S方程则包含二阶偏微分方程。这不仅使LBM的实现更简洁，也使LBM相比传统的N-S方法有着非常高的求解效率与精度。而LBE可以通过查普曼-恩斯科格 (Chapman-Enskog) 分析与N-S方程建立联系，从而证明LBE在弱可压流体中，与N-S方程在宏观上等同~\cite{Y.H.Qian_1993}，这保证了LBM的理论精度。
 
-LBM的另一独特优势为，LBM在低速 (Ma<0.4) 可压缩非稳态湍流求解上非常高效，所以可以直接通过仿真计算亚声速情况下的气动声。这样的直接噪声计算 (Direct Noise Computation，DNC) 在使用传统N-S方法时是十分困难的，因为在湍流情况下对可压缩非稳态N-S方程求解的计算成本十分高昂。虽然可以求解雷诺平均纳维-斯托克斯 (Reynolds-averaged Navier-Stokes, RANS) 方程得到平均流场后，通过莱特希尔 (Lighthill) 方程~\cite{doi:10.1098/rspa.1952.0060} 从近场流动构造出气动声源，再利用FW-H (Ffowcs Williams-Hawkings) 声比拟积分法~\cite{doi:10.1098/rsta.1969.0031} 进行声场传播求解。但是显然，平均流场信息中高频信号是丢失的，这样的混合方法相比直接噪声计算精度有所下降。而LBM的高效湍流求解使得LBM成为计算气动声学领域的一个非常有前景的直接仿真方法。高精度、高效率和实现简洁的优势使得LBM有着同时满足工业制造、气动声分析与视觉动画等不同领域需求的潜力。
+LBM的另一独特优势为，LBM在低速 (马赫数低于0.4) 可压缩非稳态湍流求解上非常高效，所以可以直接通过仿真计算亚声速情况下的气动声。这样的直接噪声计算 (Direct Noise Computation，DNC) 在使用传统N-S方法时是十分困难的，因为在湍流情况下对可压缩非稳态N-S方程求解的计算成本是巨大的。虽然可以求解雷诺平均纳维-斯托克斯 (Reynolds-Averaged Navier-Stokes, RANS) 方程得到平均流场后，再结合莱特希尔 (Lighthill) 方程~\cite{doi:10.1098/rspa.1952.0060} 与FW-H (Ffowcs Williams-Hawkings) 声比拟积分法~\cite{doi:10.1098/rsta.1969.0031} 进行声场传播求解 (这也被称为CAA中的混合方法)。但是显然，平均流场信息中高频信号是丢失的，这样的混合方法相比直接噪声计算精度有所下降。而LBM的高效湍流求解使得LBM成为计算气动声学领域的一个非常有前景的直接仿真方法。高精度、高效率和实现简洁的优势使得LBM有着同时满足工业制造、气动声分析与视觉动画等不同领域需求的潜力。
 
-但同时，格子玻尔兹曼方法也有一些亟待解决的问题。第一点是亚网格物体的流固耦合问题。亚网格物体是指某些维度远小于计算网格大小的物体。由于这些网格亚网格的特点，它们的几何特征很难被一般的流固耦合方法捕捉，从而会造成错误的求解结果。第二点是边界处理及碰撞模型的精度及稳定性不足。虽然LBM在很多验证案例中都有着优秀的精度表现，但一些极难使用数值仿真复现的物理现象 (如高雷诺数下的湍流边界层分离) 对于LBM也依然具有挑战。这样问题的本质是LBM中的碰撞模型与边界处理的精度与稳定性还有待进一步提升。第三点是计算网格构建复杂的问题。因为LBM的边界处理大多基于切削网格，所以对几何网格的质量要求相比传统N-S方法是大幅降低的。但是对于计算网格，LBM同样缺乏上述的自动网格生成技术。
+但同时，在技术层面格子玻尔兹曼方法也有一些亟待解决的问题。第一点是亚网格物体的流固耦合问题。亚网格物体是指某些维度远小于计算网格大小的物体。由于这些网格亚网格的特点，它们的几何特征很难被一般的流固耦合方法捕捉，从而会造成错误的求解结果。第二点是边界处理及碰撞模型的精度及稳定性不足。虽然LBM在很多验证案例中都有着优秀的精度表现，但一些极难使用数值仿真复现的物理现象 (如高雷诺数下的湍流边界层分离) 对于LBM也依然具有挑战。这样问题的本质是LBM中的碰撞模型与边界处理的精度与稳定性还有待进一步提升。第三点是计算网格构建复杂的问题。因为LBM的边界处理大多基于切削网格，所以对几何网格的质量要求相比传统N-S方法是大幅降低的。但是对于计算网格，LBM同样缺乏上述的自动网格生成技术。
 
-为了解决这一系列问题，本文基于现有的格子玻尔兹曼方法，提升其求解精度和稳定性，构建了整体的仿真框架，以自动化地完成高效、高精度地流体仿真，并展示其在不同领域中的应用。首先，针对亚网格物体的流固耦合问题，本文提出了基于速度修正和简单反弹 (Simple Bounce-back, SBB) 边界方法的混合边界方法。该方法可以求解流体与轻薄物体的交互，如薄片、细棒等。这些物体的某些尺度通常比计算域的离散尺度还要小，在传统的流体仿真方法中极易引起流体泄露。本文提出的新的混合边界方法在解决流体泄露问题的同时，提升了求解的稳定性。其次，针对于需要更高精度的应用，本文还提出了新的单点插值反弹 (Interpolated Bounce-back, IBB) 边界方法，与基于熵优化的累积量碰撞模型。通过与物理实验的比较，本文验证了新的方法相比现有方法有着进一步的精度提升，并可以模拟出物理上的阻力危机现象。在实现与效率上，本文提出了基于距离场的自动计算网格构建方法，该方法可以自动识别出有效的流体区域，并依据与固体距离的远近自动细分网格，实现了快速、简便的网格生成。最后，本文提出了整个框架的GPU优化算法，在代码层面进一步提升运行效率。
+为了解决这一系列问题，本文基于现有的格子玻尔兹曼方法，提升其求解精度和稳定性，构建了整体的流体仿真框架，以自动化地完成高效、高精度地流体仿真，并展示其在不同领域中的应用。首先，针对亚网格物体的流固耦合问题，本文提出了基于速度修正和简单反弹 (Simple Bounce-back, SBB) 边界方法的混合边界方法。该方法可以求解流体与轻薄物体的交互，如薄片、细棒等。这些物体的某些尺度通常比计算域的离散尺度还要小，在传统的流体仿真方法中极易引起流体泄露。本文提出的新的混合边界方法在解决流体泄露问题的同时，提升了求解的稳定性。其次，针对于需要更高精度的应用，本文还提出了新的单点插值反弹 (Interpolated Bounce-back, IBB) 边界方法，与基于熵优化的累积量碰撞模型。通过与物理实验的比较，本文验证了新的方法相比现有方法有着进一步的精度提升，并可以模拟出物理上的阻力危机现象。在实现与效率上，本文提出了基于距离场的自动计算网格构建方法，该方法可以自动识别出有效的流体区域，并依据与固体距离的远近自动细分网格，实现了快速、简便的网格生成。最后，本文提出了整个框架的GPU优化算法，在代码层面进一步提升运行效率。
+
+在技术层面之外，我们也注意到LBM本身由于其发展时间较短，在许多领域并没有得到足够的关注。
 
 本文的核心目标为进一步提升LBM方法的精度、稳定性与易用性，推动LBM在计算机图形学、计算流体力学、计算气动声学等不同领域中的发展与应用，缩小这些不同领域中计算方法的区别，提出一个统一、高效、精准的流固耦合仿真框架，并完善相关实现方法，使流体仿真技术在现实中有着更强的指导意义。
 
@@ -45,21 +49,21 @@ LBM的另一独特优势为，LBM在低速 (Ma<0.4) 可压缩非稳态湍流求�
 \subsection{计算流体力学中的流体仿真方法}
 \label{sec:1_related_works_CFD}
 \paragraph{有限差分方法}
-有限差分方法是最简单而易于实现的偏微分方程求解方法。应用于N-S方程时，有限差分方法同样只需要较小的计算量即可求解~\cite{kooij2018comparison,vreman2014comparison}。但是只有极少数情况中，有限差分方法被应用于湍流仿真。在求解不可压缩N-S方程时，需要额外求解全局的泊松方程来满足不可压条件 (使速度场散度为0)，这也是使用有限差分方法进行流体仿真的难点。对于拉普拉斯算子 (Laplace operator)，通常需要使用迭代的求解方法 (如多重网格方法~\cite{golub2013matrix}) 来求解线性系统。其次，对于非线性平流项，有限差分方法往往采取半拉格朗日方法~\cite{smolarkiewicz1992class}。但这会带来很大的数值黏度误差。现代CFD中比较重要的差分格式为总变差减小 (total variation diminishing, TVD) 格式~\cite{osher1986very, YEE1985327, HARTEN1983357}。在TVD格式中，已经通过对左右模板 (stencil) 的导数值的比较来进行自适应的选择适当的值，这一思想也被扩展到了之后的基本无震荡 (essentially non-oscillatory, ENO) 格式~\cite{HARTEN19973, SHU198932, SHU1988439}与加权基本无震荡 (weighted essentially non-oscillatory, WENO) 格式~\cite{LIU1994200}。但是由于有限差分方法在多维问题上只能在各个维度上进行一维近似，所以其只能应用于结构化网格，从而对复杂几何体的处理能力有限。
+有限差分方法是最简单而易于实现的偏微分方程求解方法。应用于N-S方程时，有限差分方法同样只需要较小的计算量即可求解~\cite{kooij2018comparison,vreman2014comparison}。但是只有极少数情况中，有限差分方法被应用于湍流仿真。在求解不可压缩N-S方程时，需要额外求解全局的泊松方程来满足不可压条件 (使速度场散度为0)，这也是使用有限差分方法进行流体仿真的难点。对于拉普拉斯算子 (Laplace operator)，通常需要使用迭代的求解方法 (如多重网格方法~\cite{golub2013matrix}) 来求解线性系统。其次，对于非线性平流项，有限差分方法往往采取半拉格朗日方法~\cite{smolarkiewicz1992class}。但这会带来很大的数值黏度误差。现代CFD中比较重要的差分格式为总变差减小 (Total Variation Diminishing, TVD) 格式~\cite{osher1986very, YEE1985327, HARTEN1983357}。在TVD格式中，已经通过对左右模板 (stencil) 的导数值的比较来进行自适应的选择适当的值，这一思想也被扩展到了之后的基本无震荡 (Essentially Non-Oscillatory, ENO) 格式~\cite{HARTEN19973, SHU198932, SHU1988439}与加权基本无震荡 (Weighted Essentially Non-Oscillatory, WENO) 格式~\cite{LIU1994200}。但是由于有限差分方法在多维问题上只能在各个维度上进行一维近似，所以其只能应用于结构化网格，从而对复杂几何体的处理能力有限。
 
 \paragraph{有限体积方法}
 相对于有限差分方法从微分形式的方程出发，有限体积方法通过从积分形式的方程出发出发构造算法，这使得有限体积方法有着天然的守恒性。也因为它直接计算积分项，使其可以直接应用于非结构网格上。这些特点使得有限体积方法能够运用于复杂几何体的计算。目前，有限体积方法被广泛应用于商业流体仿真软件中，如Ansys FLUENT，Ansys CFX等~\cite{JEONG201419}。 
 对于不可压缩的流体，典型的显式有限体积法必须与压力投影阶段相结合，以得到无旋的速度场~\cite{https://doi.org/10.1002/fld.310, pember1996higher}。为了提高稳定性，对速度和压力进行离散时，通常会使用交错网格。虽然在结构化网格中实现这一点并不难，但非结构网格中这依然有一定的挑战~\cite{herbin2012staggered, gao2012unstructured, bermudez1998upwind}。此外，也有工作提出了更高阶的有限体积方法，如k-exact有限体积方法~\cite{barth1990higher}与WENO有限体积方法~\cite{HU199997}等。
 
 \paragraph{有限元方法}
-有限元方法将计算域离散为许多小区域 (即有限元)，每个单元可以看作是整个解的一个分段的近似。通过有限元方法求解偏微分方程通常先要将方程改写为弱形式，这个求解的方法称作伽辽金 (Galerkin) 方法。而因为其采用连续函数空间，使得每个单元之间无法完全独立，在求解时需要求解一个全局的庞大线性方程组。所需的计算消耗使得该方法并未在流体仿真领域得到广泛应用。而随后，间断伽辽金 (discontinuous Galerkin，DG) 方法被提出，最早其被用于求解中子运输方程~\cite{reed1973triangular}，并随后通过与龙格-库塔 (Runge-Kutta) 方法的结合，被推广并应用到双曲守恒律方程的求解中~\cite{cockburn2001runge, cockburn1990runge, cockburn1989tvb2, cockburn1989tvb3}。在此之后该方法也开始被应用于CFD领域~\cite{Zienkiewicz-2013, lomtev1999discontinuous, bassi1997high}。为了改进DG方法计算量大等缺点，无积分型 (quadrature-dree) DG~\cite{atkins1998quadrature}与节点型 (nodal) DG~\cite{hesthaven2007nodal}也被相应提出。
+有限元方法将计算域离散为许多小区域 (即有限元)，每个单元可以看作是整个解的一个分段的近似。通过有限元方法求解偏微分方程通常先要将方程改写为弱形式，这个求解的方法称作伽辽金 (Galerkin) 方法。而因为其采用连续函数空间，使得每个单元之间无法完全独立，在求解时需要求解一个全局的庞大线性方程组。所需的计算消耗使得该方法并未在流体仿真领域得到广泛应用。而随后，间断伽辽金 (Discontinuous Galerkin，DG) 方法被提出，最早其被用于求解中子运输方程~\cite{reed1973triangular}，并随后通过与龙格-库塔 (Runge-Kutta) 方法的结合，被推广并应用到双曲守恒律方程的求解中~\cite{cockburn2001runge, cockburn1990runge, cockburn1989tvb2, cockburn1989tvb3}。在此之后该方法也开始被应用于CFD领域~\cite{Zienkiewicz-2013, lomtev1999discontinuous, bassi1997high}。为了改进DG方法计算量大等缺点，无积分型 (quadrature-dree) DG~\cite{atkins1998quadrature}与节点型 (nodal) DG~\cite{hesthaven2007nodal}也被相应提出。
 
 % Sec 1.2.2
 \subsection{计算机图形学中的流体仿真方法}
 \label{sec:1_related_works_CG}
 \paragraph{流体仿真方法}
-相对于CFD领域中流体仿真对精度的追求，CG中的流体仿真方法更加注重效率与灵活性。例如早期Stam~(\citeyear{Stam-1999}) 提出的简单的无条件稳定的半拉格朗日方法。该方法开创了CG领域流体仿真的研究，但该方法因为有较强的数值耗散误差而无法进行湍流的仿真。之后的许多工作提出了新的数值求解方法从而改善这一情况，如 前后误差补偿和校正 (back and forth error compensation correction, BFECC) 方法~\cite{Kim-2005}，无条件稳定的麦科马克 (MacCormack) 方法~\cite{Selle-2008}，对流-反射 (advection-reflection) 方法~\cite{Zehnder-2018}与对流量双向映射(bi-directional mapping of convective quantities, BiMocq$^2$) 方法~\cite{Qu-2019}。但这些方法通常会带来额外的数值色散误差。
-因为烟雾动画更加注重其表面涡量的模拟，涡方法应运而生。涡方法将N-S方程重新构造为了基于涡量的形式~\cite{Park-2005, Selle-2005}，并使用涡丝~\cite{ Weissmann-2010, Angelidis-2005}或涡片~\cite{Zhang-2015, Zhang-2014, Pfaff-2012}进行仿真。除去上述基于网格的方法，也有部分基于粒子的方法被应用于CG领域的流体仿真。如光滑粒子流体动力学 (smoothed particle hydrodynamics, SPH) 由于其易于实现的特性与良好的视觉效果，是CG领域中十分流行的液体仿真方法~\cite{Ihmsen-2014-1, Becker-2007, Adams-2007, Muller-2003, Desbrun-1996}。为了更好地保证流体的不可压缩性，基于密度~\cite{Bender-2015, Ihmsen-2014-2, Solenthaler-2009}或空间位置~\cite{Macklin-2013}的修正被提出以改善SPH方法的视觉效果。
+相对于CFD领域中流体仿真对精度的追求，CG中的流体仿真方法更加注重效率与灵活性。例如早期Stam~(\citeyear{Stam-1999}) 提出的简单的无条件稳定的半拉格朗日方法。该方法开创了CG领域流体仿真的研究，但该方法因为有较强的数值耗散误差而无法进行湍流的仿真。之后的许多工作提出了新的数值求解方法从而改善这一情况，如 前后误差补偿和校正 (Back and Forth Error Compensation Correction, BFECC) 方法~\cite{Kim-2005}，无条件稳定的麦科马克 (MacCormack) 方法~\cite{Selle-2008}，对流-反射 (advection-reflection) 方法~\cite{Zehnder-2018}与对流量双向映射(Bi-directional Mapping of convective quantities, BiMocq$^2$) 方法~\cite{Qu-2019}。但这些方法通常会带来额外的数值色散误差。
+因为烟雾动画更加注重其表面涡量的模拟，涡方法应运而生。涡方法将N-S方程重新构造为了基于涡量的形式~\cite{Park-2005, Selle-2005}，并使用涡丝~\cite{Weissmann-2010, Angelidis-2005}或涡片~\cite{Zhang-2015, Zhang-2014, Pfaff-2012}进行仿真。除去上述基于网格的方法，也有部分基于粒子的方法被应用于CG领域的流体仿真。如光滑粒子流体动力学 (Smoothed Particle Hydrodynamics, SPH) 由于其易于实现的特性与良好的视觉效果，是CG领域中十分流行的液体仿真方法~\cite{Ihmsen-2014-1, Becker-2007, Adams-2007, Muller-2003, Desbrun-1996}。为了更好地保证流体的不可压缩性，基于密度~\cite{Bender-2015, Ihmsen-2014-2, Solenthaler-2009}或空间位置~\cite{Macklin-2013}的修正被提出以改善SPH方法的视觉效果。
 此外，还有混合方法尝试结合网格与粒子方法的优点~\cite{Zhu-2005, Foster-1996, Brackbill-1986, Harlow-1962}。基于此，有工作~\cite{Fu-2017, Jiang-2015}进一步通过更精准的网格与粒子间的转换提升了精度。近来，Fei 等~(\citeyear{Fei-2021}) 使用了分离的积分方法降低了数值耗散，Qu 等~(\citeyear{Qu-2022}) 提出了新的网格与粒子间的转换方法以更好的保证流体体积的一致性。
 
 \paragraph{流固耦合方法}
@@ -68,16 +72,16 @@ LBM的另一独特优势为，LBM在低速 (Ma<0.4) 可压缩非稳态湍流求�
 相比于常见固体，与薄片耦合的流体仿真难度更大，大多数需要特殊处理，如单边的基于求交的修正以防止流体泄露，或进行两次压力求解以计算应用于固体上的耦合作用力~\cite{Guendelman-2005}。
 也有方法提出了更精准的动量转移与虚拟单元方法~\cite{Robinson:2009, Robinson-2008}。理论上，基于自适应网格的欧拉方法~\cite{Elcott-2007,Klingner-2006,Feldman:DF:2005,Feldman-2005,dai-2005}或拉格朗日方法~\cite{Clausen-2013,Misztal:2010}可以处理任意形状的固体，但这些方法需要频繁地调整网格结构，从而降低计算效率。
 为了降低计算难度，部分基于切削网格 (cut-cell) 的方法使用了类有限体积的形式，在单元内切割出贴合边界的区域以防止流体穿过物体~\cite{Azevedo-2016,Liu:2015:MVF,weber-2015,Edwards-2014,gibou-2012,Ng-2009,Batty-2007,Roble-2005}。
-对于基于粒子的流体仿真方法，通常会在流体上施加惩罚力以实现边界条件~\cite{peer-2015,Ihmsen-2013}。Gao等~(\citeyear{Gao:2017}) 在流体隐式粒子 (fluid-implicit-particle, FLIP) 方法中加入了贴合物体形状的约束, 但该方法在湍流中有稳定性问题。并且，绝大部分的基于粒子的方法无法保证流体压力的一致性~\cite{band-2018}。
+对于基于粒子的流体仿真方法，通常会在流体上施加惩罚力以实现边界条件~\cite{peer-2015,Ihmsen-2013}。Gao等~(\citeyear{Gao:2017}) 在流体隐式粒子 (FLuid-Implicit-Particle, FLIP) 方法中加入了贴合物体形状的约束, 但该方法在湍流中有稳定性问题。并且，绝大部分的基于粒子的方法无法保证流体压力的一致性~\cite{band-2018}。
 此外，也有部分混合方法，使用网格来完成耦合的同时，利用粒子进行流体仿真~\cite{Fei-2019,Fei-2018,hu-2018,Zhang-2016}。
 
 % Sec 1.2.3
 \subsection{格子玻尔兹曼方法}
 \label{sec:1_related_works_LBM}
 \paragraph{碰撞模型}
-在LBM中最简洁也最易于实现的碰撞模型为BGK (Bhatnagar-Gross-Krook) 碰撞模型~\cite{Chen-1998, Bhatnagar-1954}，然而在高雷诺数流体中，BGK模型有着很大的截断误差，从而在数值上非常不稳定。多松弛时间 (multiple relaxation time, MRT) 碰撞模型~\cite{Coveney-2002, Lallemand-2000, dHumieres-1992}尝试通过在矩 (moment) 空间进行松弛，来提升整体的数值稳定性与准确性。最初MRT碰撞模型通过原始矩 (raw moment) 进行构造，而这一形式违反了伽利略不变性 (Galilean invariance)。而之后为了进一步提升精度与稳定性，基于中心矩 (central moment)~\cite{Geier-2006, Geier-2009}、埃尔米特矩 (Hermite moment)~\cite{Shan-2007, Chen-2014, Adhikari-2008}、中心埃尔米特矩 (central Hermite moment)~\cite{Mattila-2017, Shan-2019}和累积量 (cumulant)~\cite{Geier-2015, Geier-2017}的MRT碰撞模型被提出，并满足了伽利略不变性。
-还有一类碰撞模型是对分布函数进行埃尔米特多项式 (Hermite polynomial) 展开后截断来去除非流体动力学 (non-hydrodynamic) 的模态 (modes)，之后进行碰撞。这类碰撞模型被称为正则化碰撞模型~\cite{Zhang-2006, Latt-2006}。后期有工作通过递归形式改进了正则化碰撞模型，被称为递归正则化碰撞模型~\cite{Malaspinas-2015, Coreixas-2017}。作者证明了该方法有着更好的数值耗散和色散性质。Jacob等~(\citeyear{Jacob-2018}) 之后又提出了混合递归正则化模型，对二阶应力张量的重构做了调整，提高了方法的稳定性。
-另一类对碰撞模型的改进路线是动态调整松弛时间，主要的方法包括大涡模拟 (large-eddy simulation, LES) 亚网格模型~\cite{Eggels-1996, Sagaut-2010}和基于熵优化的碰撞模型~\cite{Karlin-1999, Ansumali-2003}。
+在LBM中最简洁也最易于实现的碰撞模型为BGK (Bhatnagar-Gross-Krook) 碰撞模型~\cite{Chen-1998, Bhatnagar-1954}，然而在高雷诺数流体中，BGK模型有着很大的截断误差，从而在数值上非常不稳定。多松弛时间 (Multiple Relaxation Time, MRT) 碰撞模型~\cite{Coveney-2002, Lallemand-2000, dHumieres-1992}尝试通过在矩 (moment) 空间进行松弛，来提升整体的数值稳定性与准确性。最初MRT碰撞模型通过原始矩 (raw moment) 进行构造，而这一形式违反了伽利略不变性 (Galilean invariance)。而之后为了进一步提升精度与稳定性，基于中心矩 (central moment)~\cite{Geier-2006, Geier-2009}、埃尔米特矩 (Hermite moment)~\cite{Shan-2007, Chen-2014, Adhikari-2008}、中心埃尔米特矩 (central Hermite moment)~\cite{Mattila-2017, Shan-2019}和累积量 (cumulant)~\cite{Geier-2015, Geier-2017}的MRT碰撞模型被提出，并满足了伽利略不变性。
+还有一类碰撞模型是对分布函数进行埃尔米特多项式 (Hermite polynomial) 展开后截断来去除非流体动力学的模态 (non-hydrodynamic modes)，之后进行碰撞。这类碰撞模型被称为正则化碰撞模型~\cite{Zhang-2006, Latt-2006}。后期有工作通过递归形式改进了正则化碰撞模型，被称为递归正则化碰撞模型~\cite{Malaspinas-2015, Coreixas-2017}。作者证明了该方法有着更好的数值耗散和色散性质。Jacob等~(\citeyear{Jacob-2018}) 之后又提出了混合递归正则化模型，对二阶应力张量的重构做了调整，提高了方法的稳定性。
+另一类对碰撞模型的改进路线是动态调整松弛时间，主要的方法包括大涡模拟 (Large-Eddy Simulation, LES) 亚网格模型~\cite{Eggels-1996, Sagaut-2010}和基于熵优化的碰撞模型~\cite{Karlin-1999, Ansumali-2003}。
 对于LES亚网格模型，在LBM中最早被应用的是斯马古林斯基 (Smagorinsky) 模型~\cite{Hou-1994, Krafczyk-2003}。之后的工作通过包含动态的参数估计~\cite{Premnath-2009}、范德里斯 (van Driest) 阻尼函数~\cite{Malaspinas-2014}与改进的应力项~\cite{Leveque-2007}，来提升壁面流体描述的精度。
 除了使用涡流黏度之外，还有基于近似反卷积的模型~\cite{Malaspinas-2011, Nathen-2018}和壁面自适应大涡模型 (wall-adaptive large eddy, WALE)~\cite{Weickert-2010}被应用在LBM中。
 同时，基于熵优化的碰撞模型通过最大化局部熵值，为高阶矩的松弛时间提供了一个有效的约束。然而，在碰撞过程中求解带约束的熵优化问题在数值上耗费很大。所以有不少方法尝试优化求解效率，如KBC (Karlin-B\"osch-Chikatamarla) 模型~\cite{Karlin-2014}、基于伪熵的方法~\cite{Kramer-2019}和使用解析解进行优化的方法~\cite{Tang-2022}。
@@ -88,7 +92,7 @@ LBM的另一独特优势为，LBM在低速 (Ma<0.4) 可压缩非稳态湍流求�
 
 \paragraph{边界处理}
 边界处理在LBM中是一个非常重要的研究方向~\cite{Marson-2022}。
-在LBM中最常用的实现无滑移条件的边界方法是反弹边界 (bounce-back，BB) 条件~\cite{Ladd-1994, Bouzidi-2001, Ginzburg-2003, Chun-2007}和浸没边界法 (immersed boundary method, IBM)~\cite{Peskin-1972, Lu-2012, Kang-2011, Patel-2018, Seo-2011, Chen-2013}。
+在LBM中最常用的实现无滑移条件的边界方法是反弹边界 (Bounce-Back，BB) 条件~\cite{Ladd-1994, Bouzidi-2001, Ginzburg-2003, Chun-2007}和浸没边界法 (Immersed Boundary Method, IBM)~\cite{Peskin-1972, Lu-2012, Kang-2011, Patel-2018, Seo-2011, Chen-2013}。
 简单反弹边界因为十分易于实现，而成为最常见的边界处理方法。但是由于它实质上将边界形状看作了体素化的边界，所以一般情况下只有一阶精度。为了解决这一问题，一个常用的方案是根据网格点到边界的距离对分布函数进行插值。这一方法被称为插值反弹边界~\cite{Bouzidi-2001, Yu-2003}。
 Ginzburg和d'Humières~(\citeyear{Ginzburg-2003}) 通过构造多次反射边界处理 (multi-reflection boundary treatment)，在弯曲边界处理上取得了更高阶的精度。
 虽然这些方法可以有效地处理复杂几何，但是它们通常包含非局部的计算，即需要依赖于其相邻点的分布函数。这样首先造成了当网格点处于狭窄边界时，可能由于没有相邻点而无法处理的现象。其次，由于需要访问相邻点的数据，在并行计算中也会对效率产生影响。

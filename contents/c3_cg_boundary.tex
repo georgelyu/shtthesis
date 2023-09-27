@@ -1,15 +1,15 @@
 \chapter{可处理复杂几何的通用流体仿真及流固耦合方法}
 \label{chap:siga21}
 
-在介绍完与我们的工作最相关的一些背景知识之后，我们下面介绍我们的新的面向视觉动画的通用流体仿真及流固耦合方法。该方法的主要目的是面向计算机图形学领域，解决一些图形学流体仿真中的难点问题，并推动LBM在计算机图形学领域中的发展与应用。
+在介绍完与我们的工作最相关的一些背景知识之后，我们下面介绍我们的新的可处理复杂几何的通用流体仿真及流固耦合方法。
 
 % Sec 3.1
 \section{背景与动机}
 流固耦合对于复杂的视觉现象仿真有很重要的作用，流体和固体之间的相互作用对两者的运动皆有影响，从而成为一个时间上的迭代过程。这种相互作用在数值上的计算是非常复杂的，并且，在有薄壳或细棒的场景中，流固耦合的计算是更加艰巨的。我们这里定义的薄壳或细棒是在某一个或某两个维度上非常狭窄的物体，以至于在这些维度上，物体的大小是远小于网格的尺度的。由于薄壳或细棒的这种特性，它们的特征在网格中很难被捕捉到，以至于经常发生泄漏或穿透等现象。
 
-虽然有工作展示了薄壳~\cite{DiscreteShells,Bridson:2003} 或细棒~\cite{DiscreteRods} 的仿真，也包括它们在黏性流体~\cite{Fei-2018,Takahashi:2019,Fei-2019} 或非湍流~\cite{Azevedo-2016} 中的耦合。也有一些工作在动理学方法中使用扩散界面浸入边界法获得相比N-S方法更加稳定、高效的湍流仿真结果~\cite{Li-2018,Li-2020}。
+虽然有工作展示了薄壳~\citep{DiscreteShells,Bridson:2003} 或细棒~\citep{DiscreteRods} 的仿真，也包括它们在黏性流体~\citep{Fei-2018,Takahashi:2019,Fei-2019} 或非湍流~\citep{Azevedo-2016} 中的耦合。也有一些工作在动理学方法中使用扩散界面浸入边界法获得相比N-S方法更加稳定、高效的湍流仿真结果~\citep{Li-2018,Li-2020}。
 
-在本章中，我们介绍一个在LBM框架下的高效且通用的双向流固耦合边界处理方法，以可同时求解固体任意维度为亚网格尺度的情况。我们的方法将简单反弹边界方法与一个速度修正方法混合，以克服之前方法的缺点，提升仿真的稳定性与视觉效果。并且，通过几何上的近似，与实现层面的GPU优化，我们的方法相比Chen等~(\citeyear{Chen-2021}) 提出的LBM优化方案，在仿真效率上有着数倍的提升。
+在本章中，我们介绍一个在LBM框架下的高效且通用的双向流固耦合边界处理方法，以可同时求解固体任意维度为亚网格尺度的情况。我们的方法将简单反弹边界方法与一个速度修正方法混合，以克服之前方法的缺点，提升仿真的稳定性与视觉效果。并且，通过几何上的近似，与实现层面的GPU优化，我们的方法相比~\citet{Chen-2021} 提出的LBM优化方案，在仿真效率上有着数倍的提升。
 
 因为LBM使用笛卡尔网格来离散空间空间，而固体的边界一般不与网格对齐，于是出现了切削网格的概念，即网格被固体边界所切割。一个直观的例子可见图~\ref{img:cutcell_and_interpolation} 中的绿色网格。一般在LBM中需要对切削网格进行特殊处理，以刻画流体与固体间的相互作用。现有的各类基于切削网格的边界处理方法虽不能在效率、准确度、稳定性上都尽善尽美，但也有各自的优势。如扩散界面浸入边界法不需要追踪网格随物体的变化，从而降低了求解的复杂度。但它通过施加惩罚力来描述边界对流体的作用，不能准确刻画边界的形状，从而不适用于薄物体的仿真，如图~\ref{img:cutcell_and_interpolation} 所示。而简单反弹边界方法虽然可以通过分布函数的反弹阻止流体泄露 (即使是薄物体)，但是因为它的准确性有限，在仿真中会产生不正确的速度分布，影响仿真的稳定性，如图~\ref{img:Immersed_Bounce_back} 所示。
 
@@ -25,7 +25,7 @@
 \begin{figure}[htb]
     \centering
       \includegraphics[width=0.97\columnwidth]{figures/comparison_with_ib.png}
-    \bicaption[浸没边界法造成的泄露]{浸没边界法造成的泄露。当有薄板存在时，Li等~(\citeyear{Li-2020}) 所使用的浸没边界法 (左图) 与我们的方法的对比 (右图)。因为惩罚力会分布到薄板两侧，扩散边界浸没边界法可能会产生泄露 (见图中红色方框)，而我们的方法可防止此现象。}{Leakage of immersed boundary. For a kinetic fluid simulation coupled with a thin plate, the immersed boundary method used by Li et al.~(\citeyear{Li-2020}) (left) is compared with our method (right). Due to force spreading in both sides of the thin plate, this recent coupling approach employing a diffuse-interface immersed boundary method may generate leakage through the plate (see red box), while our method prevents this issue by design.}
+    \bicaption[浸没边界法造成的泄露]{浸没边界法造成的泄露。当有薄板存在时，\citet{Li-2020} 所使用的浸没边界法 (左图) 与我们的方法的对比 (右图)。因为惩罚力会分布到薄板两侧，扩散边界浸没边界法可能会产生泄露 (见图中红色方框)，而我们的方法可防止此现象。}{Leakage of immersed boundary. For a kinetic fluid simulation coupled with a thin plate, the immersed boundary method used by \citet{Li-2020} (left) is compared with our method (right). Due to force spreading in both sides of the thin plate, this recent coupling approach employing a diffuse-interface immersed boundary method may generate leakage through the plate (see red box), while our method prevents this issue by design.}
     \label{img:comparison_with_ib}
 \end{figure}
 
@@ -48,7 +48,7 @@
 我们将在下面依次介绍这三部分内容。
 
 \subsection{双面简单反弹边界}
-在第~\ref{sec:boundary_treatment} 节中，我们回顾了简单反弹边界方法。一般来说，反弹边界都只应用于流体点。然而随着物体的运动，流体点可能被固体覆盖成为固体点，固体点也可能重新变为流体点。这个转换过程不止需要追踪格点状态，并且需要进行速度的插值，甚至外插，来完成格点的重建。这样会在高雷诺数下在固体边界上产生很强的耗散误差。为了避免这一现象，我们对所有切削网格内的点都进行分布函数反弹，而不只针对流体点。我们称该方法为\emph{双面简单反弹边界方法}。这样的话，我们就不再需要区分固体点和流体点，并进行相关的格点追踪与重建。该方法依旧可以避免流体泄露，即使有亚网格物体存在。但这并没有改善固体边界的速度锯齿现象与大速度梯度造成的误差，所以我们引入下一节中介绍的速度修正方法。
+在第~\ref{sec:boundary_treatment} 节中，我们回顾了简单反弹边界方法。一般来说，反弹边界都只应用于流体点。然而随着物体的运动，流体点可能被固体覆盖成为固体点，固体点也可能重新变为流体点。这个转换过程不止需要追踪格点状态，并且需要进行速度的插值，甚至外插，来完成格点的重建。这样会在高雷诺数下在固体边界上产生很强的耗散误差。为了避免这一现象，我们对所有切削网格内的点都进行分布函数反弹，而不只针对流体点。我们称该方法为双面简单反弹边界方法。这样的话，我们就不再需要区分固体点和流体点，并进行相关的格点追踪与重建。该方法依旧可以避免流体泄露，即使有亚网格物体存在。但这并没有改善固体边界的速度锯齿现象与大速度梯度造成的误差，所以我们引入下一节中介绍的速度修正方法。
 
 \subsection{切削网格的速度修正}
 我们期望获得一个速度的修正，那么势必我们需求一个理想的速度的分布，即我们希望获得的速度分布是什么样子。因为我们主要考虑在图形学中的应用，平衡精度、效率与实现的难易度后，我们在这里谋求一个一阶 (线性) 精度的边界处理。我们注意到简单反弹边界本身也是一阶精度的，这也是我们没有采用更高阶的插值反弹边界的原因。我们在后面也通过一系列的结果展示，这一方案在实现较为简洁的前提下，对于视觉动画制作已经足够。我们在第~\ref{chap:sig23} 章中会介绍更高阶精度的边界处理方法，以进一步扩展我们的方法的应用范围。
@@ -69,7 +69,7 @@
 \begin{equation} \label{eq:penaltyForce}
 \bm{F}_p(\bm{x}) = \hat{\bm{u}}(\bm{x})-\bm{u}(\bm{x})
 \end{equation}
-施加在点$\bm{x}$上，具体的力在LBM中的实现方法与~\cite{Li-2020} 中相同，即将惩罚力投影至分布函数空间，分布函数使用最高阶的埃尔米特多项式展开，以维持精度与稳定性。由于反弹边界已经承担了大部分的边界处理，这里的惩罚力会比传统浸没边界法中的惩罚力小很多，只作为一个速度的修正出现，于是我们也不需要采用~\cite{Li-2020} 中的时间重缩放来缩短物理时间步长从而提升稳定性。这可以使仿真效率进一步提升。
+施加在点$\bm{x}$上，具体的力在LBM中的实现方法与~\citep{Li-2020} 中相同，即将惩罚力投影至分布函数空间，分布函数使用最高阶的埃尔米特多项式展开，以维持精度与稳定性。由于反弹边界已经承担了大部分的边界处理，这里的惩罚力会比传统浸没边界法中的惩罚力小很多，只作为一个速度的修正出现，于是我们也不需要采用~\citep{Li-2020} 中的时间重缩放来缩短物理时间步长从而提升稳定性。这可以使仿真效率进一步提升。
 
 \begin{figure}[htb]
     \centering
@@ -129,7 +129,7 @@
 
 \section{算法优化}
 \subsection{几何近似}
-我们的混合边界处理中需要许多的几何计算，如将流体点投影至固体表面，或将速度方向与固体边界进行求交等。我们还需要识别切削网格点，以及它们的状态 (属于流体区域或固体区域)。许多工作阐述了如何准确地进行这样的几何计算~\cite{Azevedo-2016,Robinson:2009}。但由于固体边界的形状可能十分复杂，这一过程可能非常耗时，不利于维持LBM高并行度的优势。
+我们的混合边界处理中需要许多的几何计算，如将流体点投影至固体表面，或将速度方向与固体边界进行求交等。我们还需要识别切削网格点，以及它们的状态 (属于流体区域或固体区域)。许多工作阐述了如何准确地进行这样的几何计算~\citep{Azevedo-2016,Robinson:2009}。但由于固体边界的形状可能十分复杂，这一过程可能非常耗时，不利于维持LBM高并行度的优势。
 为了在效率与精度间取得平衡，我们提出一系列的几何近似计算方法，以在不影响视觉可信度的情况下提升计算效率。
 
 \begin{figure}[!htbp]
@@ -140,10 +140,10 @@
 \end{figure}
 
 \paragraph{表面采样与切削网格识别}
-为了加速计算，我们可以使用采样点而不是实际的几何来表达边界。这一过程需要对固体表面进行均匀采样，如使用泊松圆盘采样 (Poisson-disk sampling)~\cite{dunbar2006spatial}。注意这也要求固体模型应该是密封的。每一个采样点$\bm{x}_s$在采样时可获得一个由边界朝外的法向$\bm{n}(\bm{x}_s)$。之后如果有网格中包含至少一个边界采样点，这个网格就可以被识别为切削网格 (如图~\ref{img:geometric-computing} (a))。
+为了加速计算，我们可以使用采样点而不是实际的几何来表达边界。这一过程需要对固体表面进行均匀采样，如使用泊松圆盘采样 (Poisson-disk sampling)~\citep{dunbar2006spatial}。注意这也要求固体模型应该是密封的。每一个采样点$\bm{x}_s$在采样时可获得一个由边界朝外的法向$\bm{n}(\bm{x}_s)$。之后如果有网格中包含至少一个边界采样点，这个网格就可以被识别为切削网格 (如图~\ref{img:geometric-computing} (a))。
 
 \paragraph{高效切削网格投影}
-在几何计算中一个最重要的 (也可能是最耗时的) 部分是将流体点$\bm{x}$投影至固体表面上，以得到投影点位置$\bm{x}'$。传统方法可能会构建一个树形结构，然后搜索距离$\bm{x}$点最近的三角形~\cite{wang-2012}。在这里我们使用一个高效的近似算法来替代这一过程，我们在固体表面选择一个距离$\bm{x}$点最近的采样点$\bm{x}_s$，并满足
+在几何计算中一个最重要的 (也可能是最耗时的) 部分是将流体点$\bm{x}$投影至固体表面上，以得到投影点位置$\bm{x}'$。传统方法可能会构建一个树形结构，然后搜索距离$\bm{x}$点最近的三角形~\citep{wang-2012}。在这里我们使用一个高效的近似算法来替代这一过程，我们在固体表面选择一个距离$\bm{x}$点最近的采样点$\bm{x}_s$，并满足
 \begin{equation}\label{eq:is_in_fluid}
 (\bm{x}-\bm{x}_s)\cdot \bm{n}(\bm{x}_s) \geq 0\;
 \end{equation}
@@ -155,13 +155,13 @@
 如果朝向不一致 (图~\ref{img:geometric-computing} (e) 即为此情况)，则我们认为$\bm{x}$点与$\bm{y}$点处于边界的不同侧，所以这个速度方向是与固体表面相交的。则我们应在这个方向上进行反弹边界处理。
 
 \subsection{GPU实现}
-目前为止所描述的我们的算法，包括几何近似，我们都希望它们尽可能的简单，且只涉及局部计算。这样可以令GPU的实现较为简单直接，且有尽可能高的计算效率。在实现时我们应用了Chen等~(\citeyear{Chen-2021}) 中提出的加速技术，与一些针对我们算法设计的加速实现。这些实现方法在本节进行讨论。
+目前为止所描述的我们的算法，包括几何近似，我们都希望它们尽可能的简单，且只涉及局部计算。这样可以令GPU的实现较为简单直接，且有尽可能高的计算效率。在实现时我们应用了 \citet{Chen-2021} 中提出的加速技术，与一些针对我们算法设计的加速实现。这些实现方法在本节进行讨论。
 
 \paragraph{存储布局}
-对于LBM来说，在并行时一般是按方向的。即先计算$f_0$，之后计算$f_1$、$f_2$、……，以此类推。在这种情况下数组结构体 (structure-of-arrays, SoA) 是对缓存更友好的存储布局，因为SoA结构可以提升缓存利用率，从而提升整体性能~\cite{Chen-2021}。我们在实现中也同样使用SoA布局。
+对于LBM来说，在并行时一般是按方向的。即先计算$f_0$，之后计算$f_1$、$f_2$、……，以此类推。在这种情况下数组结构体 (structure-of-arrays, SoA) 是对缓存更友好的存储布局，因为SoA结构可以提升缓存利用率，从而提升整体性能~\citep{Chen-2021}。我们在实现中也同样使用SoA布局。
 
 \paragraph{快速碰撞计算}
-Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心矩投影矩阵$\bm{M}(\bm{u})$的逆矩阵$\bm{M}(\bm{u})^{-1}$计算问题。作者们在其中提到逆矩阵应该使用解析式进行计算来保证碰撞的精度。然而由于解析式非常复杂，在GPU计算时，会占用过多的寄存器，导致GPU占用率低。但是我们注意到，如果将$\bm{M}(\bm{u})^{-1}$的解析式进行LU分解~\cite{fei2018three}，分解后的三角矩阵中很多元素是非常接近于0的。所以我们可以将这些非常接近于0的元素置0，之后使用稀疏矩阵的数据格式进行存储。这样并不会影响整体计算的精度 (所造成的误差低于机器误差)，但是寄存器使用量可以大幅减少。在同样的GPU上进行测试，我们的碰撞过程的效率约是~\cite{Chen-2021} 中碰撞过程的三倍。
+\citet{Chen-2021} 还讨论了在碰撞过程中所需要的中心矩投影矩阵$\bm{M}(\bm{u})$的逆矩阵$\bm{M}(\bm{u})^{-1}$计算问题。作者们在其中提到逆矩阵应该使用解析式进行计算来保证碰撞的精度。然而由于解析式非常复杂，在GPU计算时，会占用过多的寄存器，导致GPU占用率低。但是我们注意到，如果将$\bm{M}(\bm{u})^{-1}$的解析式进行LU分解~\citep{fei2018three}，分解后的三角矩阵中很多元素是非常接近于0的。所以我们可以将这些非常接近于0的元素置0，之后使用稀疏矩阵的数据格式进行存储。这样并不会影响整体计算的精度 (所造成的误差低于机器误差)，但是寄存器使用量可以大幅减少。在同样的GPU上进行测试，我们的碰撞过程的效率约是~\citep{Chen-2021} 中碰撞过程的三倍。
 
 \paragraph{并行的切削网格点识别与投影}
 我们在上一小节讨论了我们算法中的一个关键步骤是将切削网格点投影到物体表面，这一过程可以通过寻找距离该点最近的固体采样点来近似。一般这一过程会将流体边界点作为并行单元，来搜索距其最近的采样点。但是这样会造成GPU负载不均衡，从而降低GPU占用率。
@@ -169,7 +169,7 @@ Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心�
 这样的好处是，每个固体采样点附近一定存在切削网格点，并且数量接近。这样可以大幅提升GPU的负载均衡，减少无用的线程造成的线程开销，提升GPU占用率。
 
 \section{与现有方法的对比}
-此节中我们将我们的图形方法与图形学中近期提出的 (也是目前最前沿的) LBM仿真方法~\cite{Li-2020} 进行定量与定性的对比。我们还针对计算效率，讨论基于Li等~\citeyear{Li-2020} 的性能改进~\cite{Chen-2021} 与我们方法的比较。
+此节中我们将我们的图形方法与图形学中近期提出的 (也是目前最前沿的) LBM仿真方法~\citep{Li-2020} 进行定量与定性的对比。我们还针对计算效率，讨论基于 \citet{Li-2020} 所提方法的性能改进~\citep{Chen-2021} 与我们方法的比较。
 
 \begin{figure}[!htbp]
   \centering
@@ -181,12 +181,12 @@ Chen等~(\citeyear{Chen-2021}) 还讨论了在碰撞过程中所需要的中心�
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.94\columnwidth]{figures/taylor-couette-compare-2d.png}
-  \bicaption[二维泰勒-库埃特流仿真的对比]{二维泰勒-库埃特流仿真的对比。我们将不同求解器 (从左至右) 得到的不同分辨率 (从上至下) 的二维泰勒-库埃特流数值仿真结果进行可视化，可视化的值为相对误差，场景设置见图~\ref{img:taylor-couette-setting-2d}。图中从左至右依次为原始的简单反弹边界~\cite{Ladd-1994}、\cite{Li-2020} 中的动理学方法、我们的边界处理，以及ANSYS Fluent求解器。ANSYS Fluent在求解时使用了自适应的体网格，平均元素大小与其它求解器中的网格大小相当。}{Comparison of 2D Taylor-Couette flow simulation. We visualize the relative errors of the numerical solution to the 2D Taylor-Couette flow of Fig.~\ref{img:taylor-couette-setting-2d} computed by different solvers (columns) and different resolutions (rows). From left to right: the original bounce-back scheme~\cite{Ladd-1994}, the kinetic solver of~\cite{Li-2020}, our boundary treatment method, as well as the ANSYS Fluent solver using adaptive radial mesh for which the average element area matches the grid cell area used for the other solvers.}
+  \bicaption[二维泰勒-库埃特流仿真的对比]{二维泰勒-库埃特流仿真的对比。我们将不同求解器 (从左至右) 得到的不同分辨率 (从上至下) 的二维泰勒-库埃特流数值仿真结果进行可视化，可视化的值为相对误差，场景设置见图~\ref{img:taylor-couette-setting-2d}。图中从左至右依次为原始的简单反弹边界~\citep{Ladd-1994}、\citep{Li-2020} 中的动理学方法、我们的边界处理，以及ANSYS Fluent求解器。ANSYS Fluent在求解时使用了自适应的体网格，平均元素大小与其它求解器中的网格大小相当。}{Comparison of 2D Taylor-Couette flow simulation. We visualize the relative errors of the numerical solution to the 2D Taylor-Couette flow of Fig.~\ref{img:taylor-couette-setting-2d} computed by different solvers (columns) and different resolutions (rows). From left to right: the original bounce-back scheme~\citep{Ladd-1994}, the kinetic solver of~\citep{Li-2020}, our boundary treatment method, as well as the ANSYS Fluent solver using adaptive radial mesh for which the average element area matches the grid cell area used for the other solvers.}
   \label{img:taylor-couette-compare-2d}
 \end{figure}
 
 \paragraph{二维泰勒-库埃特 (Taylor-Couette) 流仿真}
-为了验证我们方法的精度，我们首先对二维泰勒-库埃特流进行仿真。这是一个经典的二维流体基准测试，具体来说，测试的场景为两个同心圆 (厚度可不计) 分别以各自的速度旋转~\cite{xu2006immersed}。即在这个场景中，这两个圆既为薄物体，又为动态边界，所以十分适合对我们的方法进行精度的测试。该测试场景的示意可见图~\ref{img:taylor-couette-setting-2d} (a)。
+为了验证我们方法的精度，我们首先对二维泰勒-库埃特流进行仿真。这是一个经典的二维流体基准测试，具体来说，测试的场景为两个同心圆 (厚度可不计) 分别以各自的速度旋转~\citep{xu2006immersed}。即在这个场景中，这两个圆既为薄物体，又为动态边界，所以十分适合对我们的方法进行精度的测试。该测试场景的示意可见图~\ref{img:taylor-couette-setting-2d} (a)。
 两个圆的半径分别为$r_1 \!=\! 0.5$、$r_2 \!=\! 1.0$，角速度为$\Omega_1 \!=\! 1.0$、$\Omega_2 \!=\! -1.0$。雷诺数为$\text{Re} \!=\! 10$，对应运动黏度为$\nu \!=\! 0.1$。
 在这样的设置下，两个圆之间的圆环会产生流场，并且这个流场存在解析解$\bm{u}^\text{ref}\!=\!(u_x^\text{ref},u_y^\text{ref})$。我们以两个圆的圆心为坐标轴原点，对于任意一个点$(x,y)$，我们可以用$r\!=\!\sqrt{x^2+y^2}$衡量该点到圆心的距离。那么对于$r\!\in\![r_1, r_2]$的点，流场的解析解为
 \begin{equation}
@@ -208,11 +208,11 @@ A = \frac{\Omega_2 r_2^2 - \Omega_1 r_1^2}{r_2^2 - r_1^2}, \hspace{4mm} B= \frac
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/ns-compare-2d.png}
-  \bicaption[与二维N-S求解器的对比]{与二维N-S求解器的对比。我们仿真一个二维的薄板在流体中旋转的场景，仿真分辨率为$256\times256$。顶图：由基于切削网格方法的N-S求解器~\cite{Azevedo-2016} 得到的速度场模值；底图：我们的图形方法获得的速度场模值。(a)、(c) 与 (b)、(d) 分别从仿真中的同一帧截取。虽然两个仿真方法的结果都在视觉上可以接受，但是我们的方法有着更多涡流的细节，证明了我们的方法更适合于湍流的仿真场景。}{Comparison with 2D N-S solver. We simulated a 2D thin plate spinning in a fluid using a grid resolution of $256\times256$. Top: velocity magnitude plot from a cut-cell-based NS solver~\cite{Azevedo-2016}; Bottom: velocity magnitude plot from our solver for the same frames as (a) and (b). Although both solvers retain good boundary velocities, ours produces much more detailed vortices, making it significantly more suitable for solving coupling in a turbulent flow scenario.}
+  \bicaption[与二维N-S求解器的对比]{与二维N-S求解器的对比。我们仿真一个二维的薄板在流体中旋转的场景，仿真分辨率为$256\times256$。顶图：由基于切削网格方法的N-S求解器~\citep{Azevedo-2016} 得到的速度场模值；底图：我们的图形方法获得的速度场模值。(a)、(c) 与 (b)、(d) 分别从仿真中的同一帧截取。虽然两个仿真方法的结果都在视觉上可以接受，但是我们的方法有着更多涡流的细节，证明了我们的方法更适合于湍流的仿真场景。}{Comparison with 2D N-S solver. We simulated a 2D thin plate spinning in a fluid using a grid resolution of $256\times256$. Top: velocity magnitude plot from a cut-cell-based NS solver~\citep{Azevedo-2016}; Bottom: velocity magnitude plot from our solver for the same frames as (a) and (b). Although both solvers retain good boundary velocities, ours produces much more detailed vortices, making it significantly more suitable for solving coupling in a turbulent flow scenario.}
   \label{img:cut-cell-based-NS-solver}
 \end{figure}
 
-我们使用了不同的求解器，对该边界驱动的流体进行求解，求解器分别为 (a) 使用原始简单反弹边界~\cite{Ladd-1994} 的动理学方法、(b) DI-IBM~\cite{Li-2020}、(c) 我们的图形方法与 (d) 使用N-S方法的商业求解器ANSYS Fluent~\cite{Ansys-2014}。在使用ANSYS Fluent求解时，我们采用了自适应的体网格，平均元素大小与其它求解器中的网格大小相当。由于其使用的是贴体网格，ANSYS Fluent的误差应该会更小。
+我们使用了不同的求解器，对该边界驱动的流体进行求解，求解器分别为 (a) 使用原始简单反弹边界~\citep{Ladd-1994} 的动理学方法、(b) DI-IBM~\citep{Li-2020}、(c) 我们的图形方法与 (d) 使用N-S方法的商业求解器ANSYS Fluent~\citep{Ansys-2014}。在使用ANSYS Fluent求解时，我们采用了自适应的体网格，平均元素大小与其它求解器中的网格大小相当。由于其使用的是贴体网格，ANSYS Fluent的误差应该会更小。
 图~\ref{img:taylor-couette-compare-2d} 展示了不同求解器 (从左至右) 在不同分辨率 (从上至下) 下的相对误差的分布。从图中可以看到我们的方法相比其它方法拥有更小误差同时，也随着分辨率上升而更快地达到收敛。
 
 我们还测量了不同求解器结果的加权$\ell_2$误差：
@@ -229,17 +229,17 @@ A = \frac{\Omega_2 r_2^2 - \Omega_1 r_1^2}{r_2^2 - r_1^2}, \hspace{4mm} B= \frac
 \end{figure}
 
 \paragraph{与基于切削网格的二维N-S求解器的对比}
-CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的流固耦合方法。其中基于切削网格的方法是精度与计算效率均相对较高的方法。于是我们与~\cite{Azevedo-2016} 中的基于切削网格的N-S方法进行对比。该方法在切削网格构造了类似有限体积法中的网格以提升精度。我们使用该方法与我们的图形方法分别仿真了一个二维的薄板以角速度$\omega_s = 3 \text{rad}/s$旋转的场景，并将得到的速度场展示在图~\ref{img:cut-cell-based-NS-solver} 中。由于Azevedo等~(\citeyear{Azevedo-2016}) 求解的是无黏度的欧拉方程，我们在我们的仿真中也将黏度设为0 ($\nu\!=\!0$)。虽然Azevedo等的方法得到了不错的结果，但是在流场中只有大涡，即使流体本身是无粘的，而我们的方法可以提供更多的湍流细节。我们注意到目前也有一些更加精准的N-S求解器，如~\cite{zehnder2018advection,qu2019efficient}，但这些方法的计算效率是显著不如动理学方法的~\cite{Li-2020}。从上述分析可得，我们的方法拥有较为独特的优势，即提供更为精准且高效的湍流仿真，同时可以对不同类型的复杂几何进行耦合。
+CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的流固耦合方法。其中基于切削网格的方法是精度与计算效率均相对较高的方法。于是我们与~\citep{Azevedo-2016} 中的基于切削网格的N-S方法进行对比。该方法在切削网格构造了类似有限体积法中的网格以提升精度。我们使用该方法与我们的图形方法分别仿真了一个二维的薄板以角速度$\omega_s = 3 \text{rad}/s$旋转的场景，并将得到的速度场展示在图~\ref{img:cut-cell-based-NS-solver} 中。由于~\citet{Azevedo-2016} 求解的是无黏度的欧拉方程，我们在我们的仿真中也将黏度设为0 ($\nu\!=\!0$)。虽然Azevedo等的方法得到了不错的结果，但是在流场中只有大涡，即使流体本身是无粘的，而我们的方法可以提供更多的湍流细节。我们注意到目前也有一些更加精准的N-S求解器，如~\citep{zehnder2018advection,qu2019efficient}，但这些方法的计算效率是显著不如动理学方法的~\citep{Li-2020}。从上述分析可得，我们的方法拥有较为独特的优势，即提供更为精准且高效的湍流仿真，同时可以对不同类型的复杂几何进行耦合。
 
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=0.95\columnwidth]{figures/comparsion_car_ib_ours.png}
-  \bicaption[DI-IBM~\cite{Li-2020} (顶图) 与我们的图形方法 (底图) 进行气动仿真的对比]{DI-IBM~\cite{Li-2020} (顶图) 与我们的图形方法 (底图) 进行气动仿真的对比。速度场截面使用颜色可视化 (单位为$km/h$)。我们的仿真更贴近图~\ref{img:car_wind_tunnel} 中风洞的实际实验，而DI-IBM在车顶即开始发生边界层分离，不切合实际情况。}{Comparison of aerodynamic simulations. DI-IB method~\cite{Li-2020} (top) vs. our result (bottom), using a visualization showing the color-coded velocity field magnitude (in $km/h$) of a cross section. While our simulation matches the wind-tunnel visualization of air flow around a car as Fig.~\ref{img:car_wind_tunnel} demonstrates, the DI-IB method, on the other hand, fails to have accurate boundary treatment, leading to unreasonable boundary layer separation at the top of the car.}
+  \bicaption[DI-IBM~\citep{Li-2020} (顶图) 与我们的图形方法 (底图) 进行气动仿真的对比]{DI-IBM~\citep{Li-2020} (顶图) 与我们的图形方法 (底图) 进行气动仿真的对比。速度场截面使用颜色可视化 (单位为$km/h$)。我们的仿真更贴近图~\ref{img:car_wind_tunnel} 中风洞的实际实验，而DI-IBM在车顶即开始发生边界层分离，不切合实际情况。}{Comparison of aerodynamic simulations. DI-IB method~\citep{Li-2020} (top) vs. our result (bottom), using a visualization showing the color-coded velocity field magnitude (in $km/h$) of a cross section. While our simulation matches the wind-tunnel visualization of air flow around a car as Fig.~\ref{img:car_wind_tunnel} demonstrates, the DI-IB method, on the other hand, fails to have accurate boundary treatment, leading to unreasonable boundary layer separation at the top of the car.}
   \label{img:comparsion_car_ib_ours}
 \end{figure}
 
 \paragraph{与图形学中现有方法的对比}
-近来，Li等~(\citeyear{Li-2020}) 提出了一个基于动理学方法的双向流固耦合湍流求解方法，该方法使用DI-IBM处理固体边界。然而这一方法有一定的局限性。首先因为DI-IBM在边界两侧施加惩罚力，其在求解亚网格物体的流固耦合时，会有流体穿透的现象。图~\ref{img:comparison_with_ib} 展示了一个三维的喷射流打向一个薄板，其中图 (a) 使用了Li等~\citeyear{Li-2020} 的方法，并出现了不应该存在的流体穿透现象 (图中红框)。图 (b) 使用了我们的方法，没有产生类似的现象。
+近来，\citet{Li-2020} 提出了一个基于动理学方法的双向流固耦合湍流求解方法，该方法使用DI-IBM处理固体边界。然而这一方法有一定的局限性。首先因为DI-IBM在边界两侧施加惩罚力，其在求解亚网格物体的流固耦合时，会有流体穿透的现象。图~\ref{img:comparison_with_ib} 展示了一个三维的喷射流打向一个薄板，其中图 (a) 使用了 \citet{Li-2020} 的方法，并出现了不应该存在的流体穿透现象 (图中红框)。图 (b) 使用了我们的方法，没有产生类似的现象。
 
 另外，DI-IBM有精度不足的问题，使得在湍流仿真时得不到正确结果，尤其是在固体边界层上。我们对一个向前运动的汽车模型进行气流仿真来说明这一问题，见图~\ref{img:comparsion_car_ib_ours}。对于汽车外形来说，气流的分离点一般位于汽车尾部，并且可以通过扰流板等进一步影响尾流走向 (如图~\ref{img:comparsion_car_design} (d) 中的风洞实验)。但仿真结果显示，DI-IBM预测的边界分离点在车顶，完全不符合实际风洞实验，而我们的方法可以正确预测边界的分离点 (两次仿真除边界处理外使用同样的参数设置)。
 
@@ -248,12 +248,12 @@ CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的
 \begin{figure}[!tbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/comparsion_car_design.png}
-  \bicaption[汽车的空气动力学设计]{汽车的空气动力学设计。通过我们的方法对没有尾翼的汽车进行仿真 (a)，其结果与一个相似的车辆模型在风洞可视化的结果匹配 (b)。之后添加一个小型的扰流板 (图中红色方框) 到汽车尾部之后，仿真中的尾流发生显著变化 (c)，与带有扰流板的风洞测试相似 (d)。这展示出我们的方法可以快速、有效地为气动外形设计服务。图中的速度模值单位为$km/h$。图 (b) 与 (d) 的版权来自 Feltham~(\citeyear{youtube_2014})。}{Aerodynamic design of a car model. Simulating the airflow around a car model without a spoiler using our solver (a) matches the wind tunnel visualization for a similar car model (b); A small and thin spoiler (in red box) added on the back of the car model (c) changes the wake flow of the car model in our simulation quite significantly, in line with a wind-tunnel test of a car model with a spoiler (d) --- indicating that our solver offers an efficient, yet predictive tool of air flows for computational shape design. The velocity magnitude is measured in $km/h$. Image (b) and (d) courtesy of Feltham~(\citeyear{youtube_2014}).}
+  \bicaption[汽车的空气动力学设计]{汽车的空气动力学设计。通过我们的方法对没有尾翼的汽车进行仿真 (a)，其结果与一个相似的车辆模型在风洞可视化的结果匹配 (b)。之后添加一个小型的扰流板 (图中红色方框) 到汽车尾部之后，仿真中的尾流发生显著变化 (c)，与带有扰流板的风洞测试相似 (d)。这展示出我们的方法可以快速、有效地为气动外形设计服务。图中的速度模值单位为$km/h$。图 (b) 与 (d) 的版权来自~\citet{youtube_2014}。}{Aerodynamic design of a car model. Simulating the airflow around a car model without a spoiler using our solver (a) matches the wind tunnel visualization for a similar car model (b); A small and thin spoiler (in red box) added on the back of the car model (c) changes the wake flow of the car model in our simulation quite significantly, in line with a wind-tunnel test of a car model with a spoiler (d) --- indicating that our solver offers an efficient, yet predictive tool of air flows for computational shape design. The velocity magnitude is measured in $km/h$. Image (b) and (d) courtesy of~\citet{youtube_2014}.}
   \label{img:comparsion_car_design}
 \end{figure}
 
 \paragraph{性能对比}
-在~\cite{Li-2020} 与~\cite{Chen-2021} 中，作者已经通过对比，说明了动理学方法的计算效率是显著优于N-S方法的。这种优势在湍流流固耦合仿真中更加明显，因为需要的时间步长更小。由于我们的方法与这些工作的框架相同，结合上述的各项优化，使得我们的方法在性能上更有优势。我们在同一张NVIDIA RTX 3090 GPU上，进行了多个分辨率的对比，结果显示我们的方法在所有的分辨率上都有显著提升 (见图~\ref{img:Performance})。通过代码性能分析，我们分析出两个使性能得以提升的主要因素：第一个是基于LU分解的碰撞运算符简化~\cite{fei2018three} 显著提升了GPU占用率，第二个是使用了几何近似优化之后，我们的混合边界处理比起之前工作使用的DI-IBM，计算量要更小。这两点使得我们的GPU计算效率得以提升。
+在~\citep{Li-2020} 与~\citep{Chen-2021} 中，作者已经通过对比，说明了动理学方法的计算效率是显著优于N-S方法的。这种优势在湍流流固耦合仿真中更加明显，因为需要的时间步长更小。由于我们的方法与这些工作的框架相同，结合上述的各项优化，使得我们的方法在性能上更有优势。我们在同一张NVIDIA RTX 3090 GPU上，进行了多个分辨率的对比，结果显示我们的方法在所有的分辨率上都有显著提升 (见图~\ref{img:Performance})。通过代码性能分析，我们分析出两个使性能得以提升的主要因素：第一个是基于LU分解的碰撞运算符简化~\citep{fei2018three} 显著提升了GPU占用率，第二个是使用了几何近似优化之后，我们的混合边界处理比起之前工作使用的DI-IBM，计算量要更小。这两点使得我们的GPU计算效率得以提升。
 
 \section{方法的局限性}
 虽然我们的方法展示出了优秀的通用性与数值结果，我们的方法依旧有一定的局限性。
@@ -262,7 +262,7 @@ CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的
 \begin{figure}[!tbp]
   \centering
     \includegraphics[width=0.93\columnwidth]{figures/performance.png}
-  \bicaption[性能对比]{性能对比。我们将我们的方法 (绿色) 与~\cite{Li-2020,Chen-2021} 中的动理学求解方法 (红色) 进行比较，比较用例为图~\ref{img:comparsion_car_ib_ours} 中所示的汽车仿真，仿真时长为1秒。在同一张NVIDIA RTX 3090 GPU上得到的测试结果显示我们的方法在所有分辨率上都有显著的性能提升。}{Performance comparison. We compare the efficiency of the kinetic solver from~\cite{Li-2020,Chen-2021} (red) with our kinetic solver (green) based on one second of simulation of the car model shown in Fig.~\ref{img:comparsion_car_ib_ours} and both executed on a same NVIDIA RTX 3090 GPU, showing significant performance improvement for all grid resolutions.}
+  \bicaption[性能对比]{性能对比。我们将我们的方法 (绿色) 与~\citep{Li-2020,Chen-2021} 中的动理学求解方法 (红色) 进行比较，比较用例为图~\ref{img:comparsion_car_ib_ours} 中所示的汽车仿真，仿真时长为1秒。在同一张NVIDIA RTX 3090 GPU上得到的测试结果显示我们的方法在所有分辨率上都有显著的性能提升。}{Performance comparison. We compare the efficiency of the kinetic solver from~\citep{Li-2020,Chen-2021} (red) with our kinetic solver (green) based on one second of simulation of the car model shown in Fig.~\ref{img:comparsion_car_ib_ours} and both executed on a same NVIDIA RTX 3090 GPU, showing significant performance improvement for all grid resolutions.}
   \label{img:Performance}
 \end{figure}
 

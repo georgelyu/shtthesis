@@ -268,6 +268,54 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 这证明了在DrivAer测试中，精度层面上，我们与现有的工业软件是大致相当的。当然我们也认为我们需要与PowerFLOW与StarCCM+等软件进行更直接的对比，以更明确地确定我们的方法与现有工业软件的优劣。这些我们留在未来的工作中。
 
 \section{气动声学的仿真结果}
+\subsection{平面波的传播仿真}
+平面波是三维空间中最简单的一种波。将某一时刻一个波振动相位相同的点连起来，我们可以得到一系列的同相面 (波阵面)，若我们得到的波阵面均为平面，且这些平面垂直于波的传播方向，我们称这样的波动为平面波 (见图)。我们先对平面波进行仿真，以测试我们的方法声波仿真的能力。在没有物体存在下平面波的传播相对较为简单，且已经被许多工作验证在LBM下该现象可以被准确捕捉~\cite{doi:10.2514/6.2009-3395, viggen2009lattice}。所以我们这里验证在有物体散射时的平面波，具体地来说，我们考虑一个刚性的单位球 (半径$r=1$ $m$的球) 在计算域中时的平面波传播仿真，以同时验证我们的边界处理精度。
+
+\begin{figure}[!htbp]
+  \centering
+    \includegraphics[width=0.7\columnwidth]{figures/plane_wave.png}
+  \bicaption[平面波示意图]{平面波示意图。箭头指向波的传播方向，不同颜色的平面标识波阵面。}{Schematics of plane wave. The arrow indicates wave propagation direction, the planes with different colors indicate wave fronts.}
+  \label{img:plane_wave}
+\end{figure}
+
+考虑某个时刻的平面波沿着$+x$方向传播，可以表达为
+\begin{equation}
+  p_{inc}=p_0 e^{ikx},
+\end{equation}
+其中$x$为空间的位置，$i$为虚数单位，$k=\omega/c$为频率是$\omega$，$c=343$ $m/s$时的波数。这个入射的平面波可以被表示为一系列的球谐函数 (spherical harmonics)~\cite{rayleigh1896theory}：
+\begin{equation}
+  p_{\text {inc }}=p_{o} \sum_{l=0}^{N}(2 l+1) i^{l} j_{l}(k r) P_{l}(\cos \theta),
+\end{equation}
+其中$j_{l}$是球贝塞尔函数 (spherical Bessel function)，$P_{l}$是$l$阶勒让德多项式 (Legendre polynomials)。
+
+而因为球体的存在，该平面波会被散射。我们假设$p_{\text {scattered}}$是被球散射的声压，则$p_{\text {scattered}}$应该满足亥姆霍兹方程 (Helmholtz equation) 与索末菲辐射条件 (Sommerfeld radiation condition)。则该散射波可以被表达为
+\begin{equation}
+  p_{\text {scattered }}=\sum_{l=0}^{N} A_{l} h_{l}(k r) P_{l}(\cos \theta),
+\end{equation}
+其中$h_{l}$是$l$阶第一类球面汉克尔函数 (spherical Hankel function of the first kind)，$A_{l}$是一个待求的系数。该系数是通过设定球面上散射压力的法向导数与球面上入射压力的法向导数相反，从而使球面上的总法向速度为零 (固体的边界条件) 来确定的，即
+\begin{equation}
+  \frac{\partial p_{\text {inc }}}{\partial r}+\frac{\partial p_{\text {scattered }}}{\partial r}=0, \mathrm{r}=\mathrm{r_0}.
+\end{equation}
+从而可以求得
+\begin{equation}
+  A_{l}=-p_{0}(2 l+1) i^{l} \frac{l j_{l-1}(k a)-(l+1) j_{l+1}(k a)}{l h_{l-1}(k a)-(l+1) h_{l+1}(k a)}.
+\end{equation}
+则场中任意一点的总声压为入射的声压和散射的声压的和
+\begin{equation}
+  p_{\text {total }}=p_{\text {inc }}+p_{\text {scattered }}.
+  \label{eq:plane_wave_gt}
+\end{equation}
+我们在仿真中设置$p_0=1$，$k=2.74$，此时公式~\ref{eq:plane_wave_gt} 所描述的声压解析解的可视化可见图~\ref{img:plane_wave_result} (a)。我们使用第~\ref{chap:sig23} 章中的方法，在$120\times120\times120$的单分辨率网格上进行测试。在仿真时，除波射入面以外的计算域边界条件均使用周期边界条件 (periodic boundary condition)。得到的声压可视化结果可见图~\ref{img:plane_wave_result} (b)。
+
+通过计算可得，通过LBM仿真得到的结果与解析解的平均声压误差约为3.7\%，具体的误差分布可见图~\ref{img:plane_wave_result} (c)。结果证明即使在相对较低的分辨率，LBM依然可以较为准确地进行声学现象仿真。
+
+\begin{figure}[!htbp]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/plane_wave_result.png}
+  \bicaption[平面波被刚性球散射的仿真结果]{平面波被刚性球散射的仿真结果。(a) 平面波被刚性球散射时，声场的解析解可视化。(b) 使用LBM对该场景仿真得到的声场可视化。(c) 仿真误差的可视化。}{Simulation result of plane wave scattering by a rigid sphere. (a) Analytical solution of plane wave scattering by a rigid sphere. (b) Visualization of simulated acoustic field using LBM. (c) Visualization of simulation error.}
+  \label{img:plane_wave_result}
+\end{figure}
+
 \subsection{起落架模型的气动声学仿真}
 了解和预测民航客机机身的噪声对于提升民航客机的舒适度非常重要。由于高涵道比发动机的使用大大降低了发动机噪音，起落架和增升裝置的噪音开始受到关注。具体地讲，在客机进近时起落架会放出，此时起落架发出的声能 (acoustic energy) 约占飞机总声能的三分之一。除了实际风洞试验，计算气动声学为更好地了解噪声产生机制提供了一条很有前景的途径。在此背景下，由空中客车 (Airbus) 提供支持的LAGOON (LAnding-Gear nOise database for CAA validatiON) 项目尝试提供一个行业标准的起落架模型，以用于计算气动声学的数值方法研究~\citep{doi:10.2514/6.2008-2816, doi:10.2514/6.2009-3277}，LAGOON的几何模型见图~\ref{img:landing_gear_model}。
 

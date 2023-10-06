@@ -309,6 +309,8 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 
 通过计算可得，通过LBM仿真得到的结果与解析解的平均声压误差约为3.7\%，具体的误差分布可见图~\ref{img:plane_wave_result} (c)。结果证明即使在相对较低的分辨率，LBM依然可以较为准确地进行声学现象仿真。
 
+\subsection{起落架模型的气动声学仿真}
+
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/plane_wave_result.png}
@@ -316,7 +318,6 @@ The pressure field is color-mapped over the aircraft body surface, while passive
   \label{img:plane_wave_result}
 \end{figure}
 
-\subsection{起落架模型的气动声学仿真}
 了解和预测民航客机机身的噪声对于提升民航客机的舒适度非常重要。由于高涵道比发动机的使用大大降低了发动机噪音，起落架和增升裝置的噪音开始受到关注。具体地讲，在客机进近时起落架会放出，此时起落架发出的声能 (acoustic energy) 约占飞机总声能的三分之一。除了实际风洞试验，计算气动声学为更好地了解噪声产生机制提供了一条很有前景的途径。在此背景下，由空中客车 (Airbus) 提供支持的LAGOON (LAnding-Gear nOise database for CAA validatiON) 项目尝试提供一个行业标准的起落架模型，以用于计算气动声学的数值方法研究~\citep{doi:10.2514/6.2008-2816, doi:10.2514/6.2009-3277}，LAGOON的几何模型见图~\ref{img:landing_gear_model}。
 
 \begin{figure}[!htbp]

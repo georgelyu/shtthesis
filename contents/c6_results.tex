@@ -310,6 +310,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 通过计算可得，通过LBM仿真得到的结果与解析解的平均声压误差约为3.7\%，具体的误差分布可见图~\ref{img:plane_wave_result} (c)。结果证明即使在相对较低的分辨率，LBM依然可以较为准确地进行声学现象仿真。
 
 \subsection{起落架模型的气动声学仿真}
+\label{sec:acoustic_results}
 
 \begin{figure}[!htbp]
   \centering
@@ -345,12 +346,12 @@ The pressure field is color-mapped over the aircraft body surface, while passive
   \label{img:landing_gear_q_criterion}
 \end{figure}
 
-我们接下来展示一些与声音更直接相关的可视化与数值结果。首先在图~\ref{img:landing_gear_divergence} 中我们展示起落架在$y=0$平面上的胀量场分布，以突出声波的分布。从图中我们可以看到两处很明显的声波扰动 (acoustic perturbation) 来源：一处是起落架轮胎的下部，一处是起落架撑杆的顶部。并且我们也可以看到在起落架撑杆的后方 (相对于来流方向)，有很强的湍流对流 (turbulent convection)。为了进一步定性分析，我们在起落架模型的右轮胎上取一个采样点 (见图~\ref{img:landing_gear_frequency} (a))，并测量该点的压力变化。之后使用加窗平均周期图法 (Welch法~\citep{1161901}) 对压力序列进行处理以获得频谱，见过可见图~\ref{img:landing_gear_frequency} (b)。图中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约$1000Hz$与$1500Hz$出现的声调，与实验相吻合。
+我们接下来展示一些与声音更直接相关的可视化与数值结果。首先在图~\ref{img:landing_gear_divergence} 中我们展示起落架在$y=0$平面上的胀量场分布，以突出声波的分布。从图中我们可以看到两处很明显的声波扰动 (acoustic perturbation) 来源：一处是起落架轮胎的下部，一处是起落架撑杆的顶部。并且我们也可以看到在起落架撑杆的后方 (相对于来流方向)，有很强的湍流对流 (turbulent convection)。为了进一步定性分析，我们在起落架模型的右轮胎上取一个采样点 (见图~\ref{img:landing_gear_frequency} (a))，并测量该点的压力变化。之后使用加窗平均周期图法对压力序列进行处理以获得频谱，见过可见图~\ref{img:landing_gear_frequency} (b)。图中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约$1000Hz$与$1500Hz$出现的声调，与实验相吻合。
 
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/landing_gear_divergence.png}
-  \bicaption[LAGOON起落架在$y=0$平面上的胀量场分布（灰阶）]{LAGOON起落架在$y=0$平面上的胀量场分布（灰阶）。}{Dilatation field in the $y=0$ plane of LAGOON landing gear in grayscale.}
+  \bicaption[LAGOON起落架在$y=0$平面上的胀量场分布 (灰阶)]{LAGOON起落架在$y=0$平面上的胀量场分布（灰阶）。}{Dilatation field in the $y=0$ plane of LAGOON landing gear in grayscale.}
   \label{img:landing_gear_divergence}
 \end{figure}
 

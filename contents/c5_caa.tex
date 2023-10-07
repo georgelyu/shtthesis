@@ -1,9 +1,9 @@
-\chapter{后处理技术与方法的扩展}
+\chapter{方法的扩展与后处理技术}
 \label{chap:caa}
 
-在本章中我们讨论将本文中介绍的流体仿真技术应用至不同领域时，一些值得注意的要点，及所需的一些后处理技术。
+在本章中我们讨论将本文中介绍的流体仿真技术扩展应用至不同领域时，一些值得注意的要点，及所需的一些后处理技术。
 
-\section{应用于视觉动画时的仿真需求及后处理}
+\section{应用于视觉动画}
 在视觉动画中，我们主要需求真实感的烟雾渲染。而这一过程所需的烟雾数据一般为烟雾的密度场 (表示各个位置烟雾的浓淡)，而我们通过仿真得到的是流体的速度场，这自然需要模拟一个烟雾的传播 (advection) 过程。比较常见的传播方法是欧拉方法，即基于网格的。但是这有诸多的问题，其中最重要的一点是湍流仿真中有非常多的高频信号，而网格的空间采样频率很难捕捉到这些信号~\cite{bridson2015fluid}，以至于传播得到的烟雾十分平滑，失去湍流的特征。而粒子则不受这一限制。对于一个被传播的物理量$q$，粒子的传播方程$Dq/Dt=0$表明粒子上所携带的值不会受到任何的滤波或信息丢失，十分适合我们的需求。所以我们在这里介绍一种通过粒子与网格的混合方法生成烟雾密度场的方法。该方法主要分为三个部分：粒子的生成、粒子的传播、粒子到网格的转换。
 
 \paragraph{粒子的生成}
@@ -74,7 +74,7 @@ k_3 & =\mathbf{u}\left(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2\right), \\
 \end{align}
 其中$\Delta x$是网格的大小。公式~\ref{eq:particle_kernel} 中对网格大小做了自适应处理，使得每个粒子对周边的网格格点的贡献是适当的，而不会使烟雾过度模糊或颗粒化。
 
-\section{应用于物理量计算时的仿真需求及后处理}
+\section{应用于物理量计算}
 在使用流体仿真进行物理量 (如升力系数、阻力系数、物体表面压力系数等) 计算时，为了尽可能地提升仿真的物理精度，在仿真时应注意以下几点：
 \begin{itemize}
     \item 仿真域：由于目前的仿真域边界条件无法完美地模拟开放边界条件 (open boundary condition)，即所有的仿真域边界都会对域内的流体产生影响，所以为了进一步减轻这一影响，通常仿真域在各个维度的大小应设置为物体的6-12倍；
@@ -82,17 +82,44 @@ k_3 & =\mathbf{u}\left(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2\right), \\
     \item 网格构建：网格的构建应保证关键的结构和区域有足够的分辨率，如靠近物体边界的区域和物体的尾流区域。其中一些特殊结构需要额外加密，如细密格栅结构或曲率较大的结构。
   \end{itemize}
 
-同时，因为我们需要的仿真输出是不同的物理量，这里使用的后处理方式也和上述不同。除了将数值直接输出外，为了使结果看起来更加直观，很多时候会将物理量进行颜色映射后以图片或动画的形式展现。将仿真域中的物理量以截面的形式提取出来，之后通过颜色映射进行后处理，是一个比较直接的过程。而对于物体表面的物理量 (如物体表面的压力)，则并不是一个直接的过程。原因是在LBM中我们使用了切削网格来处理边界，这使得在有边界存在时，切削网格部分是不完整的 (被固体覆盖的网格点是不存在的，见图~\ref{img:pressure_projection} 中红色网格)，这造成我们无法使用常规的插值方法来获取表面上点的物理量。
-
-  \begin{figure}[htbp]
+  \begin{figure}[!htbp]
     \centering
         \includegraphics[width=0.9\columnwidth]{figures/pressure_projection.png}
     \bicaption[物体表面物理量投影的示意图]{物体表面物理量投影的示意图。图中蓝色网格为流体网格，红色为切削网格，绿色为固体网格，加点的区域为固体覆盖的区域。对于物体表面上的$s_a$与$s_b$点，如果直接从流体网格点插值物理量，则$x_a$与$x_b$点分别有着最大的影响，因为它们分别是沿法向投影后距离$s_a$与$s_b$点最近的流体点。然而因为$x_a$与$x_b$点到物体边界的距离差别较大，这两个点的物理量也会有很大区别，造成物体表面物理量的不连续。而沿着$s_a$与$s_b$点法向向外走一定距离后，分别从$p_a$与$p_b$点插值物理量，可以减轻这一问题。}{Schematics of physical quantities projection to surface. The blue, red and green cells in the firgue represent fluid, cut and solid cells, respectively. The dotted area is covered by solid object. For point $s_a$ and $s_b$ on object surface, if the physical quantities are directly interpolated from the nodes, node $x_a$ and $x_b$ would have the biggest impact, because they are the closest nodes to $s_a$ and $s_b$ after being projected to the surface along the normals, respectively. However, since node $x_a$ and $x_b$ have different distance to the object surface, resulting in largely different physical quantities which is discontinuous on surface. While interpolating from $p_a$ and $p_b$, which are points away from surface along their normals with a fixed distance can lift the problem.}
     \label{img:pressure_projection}
   \end{figure}
 
-一个简单的想法是忽略不存在的固体点，而只对物体表面点周围以某个核函数对存在的流体点进行插值。然而这也会带来问题，一个最重要的问题是在切削网格内，物体表面距其法向方向最近的切削网格点的距离也不相同。以图~\ref{img:pressure_projection} 中的情况为例，对于物体表面上的$s_a$与$s_b$点，如果直接从流体网格点插值物理量，则$x_a$与$x_b$点分别有着最大的影响，因为它们分别是沿法向投影后距离$s_a$与$s_b$点最近的流体点。然而即使在同一网格内，在高雷诺数环境下，边界层依然比网格大小要薄很多，这造成$x_a$与$x_b$点到物体边界的距离差别较大，这两个点的物理量也会有很大区别
+同时，因为我们需要的仿真输出是不同的物理量，这里使用的后处理方式也和上述不同。除了将数值直接输出外，为了使结果看起来更加直观，很多时候会将物理量进行颜色映射后以图片或动画的形式展现。将仿真域中的物理量以截面的形式提取出来，之后通过颜色映射进行后处理，是一个比较直接的过程。而对于物体表面的物理量 (如物体表面的压力)，则并不是一个直接的过程。原因是在LBM中我们使用了切削网格来处理边界，这使得在有边界存在时，切削网格部分是不完整的 (被固体覆盖的网格点是不存在的，见图~\ref{img:pressure_projection} 中红色网格)，这造成我们无法使用常规的插值方法来获取表面上点的物理量。
 
-然而因为$x_a$与$x_b$点到物体边界的距离差别较大，这两个点的物理量也会有很大区别，造成物体表面物理量的不连续。而沿着$s_a$与$s_b$点法向向外走一定距离后，分别从$p_a$与$p_b$点插值物理量，可以减轻这一问题。
+一个简单的想法是忽略不存在的固体点，而只对物体表面点周围以某个核函数对存在的流体点进行插值。然而这也会带来问题，一个最重要的问题是在切削网格内，物体表面距其法向方向最近的切削网格点的距离也不相同。以图~\ref{img:pressure_projection} 中的情况为例，对于物体表面上的$s_a$与$s_b$点，如果直接从流体网格点插值物理量，则$x_a$与$x_b$点分别有着最大的影响，因为它们分别是沿法向投影后距离$s_a$与$s_b$点最近的流体点。然而即使在同一网格内，在高雷诺数环境下，边界层依然比网格大小要薄很多，这造成这两个点的物理量也会有很大区别。所以在投影到物体表面后会造成物理量的不连续。
 
-\section{应用于气动声学分析时的仿真需求及后处理}
+为了减轻这一问题，我们不以物体表面的点为中心进行插值，而是沿着物理表面的采样点的法向向外走一定距离后，再进行插值。依然以图~\ref{img:pressure_projection} 中为例，为了获取$s_a$与$s_b$点的物理量，分别从$s_a$与$s_b$点，沿表面的法向走一定距离后，从$p_a$与$p_b$点插值物理量。这样可以避免造成因为切削网格点本身的不连续带来的投影不连续问题。
+
+\section{应用于气动声学分析}
+使用LBM进行气动声学分析是一个较为特殊的问题。虽然在第~\ref{sec:background} 节中我们已经讨论了，使用LBM进行气动声学仿真是LBM的一大优势，因为LBM可以非常高效地进行可压缩非稳态湍流求解。并且因为LBM本身求出的是弱可压过程，求解气动声与其它物理量并无区别。然而声音是由于非常微弱的气压波动导致，这种波动对精度是十分敏感的。虽然已有一些工作使用LBM进行了气动声分析，并且可以在一定程度上确定声源~\cite{doi:10.2514/6.2013-2256, doi:10.2514/1.J052365, doi:10.2514/6.2015-2993}，但同时也会产生一些错误的声源。这些问题的根本原因是，在分析气动现象时，我们观察物理量的尺度是较大的，而在分析气流导致的声音现象时，观察的尺度会小很多，此时许多之前注意不到的误差均会产生很大的影响 (见图~\ref{img:acoustic_problems})。\citet{ASTOUL2020109645} 主要讨论了两个误差的来源，分别为多分辨率网格的边界，与碰撞模型本身的精度。然而由于声波对误差的敏感性，包括物体边界与计算域边界也同样是误差的来源。可以认为彻底消除这样的误差，在目前阶段看是十分困难的。本文在第~\ref{sec:acoustic_results} 节中展示了通过本文所介绍的方法进行气动声分析的一些初步成果，以验证本文中的方法应用于计算气动声学的能力。而基于此，在提升气动声学分析的精度上，还可以有更多未来的工作。
+
+\begin{figure}[!htbp]
+  \centering
+      \includegraphics[width=0.85\columnwidth]{figures/acoustic_problems.png}
+  \bicaption[不同可视化范围下对流涡经过多分辨率网格边界的对比]{不同可视化范围下对流涡经过多分辨率网格边界的对比。其中虚线表示瞬时速度的等高线，左图与右图分别使用了基于格点的与基于网格的多分辨率处理方法。在观察气动现象时，我们看到无论采用何种方法，该涡从定性的角度看均可以顺利地通过多分辨率网格边界 (上图)。但在观察更小尺度的声波抖动时，我们可以看到在网格边界产生了不应有的声波 (下图)。图片来自~\citep{ASTOUL2020109645}。}{Comparison of convected vortex crossins a multi-resolution grid interface with a colormap of different scales. Dashed lines are isocontours of transversal velocity. Left and right figures adopt cell-vertex and cell-centered algorithms, respectively. From an aerodynamic point of view, the convected vortex is qualitatively very well transmitted from one mesh to the other one whatever the algorithm used. However, when focused on the acoustic scales, there are obvious spurious acoustic fluctuations. Images from \citep{ASTOUL2020109645}.}
+  \label{img:acoustic_problems}
+\end{figure}
+
+在后处理上，除了气动特征，通常我们还会记录某些采样点压力波动的时间序列，以定量地进行频谱分析。这一过程中，因为采样点也会位于物体表面，所以可以使用与上一节中所述的在物体表面取物理量时同样的处理。在获取到压力的时间序列后，通常使用加窗平均周期图法 (Welch法~\citep{1161901}) 进行频谱分析。具体来说该方法将时间信号序列分割成了多个块 (blocks)，对每个块使用周期图法 (periodogram) 进行谱密度估计后再进行平均。
+
+具体来说，一个时间信号序列先被分割为$K$个块
+\begin{equation}
+  x_m(n) = w(n) x(n+m R), \quad n=0,1, \ldots, M-1, m=0,1, \ldots, K-1,
+\end{equation}
+其中$x_m$为第$m$块的序列，$x$为原序列，$w$是窗函数 (window function)，$R$是窗的跳长 (hop size)。一个常用的窗函数是汉宁窗 (Hann window)：
+\begin{equation}
+  w(n)=0.5-0.5 \cos \left(\frac{2 \pi n}{N-1}\right), \quad 0 \leq n \leq N-1 .
+\end{equation}
+此时第$m$块的周期图为
+\begin{equation}
+  P_{x_m, M}\left(\omega_k\right)=\frac{1}{M}\left|\mathrm{FFT}_{N, k}\left(x_m\right)\right|^2 = \frac{1}{M}\left|\sum_{n=0}^{N-1} x_m(n) e^{-j 2 \pi n k / N}\right|^2,
+\end{equation}
+则通过加窗平均周期图法获得的功率谱密度 (Power Spectral Density, PSD) 为
+\begin{equation}
+  \hat{S}_x^W\left(\omega_k\right) = \frac{1}{K} \sum_{m=0}^{K-1} P_{x_m, M}\left(\omega_k\right).
+\end{equation}

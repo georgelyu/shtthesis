@@ -288,6 +288,13 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \end{equation}
 其中$j_{l}$是球贝塞尔函数 (spherical Bessel function)，$P_{l}$是$l$阶勒让德多项式 (Legendre polynomials)。
 
+\begin{figure}[!htbp]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/plane_wave_result.png}
+  \bicaption[平面波被刚性球散射的仿真结果]{平面波被刚性球散射的仿真结果。(a) 平面波被刚性球散射时，声场的解析解可视化。(b) 使用LBM对该场景仿真得到的声场可视化。(c) 仿真误差的可视化。}{Simulation result of plane wave scattering by a rigid sphere. (a) Analytical solution of plane wave scattering by a rigid sphere. (b) Visualization of simulated acoustic field using LBM. (c) Visualization of simulation error.}
+  \label{img:plane_wave_result}
+\end{figure}
+
 而因为球体的存在，该平面波会被散射。我们假设$p_{\text {scattered}}$是被球散射的声压，则$p_{\text {scattered}}$应该满足亥姆霍兹方程 (Helmholtz equation) 与索末菲辐射条件 (Sommerfeld radiation condition)。则该散射波可以被表达为
 \begin{equation}
   p_{\text {scattered }}=\sum_{l=0}^{N} A_{l} h_{l}(k r) P_{l}(\cos \theta),
@@ -311,13 +318,6 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 
 \subsection{起落架模型的气动声学仿真}
 \label{sec:acoustic_results}
-
-\begin{figure}[!htbp]
-  \centering
-    \includegraphics[width=0.99\columnwidth]{figures/plane_wave_result.png}
-  \bicaption[平面波被刚性球散射的仿真结果]{平面波被刚性球散射的仿真结果。(a) 平面波被刚性球散射时，声场的解析解可视化。(b) 使用LBM对该场景仿真得到的声场可视化。(c) 仿真误差的可视化。}{Simulation result of plane wave scattering by a rigid sphere. (a) Analytical solution of plane wave scattering by a rigid sphere. (b) Visualization of simulated acoustic field using LBM. (c) Visualization of simulation error.}
-  \label{img:plane_wave_result}
-\end{figure}
 
 了解和预测民航客机机身的噪声对于提升民航客机的舒适度非常重要。由于高涵道比发动机的使用大大降低了发动机噪音，起落架和增升裝置的噪音开始受到关注。具体地讲，在客机进近时起落架会放出，此时起落架发出的声能 (acoustic energy) 约占飞机总声能的三分之一。除了实际风洞试验，计算气动声学为更好地了解噪声产生机制提供了一条很有前景的途径。在此背景下，由空中客车 (Airbus) 提供支持的LAGOON (LAnding-Gear nOise database for CAA validatiON) 项目尝试提供一个行业标准的起落架模型，以用于计算气动声学的数值方法研究~\citep{doi:10.2514/6.2008-2816, doi:10.2514/6.2009-3277}，LAGOON的几何模型见图~\ref{img:landing_gear_model}。
 

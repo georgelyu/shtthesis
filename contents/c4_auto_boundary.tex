@@ -262,28 +262,28 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 \paragraph{与现有碰撞模型的对比}
 为了验证我们的基于熵优化的碰撞模型的精度，我们对高雷诺数下物体的阻力系数$C_\text{d}$进行仿真测算，来对不同的方法进行比较。我们分别使用了我们的基于熵优化的累积量碰撞模型与现有的松弛系数只优化至3阶的累积量碰撞模型~\citep{Geier-2017} 进行仿真，仿真的场景为空气流过静止的球。我们使用这一场景进行测试的原因是球在这样的场景中会发生阻力危机 (drag crisis) 现象。该现象是指，球在雷诺数$Re=100,000$时，阻力系数约为0.47，但随着雷诺数的升高，球受到的阻力会突然且剧烈地下降，至雷诺数$Re=400,000$时，球的阻力系数会下降到约0.1~\citep{Tiwari-2020}。这样的剧烈变化对于数值流体仿真来说是非常难复现的，所以非常能体现不同仿真方法的精度与能力，而最近~\citep{Geier-2017-b} 第一个使用LBM对该现象进行了仿真。
 
-我们在三个不同的雷诺数下进行了仿真，分别为$Re=100,000$、$400,000$和$800,000$。在这三个雷诺数下的仿真结果与实际实验值一并可见图~\ref{img:entropy_comp}，实验值来自~\citep{Barati-2014}。图~\ref{img:entropy_comp} (a) 展示了，相比~\citep{Geier-2017}，我们的方法可以更快地收敛并得到更贴近实验值的结果。对于更高一些的雷诺数 (阻力危机发生时)，两种仿真方法都无法非常精准地预测阻力系数，如图~\ref{img:entropy_comp} (b) 中所示。但是对这个区域通过DNS进行准确仿真一般认为也是十分困难的~\citep{Tiwari-2020}。由于在这个区域边界上会生成很多小尺度的涡流，所以阻力的波动应该会减小~\citep{Deshpande-2017}。从结果中可以看到，我们的模型相对~\citep{Geier-2017} 展示出了更小的波动，这表示出我们的基于熵优化的碰撞模型在物理量上有更强的可预测性。
-图~\ref{img:entropy_comp} (c) 展示了我们的新的碰撞模型在初期收敛之后，产生了周期性的波动。而原先的方法产生了一些不规则的波动，没有提供有意义的可置信区间，以评估平均阻力。
-
-进一步讨论我们的方法，我们可以认为我们的自适应松弛系数，包括~\citep{Geier-2017} 中的三阶松弛系数优化在内，可以被认为是某种亚网格模型。这也解释了为什么我们的LBM方法在没有使用湍流模型的情况下，依然比其它基于N-S的求解器在类似分辨率下能更好地捕捉到阻力危机现象。
-当然，在我们的方法中加入一个真实的湍流模型，如k-$\omega$模型~\citep{Menter-1994}，也并不冲突，且这样在理论上可以更好地求解亚网格流体，但是同时求解的计算时间也会显著增加。而使用我们的基于熵优化的优化方法，并不会显著地降低效率。与 \citep{Geier-2017} 相比，我们的自适应松弛系数计算只使得碰撞过程慢了约10\%，整个过程慢了约5\%。
-
-\begin{figure}[htb]
+\begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/wake_comp.png}
   \bicaption[球在发生阻力危机时的尾流]{球在发生阻力危机时的尾流。气流在$Re=400,000$下流过球时，由于固体边界附近的涡的尺度更小，尾流会收窄，从而阻力会下降。这一现象可见实际实验~\citep{Van-1982} (c)。与~\citep{Tao-2018-b} (a) 相比，在同样雷诺数下，我们的边界处理 (b) 捕捉到的边界的分离点更靠后，与实际实验更为接近。}{Wake of sphere in drag crisis. The flow passing through a sphere at $Re=400,000$ is known to exhibit in real-life experiment a narrower turbulent wake than at lower Reynolds numbers~\citep{Van-1982} (c) due to smaller scale vortices generated near the solid boundary, thus reducing drag significantly --- a paradox explained by the boundary-layer theory. Compared to~\citep{Tao-2018-b} (a), our improved boundary treatment scheme at the same Reynolds number (b) captures the separation point farther around the back of the sphere with a narrower wake, better matching the experimental visualization.}
   \label{img:sphere_wake_comp}
 \end{figure}
 
+我们在三个不同的雷诺数下进行了仿真，分别为$Re=100,000$、$400,000$和$800,000$。在这三个雷诺数下的仿真结果与实际实验值一并可见图~\ref{img:entropy_comp}，实验值来自~\citep{Barati-2014}。图~\ref{img:entropy_comp} (a) 展示了，相比~\citep{Geier-2017}，我们的方法可以更快地收敛并得到更贴近实验值的结果。对于更高一些的雷诺数 (阻力危机发生时)，两种仿真方法都无法非常精准地预测阻力系数，如图~\ref{img:entropy_comp} (b) 中所示。但是对这个区域通过DNS进行准确仿真一般认为也是十分困难的~\citep{Tiwari-2020}。由于在这个区域边界上会生成很多小尺度的涡流，所以阻力的波动应该会减小~\citep{Deshpande-2017}。从结果中可以看到，我们的模型相对~\citep{Geier-2017} 展示出了更小的波动，这表示出我们的基于熵优化的碰撞模型在物理量上有更强的可预测性。
+图~\ref{img:entropy_comp} (c) 展示了我们的新的碰撞模型在初期收敛之后，产生了周期性的波动。而原先的方法产生了一些不规则的波动，没有提供有意义的可置信区间，以评估平均阻力。
+
+进一步讨论我们的方法，我们可以认为我们的自适应松弛系数，包括~\citep{Geier-2017} 中的三阶松弛系数优化在内，可以被认为是某种亚网格模型。这也解释了为什么我们的LBM方法在没有使用湍流模型的情况下，依然比其它基于N-S的求解器在类似分辨率下能更好地捕捉到阻力危机现象。
+当然，在我们的方法中加入一个真实的湍流模型，如k-$\omega$模型~\citep{Menter-1994}，也并不冲突，且这样在理论上可以更好地求解亚网格流体，但是同时求解的计算时间也会显著增加。而使用我们的基于熵优化的优化方法，并不会显著地降低效率。与 \citep{Geier-2017} 相比，我们的自适应松弛系数计算只使得碰撞过程慢了约10\%，整个过程慢了约5\%。
+
+\begin{figure}[!tb]
+  \centering
+    \includegraphics[width=0.99\columnwidth]{figures/wei_crash_vis.png}
+  \bicaption[图形学领域中最前沿的LBM方法的发散结果]{图形学领域中最前沿的LBM方法的发散结果。现有的图形学领域中的LBM方法都依赖于中心矩碰撞模型~\citep{Li-2020}。由于中心矩中的不同阶数的矩相对并不独立，且高阶松弛系数不一定准确，在使用多分辨率网格进行仿真时通常会得到发散结果，即使雷诺数并不足够高。这里展示了使用中心矩碰撞模型对$Re$=100,000时风吹过球的仿真结果。边界附近的速度求解错误 (左图) 最终导致整个求解结果发散 (右图中黑色区域)。}{Typical blowup of latest LBM solvers in CG. Existing LBM methods in CG mostly rely on central-moment collision models~\citep{Li-2020,Lyu:2021}. Due to the entangling of various orders of moments and improper high-order relaxation rates, they often blow up at low Reynolds numbers (here, $Re$=100,000) when simulating even a simple flow around the sphere with multiresolution grids, see black region (right), due to spurious velocities near the solid boundary (left).}
+  \label{img:wei_crash_vis}
+  \end{figure}
+
 \paragraph{与现有边界处理的对比}
 为了验证我们的方法在边界处理上的精度提升，我们依然对雷诺数$Re=400,000$时，风流过球的阻力危机进行实验。如图~\ref{img:sphere_wake_comp} 所示，与实际实验的可视化相比 (图~\ref{img:sphere_wake_comp} (c))，我们的方法可以更好地预测固体边界附近的速度场及分离点 (图~\ref{img:sphere_wake_comp} (b))。并且，在图~\ref{img:bnd_comp} 中我们展示了不同方法得到的$C_\text{d}$与时间曲线，可见我们的方法得到的结果与真实实验最为匹配。这也说明在同样分辨率下，我们的方法与~\citep{Tao-2018-b} 相比，可以在固体边界上产生更小的涡流，使得尾流可以更加收敛，以在高雷诺数湍流仿真中获得更精准的结果。
-
-\begin{figure}[!htbp]
-\centering
-  \includegraphics[width=0.99\columnwidth]{figures/wei_crash_vis.png}
-\bicaption[图形学领域中最前沿的LBM方法的发散结果]{图形学领域中最前沿的LBM方法的发散结果。现有的图形学领域中的LBM方法都依赖于中心矩碰撞模型~\citep{Li-2020}。由于中心矩中的不同阶数的矩相对并不独立，且高阶松弛系数不一定准确，在使用多分辨率网格进行仿真时通常会得到发散结果，即使雷诺数并不足够高。这里展示了使用中心矩碰撞模型对$Re$=100,000时风吹过球的仿真结果。边界附近的速度求解错误 (左图) 最终导致整个求解结果发散 (右图中黑色区域)。}{Typical blowup of latest LBM solvers in CG. Existing LBM methods in CG mostly rely on central-moment collision models~\citep{Li-2020,Lyu:2021}. Due to the entangling of various orders of moments and improper high-order relaxation rates, they often blow up at low Reynolds numbers (here, $Re$=100,000) when simulating even a simple flow around the sphere with multiresolution grids, see black region (right), due to spurious velocities near the solid boundary (left).}
-\label{img:wei_crash_vis}
-\end{figure}
 
 \paragraph{与图形学领域中LBM方法的对比}
 虽然目前图形学领域中最前沿的LBM方法~\citep{Li-2020} 相比图形学领域中其它的流体仿真方法，已经显著地提升了精度与效率。但是对于工业领域的应用，这些方法在精度和稳定性上均有一定的差距。图~\ref{img:wei_crash_vis} 展示了一个使用图形学领域中的LBM方法进行的相对简单的气动仿真实验，即球在相对较低的雷诺数 ($Re$=100,000) 下的气动仿真。该仿真使用了与其它的球的气动仿真实验一致的多分辨率网格设置，但即使在分辨率相对较高的情况下，在仿真早期便开始出现不稳定现象，以至于数值发散而无法获得结果。

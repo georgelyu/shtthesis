@@ -178,7 +178,7 @@
   \label{img:taylor-couette-setting-2d}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[!htb]
   \centering
     \includegraphics[width=0.94\columnwidth]{figures/taylor-couette-compare-2d.png}
   \bicaption[二维泰勒-库埃特流仿真的对比]{二维泰勒-库埃特流仿真的对比。我们将不同求解器 (从左至右) 得到的不同分辨率 (从上至下) 的二维泰勒-库埃特流数值仿真结果进行可视化，可视化的值为相对误差，场景设置见图~\ref{img:taylor-couette-setting-2d}。图中从左至右依次为原始的简单反弹边界~\citep{Ladd-1994}、\citep{Li-2020} 中的动理学方法、我们的边界处理，以及ANSYS Fluent求解器。ANSYS Fluent在求解时使用了自适应的体网格，平均元素大小与其它求解器中的网格大小相当。}{Comparison of 2D Taylor-Couette flow simulation. We visualize the relative errors of the numerical solution to the 2D Taylor-Couette flow of Fig.~\ref{img:taylor-couette-setting-2d} computed by different solvers (columns) and different resolutions (rows). From left to right: the original bounce-back scheme~\citep{Ladd-1994}, the kinetic solver of~\citep{Li-2020}, our boundary treatment method, as well as the ANSYS Fluent solver using adaptive radial mesh for which the average element area matches the grid cell area used for the other solvers.}
@@ -205,7 +205,7 @@ A = \frac{\Omega_2 r_2^2 - \Omega_1 r_1^2}{r_2^2 - r_1^2}, \hspace{4mm} B= \frac
   \label{img:taylor-couette-error-compare}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/ns-compare-2d.png}
   \bicaption[与二维N-S求解器的对比]{与二维N-S求解器的对比。我们仿真一个二维的薄板在流体中旋转的场景，仿真分辨率为$256\times256$。顶图：由基于切削网格方法的N-S求解器~\citep{Azevedo-2016} 得到的速度场模值；底图：我们的图形方法获得的速度场模值。(a)、(c) 与 (b)、(d) 分别从仿真中的同一帧截取。虽然两个仿真方法的结果都在视觉上可以接受，但是我们的方法有着更多涡流的细节，证明了我们的方法更适合于湍流的仿真场景。}{Comparison with 2D N-S solver. We simulated a 2D thin plate spinning in a fluid using a grid resolution of $256\times256$. Top: velocity magnitude plot from a cut-cell-based NS solver~\citep{Azevedo-2016}; Bottom: velocity magnitude plot from our solver for the same frames as (a) and (b). Although both solvers retain good boundary velocities, ours produces much more detailed vortices, making it significantly more suitable for solving coupling in a turbulent flow scenario.}
@@ -241,15 +241,22 @@ CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的
 \paragraph{与图形学中现有方法的对比}
 近来，\citet{Li-2020} 提出了一个基于动理学方法的双向流固耦合湍流求解方法，该方法使用DI-IBM处理固体边界。然而这一方法有一定的局限性。首先因为DI-IBM在边界两侧施加惩罚力，其在求解亚网格物体的流固耦合时，会有流体穿透的现象。图~\ref{img:comparison_with_ib} 展示了一个三维的喷射流打向一个薄板，其中图 (a) 使用了 \citet{Li-2020} 的方法，并出现了不应该存在的流体穿透现象 (图中红框)。图 (b) 使用了我们的方法，没有产生类似的现象。
 
-另外，DI-IBM有精度不足的问题，使得在湍流仿真时得不到正确结果，尤其是在固体边界层上。我们对一个向前运动的汽车模型进行气流仿真来说明这一问题，见图~\ref{img:comparsion_car_ib_ours}。对于汽车外形来说，气流的分离点一般位于汽车尾部，并且可以通过扰流板等进一步影响尾流走向 (如图~\ref{img:comparsion_car_design} (d) 中的风洞实验)。但仿真结果显示，DI-IBM预测的边界分离点在车顶，完全不符合实际风洞实验，而我们的方法可以正确预测边界的分离点 (两次仿真除边界处理外使用同样的参数设置)。
-
-为了展示如扰流板这样的小且薄的结构对汽车周围流场的影响，我们还在图~\ref{img:comparsion_car_design} 中展示了有或无扰流板时汽车流场的仿真结果。从结果中我们可以看到，在添加了扰流板后，汽车的尾流发生了明显的变化。扰流板破坏了车身尾部表面的气流，在产生湍流的同时减少了车辆尾部的升力，从而提升了车辆在高速时的操控性。这两个例子展示出了我们的方法针对于计算机图形学中已有LBM方法的优势。
-
-\begin{figure}[!tbp]
+\begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/comparsion_car_design.png}
   \bicaption[汽车的空气动力学设计]{汽车的空气动力学设计。通过我们的方法对没有尾翼的汽车进行仿真 (a)，其结果与一个相似的车辆模型在风洞可视化的结果匹配 (b)。之后添加一个小型的扰流板 (图中红色方框) 到汽车尾部之后，仿真中的尾流发生显著变化 (c)，与带有扰流板的风洞测试相似 (d)。这展示出我们的方法可以快速、有效地为气动外形设计服务。图中的速度模值单位为$km/h$。图 (b) 与 (d) 的版权来自~\citet{youtube_2014}。}{Aerodynamic design of a car model. Simulating the airflow around a car model without a spoiler using our solver (a) matches the wind tunnel visualization for a similar car model (b); A small and thin spoiler (in red box) added on the back of the car model (c) changes the wake flow of the car model in our simulation quite significantly, in line with a wind-tunnel test of a car model with a spoiler (d) --- indicating that our solver offers an efficient, yet predictive tool of air flows for computational shape design. The velocity magnitude is measured in $km/h$. Image (b) and (d) courtesy of~\citet{youtube_2014}.}
   \label{img:comparsion_car_design}
+\end{figure}
+
+另外，DI-IBM有精度不足的问题，使得在湍流仿真时得不到正确结果，尤其是在固体边界层上。我们对一个向前运动的汽车模型进行气流仿真来说明这一问题，见图~\ref{img:comparsion_car_ib_ours}。对于汽车外形来说，气流的分离点一般位于汽车尾部，并且可以通过扰流板等进一步影响尾流走向 (如图~\ref{img:comparsion_car_design} (d) 中的风洞实验)。但仿真结果显示，DI-IBM预测的边界分离点在车顶，完全不符合实际风洞实验，而我们的方法可以正确预测边界的分离点 (两次仿真除边界处理外使用同样的参数设置)。
+
+为了展示如扰流板这样的小且薄的结构对汽车周围流场的影响，我们还在图~\ref{img:comparsion_car_design} 中展示了有或无扰流板时汽车流场的仿真结果。从结果中我们可以看到，在添加了扰流板后，汽车的尾流发生了明显的变化。扰流板破坏了车身尾部表面的气流，在产生湍流的同时减少了车辆尾部的升力，从而提升了车辆在高速时的操控性。这两个例子展示出了我们的方法针对于计算机图形学中已有LBM方法的优势。
+
+\begin{figure}[!tb]
+  \centering
+    \includegraphics[width=0.93\columnwidth]{figures/performance.png}
+  \bicaption[性能对比]{性能对比。我们将我们的方法 (绿色) 与~\citep{Li-2020,Chen-2021} 中的动理学求解方法 (红色) 进行比较，比较用例为图~\ref{img:comparsion_car_ib_ours} 中所示的汽车仿真，仿真时长为1秒。在同一张NVIDIA RTX 3090 GPU上得到的测试结果显示我们的方法在所有分辨率上都有显著的性能提升。}{Performance comparison. We compare the efficiency of the kinetic solver from~\citep{Li-2020,Chen-2021} (red) with our kinetic solver (green) based on one second of simulation of the car model shown in Fig.~\ref{img:comparsion_car_ib_ours} and both executed on a same NVIDIA RTX 3090 GPU, showing significant performance improvement for all grid resolutions.}
+  \label{img:Performance}
 \end{figure}
 
 \paragraph{性能对比}
@@ -258,13 +265,6 @@ CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的
 \section{方法的局限性}
 虽然我们的方法展示出了优秀的通用性与数值结果，我们的方法依旧有一定的局限性。
 首先，由于我们使用了基于采样点的几何计算近似，当固体包含尖角的时候，是否需要应用反弹边界可能发生误判。增加采样点数量或使用自适应采样可以提升精度，但是也会同时提升显存需求。第二，对固体所受的力和力矩的计算也受制于对固体外形的近似。如我们的亚网格近似无法真实反应物体的几何形状，会影响固体受力计算的精度。最后，对于可变形的物体，我们的方法需求一个更高效的采样方法，以每帧更新物体表面的采样点。
-
-\begin{figure}[!tbp]
-  \centering
-    \includegraphics[width=0.93\columnwidth]{figures/performance.png}
-  \bicaption[性能对比]{性能对比。我们将我们的方法 (绿色) 与~\citep{Li-2020,Chen-2021} 中的动理学求解方法 (红色) 进行比较，比较用例为图~\ref{img:comparsion_car_ib_ours} 中所示的汽车仿真，仿真时长为1秒。在同一张NVIDIA RTX 3090 GPU上得到的测试结果显示我们的方法在所有分辨率上都有显著的性能提升。}{Performance comparison. We compare the efficiency of the kinetic solver from~\citep{Li-2020,Chen-2021} (red) with our kinetic solver (green) based on one second of simulation of the car model shown in Fig.~\ref{img:comparsion_car_ib_ours} and both executed on a same NVIDIA RTX 3090 GPU, showing significant performance improvement for all grid resolutions.}
-  \label{img:Performance}
-\end{figure}
 
 \section{总结}
 在本章中，我们提出了一个基于动理学方法的混合边界处理方法，以处理在流固双向耦合。我们的方法可以有效、统一地同时处理厚、薄物体，并可以稳定、快速地完成仿真，得到视觉上可信的结果。我们的方法充分利用了反弹边界与尖锐界面浸没边界法优点的互补性，包含双面反弹边界处理与单边的速度修正，与双向耦合所需的固体受力计算。

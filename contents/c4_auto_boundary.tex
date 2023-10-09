@@ -181,9 +181,9 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 \paragraph{固体受力计算}
 对于上述的边界处理，我们依然可以用动量交换法计算固体受力~\citep{Ladd-1994, Mei-2002}，即对于边界点$\bm{x}$有
 \begin{equation}
-    \Delta \bm{p}(\bm{x})= \sum_{j\in L(\bm{x})} \bm{c}_{j'}\,(f_{j}(\bm{x}) + f^*_{j'}(\bm{x})),\vspace*{-1.5mm}
+    \Delta \bm{p}(\bm{x})= \sum_{i\in L} \bm{c}_{i'}\,(f_{i}(\bm{x}) + f^*_{i'}(\bm{x})),\vspace*{-1.5mm}
 \end{equation}
-其中$L(\bm{x})$为$\bm{x}$点向外的速度方向 (由固体向流体方向)，$f_{j}(\bm{x})$为通过边界处理方法得到的分布函数。则固体受到的合力为所有边界点上受力的和
+其中$L$为$\bm{x}$点向外的速度方向 (由固体向流体方向)，$f_{i}(\bm{x})$为通过边界处理方法得到的分布函数。则固体受到的合力为所有边界点上受力的和
 \begin{equation}
     \bm{F} = \sum_{\bm{x}} \Delta \bm{p}(\bm{x}).\vspace*{-1mm}
 \end{equation}

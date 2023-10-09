@@ -97,15 +97,15 @@
 \subsection{固体受力}
 因为要做到流固的双向耦合，我们需要讨论流体中固体的受力，也即流体传递给固体的动量。我们在边界中使用了反弹边界与速度修正的结合，所以我们在讨论固体受力时也分为两部分来讨论。我们首先讨论双面反弹边界对固体受力的贡献。在双面反弹边界之后，我们先将由公式~\ref{eq:bounce-back} 带来的动量交换进行累计。更具体地说，迁移过程后，$t$时刻$\bm{x}$点的动量可以表达为
 \begin{equation}
-  \bm{p}(\bm{x}) = \sum_{i}\bm{c}_if^*_i(\bm{x},t).
+  \bm{p}(\bm{x}) = \sum_{i \in L}\bm{c}_if^*_i(\bm{x},t).
 \end{equation}
-如果$L$是$\bm{x}$点切削速度方向的集合 (即与固体边界相交的速度方向)，每一个$L$中的速度方向都会发生分布函数反弹，那么$\bm{c}_j$方向的流固动量交换是
+其中$L$是$\bm{x}$点切削速度方向的集合 (即与固体边界相交的速度方向)。$\bm{c}_i$方向的流固动量交换是
 \begin{equation}
-  \smash{-\bm{c}_{j}\,(f^*_{j}(\bm{x}) + f^*_{j'}(\bm{x}))}.
+  \smash{-\bm{c}_{I'}\,(f^*_{i}(\bm{x}) + f^*_{i'}(\bm{x}))}.
 \end{equation}
 从而，在$\bm{x}$点交换的动量和$\Delta \bm{p}$为
 \begin{equation}
-\Delta \bm{p}(\bm{x})= - \sum_{j\in L} \bm{c}_{j}\,(f^*_{j}(\bm{x}) + f^*_{j'}(\bm{x})),
+\Delta \bm{p}(\bm{x})= - \sum_{i\in L} \bm{c}_{i}\,(f^*_{i}(\bm{x}) + f^*_{i'}(\bm{x})),
 \end{equation}
 其中我们不将$(\Delta x)^3$显式写出 ($\Delta x$是网格大小)，因为在正则化LBE空间中这一项为1。
 那么反弹边界部分所贡献的固体受力是所有点动量交换的和，即

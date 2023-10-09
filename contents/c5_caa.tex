@@ -75,6 +75,7 @@ k_3 & =\mathbf{u}\left(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2\right), \\
 其中$\Delta x$是网格的大小。公式~\ref{eq:particle_kernel} 中对网格大小做了自适应处理，使得每个粒子对周边的网格格点的贡献是适当的，而不会使烟雾过度模糊或颗粒化。
 
 \section{应用于物理量计算}
+\label{sec:pp_surface_pressure}
 在使用流体仿真进行物理量 (如升力系数、阻力系数、物体表面压力系数等) 计算时，为了尽可能地提升仿真的物理精度，在仿真时应注意以下几点：
 \begin{itemize}
     \item 仿真域：由于目前的仿真域边界条件无法完美地模拟开放边界条件 (open boundary condition)，即所有的仿真域边界都会对域内的流体产生影响，所以为了进一步减轻这一影响，通常仿真域在各个维度的大小应设置为物体的6-12倍；

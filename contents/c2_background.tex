@@ -333,9 +333,8 @@ P_{\alpha \beta}^{n e q}=\underbrace{-\rho c_{s}^{2} \tau\left(\frac{\partial u_
 \label{sec:bg_collision}
 在第~\ref{sec:2_LBM_origin} 节的末尾，我们介绍了LBM中的BGK碰撞模型 (即单松弛时间模型) 与多松弛时间模型出现的动机，并在第~\ref{sec:1_related_works_LBM} 节中介绍了基于不同量的MRT模型及其发展过程。由于数量众多，我们无法详细介绍所有的碰撞模型，于是在本节中我们主要介绍与我们工作最相关的两种碰撞模型，分别为自适应中心距碰撞模型与累积量碰撞模型。
 
-\subsection{自适应中心矩碰撞模型}
-自适应中心矩碰撞模型，全称为自适应中心矩多松弛时间 (Adaptive Central Moment Multiple-Relaxation-Time，ACM-MRT) 碰撞模型，由~\citep{Li-2020} 提出。为了介绍这一方法的发展脉络，我们需要从原始矩碰撞模型开始回顾，到中心矩碰撞模型，最后介绍自适应中心矩碰撞模型。
-
+\subsection{中心矩碰撞模型}
+\label{sec:background_mrt}
 我们在第~\ref{sec:moment} 节中提到了，矩可以联系介观世界中的分布函数与宏观世界中的物理量。那么同理，碰撞过程也可以在矩空间完成。从分布函数到矩的转换可以写作$\mathbf{m}=\mathbf{M}\mathbf{f}$，其中$\mathbf{M}=[\mathbf{M}_0, \mathbf{M}_1, \dots, \mathbf{M}_{q-1}]$是分布函数到矩的变换矩阵，$q$为离散速度的数量。从这里开始，没有特殊说明时，本文都考虑D3Q27，即三维下$q=27$时的情况，因为此时的格子在三维中有着最好的对称性。对于原始矩，我们使用~\citep{PhysRevE.95.013310} 中的构造形式
 \begin{align}
 \begin{split}
@@ -366,7 +365,11 @@ $\boldsymbol{c}_{i, x}$、$\boldsymbol{c}_{i, y}$与$\boldsymbol{c}_{i, z}$分�
 
 这里构造的$\mathbf{M}$是原始矩碰撞模型中的一个非正交版本，因为各列$\mathbf{M}_{i}$互相是不正交的。原始矩有一个主要的局限性是，它并不遵守伽利略不变性。伽利略不变性是指流体的动态不随惯性系的变化而变化，即在两个速度不同的惯性系下观察，流体的动态不应受影响 (虽然它们的速度可能有整体的差距)。但是很显然，在原始矩碰撞模型中，宏观速度不同时，松弛的系数也会发生变化，这违反了伽利略不变性，并且是原始矩模型稳定性差的一个主要原因~\citep{PhysRevE.95.013310}。
 
-中心矩碰撞模型通过一个简单的改变，尝试修补原始矩中的这一问题。在中心矩碰撞模型中，公式~\ref{eq:rm_mrt} 中的$\boldsymbol{c}_{i}$全部替换为$\bar{\boldsymbol{c}_{i}}=\boldsymbol{c}_{i}-\boldsymbol{u}$，这里的$\boldsymbol{u}$是该点的宏观速度。而观察发现，在中心矩模型中，对于高阶矩 (3阶或以上) 的松弛系数选择，对数值耗散误差有着重要的影响~\citep{Li-2020}。于是自适应中心矩模型尝试通过优化的方法求得高阶松弛系数。在该模型中存在一个度量函数
+中心矩碰撞模型通过一个简单的改变，尝试修补原始矩中的这一问题。在中心矩碰撞模型中，公式~\ref{eq:rm_mrt} 中的$\boldsymbol{c}_{i}$全部替换为$\bar{\boldsymbol{c}_{i}}=\boldsymbol{c}_{i}-\boldsymbol{u}$，这里的$\boldsymbol{u}$是该点的宏观速度。
+
+\subsection{自适应中心矩碰撞模型}
+\label{sec:background_acmmrt}
+自适应中心矩碰撞模型，全称为自适应中心矩多松弛时间 (Adaptive Central Moment Multiple-Relaxation-Time，ACM-MRT) 碰撞模型，由~\citet{Li-2020} 提出。作者们观察发现，在中心矩模型中，对于高阶矩 (3阶或以上) 的松弛系数选择，对数值耗散误差有着重要的影响。于是自适应中心矩模型尝试通过优化的方法求得高阶松弛系数。在该模型中存在一个度量函数
 \begin{equation}
     \epsilon\left(\mathbf{x}_k, t\right)=\frac{\left\|\delta^t(\rho)_k\right\|}{\bar{\rho}}+\frac{\left\|\delta^t(\rho \mathbf{u})_k\right\|}{\overline{\|\rho \mathbf{u}\|}}+\frac{\left\|\delta^t(\boldsymbol{\Pi})_k\right\|}{\overline{\|\Pi\|}},
 \end{equation}
@@ -549,12 +552,6 @@ LBM的边界处理有一定的复杂性，其中一个主要来源是，因为LB
 
 由于在LBM中有着非常多的边界处理形式，我们在这里回顾一些跟当前工作最相关的边界处理方法。
 
-\subsection{浸入边界法}
-浸入边界法 (immersed boundary method，IBM) 是一个在LBM被经常采用的边界处理方法，其一般通过施加惩罚力实现边界条件~\citep{patel2018diffuse,mittal-2008,Li-2020}。在浸入边界法的诸多变种中，锐利界面浸入边界法 (sharp-interface immersed boundary, SI-IBM)~\citep{mittal-2008} 是最为精准的。该方法的图示可见图~\ref{img:bounce_back_scheme}。
-对于边界点，SI-IBM首先重建相邻固体点的分布函数 (在图~\ref{img:bounce_back_scheme} 中标为方框)。之后将该格点投影到固体边界上 (在图~\ref{img:bounce_back_scheme} 中标为$\bm{p}^\perp$)，然后沿着法向$\bm{p}^\perp\!-\!\bm{p}$方向求得一个镜像点$\bm{p}'$。$\bm{p}'$的宏观速度可在固体边界的一侧通过周围点插值得到。因为固体点的速度$\bm{u}_b(\bm{p}^\perp)$是已知的，我们可以容易地计算出$\bm{p}$点的速度$\bm{u}^*(\bm{p}) = 2\bm{u}_b(\bm{p}^\perp) - \bm{u}(\bm{p}')$。显然这个速度会与$\bm{p}$点现有的宏观速度$\bm{u}(\bm{p})$有一个速度差$\Delta\bm{u}(\bm{p}) = \bm{u}^*(\bm{p}) - \bm{u}(\bm{p})$。这个速度差可以构成一个惩罚力$\bm{F}(\bm{p}) = \rho\Delta\bm{u}(\bm{p})$来修正$\bm{p}$点的流体速度。
-
-SI-IBM的一个优势是通过插值，固体边界的大速度梯度会被压制，从而提升稳定性。但是由于它需求有固体内部点参与计算，对于亚网格尺度的物体，SI-IBM并不适合。这一点在第~\ref{chap:siga21} 章中有更详细的说明。同时，在物体运动时，SI-IBM需要格点重填 (node refilling)，这会引入速度外插之外的新的误差。
-
 \subsection{简单反弹边界}
 简单反弹边界在LBM中同样有着重要的地位，不仅因为它是最早被应用在LBM中的边界处理方法之一，也因为其非常简洁的构造被广泛使用。对于未知的分布函数，简单反弹边界通过一个事实上的“反弹”来构造未知的分布函数：
 \begin{equation}\label{eq:bounce-back}
@@ -564,7 +561,7 @@ f_{j}(\bm{x},t+1) = f_{j'}(\bm{x},t) - 6 w_{j}\rho\bm{u}_s \cdot \bm{c}_{j}\;,
 \begin{equation}
     f_{j}(\bm{x},t+1) = f_{j'}(\bm{x},t).
 \end{equation}
-然而，简单反弹边界的简洁也带来了一些局限性。因为分布函数永远假设在速度方向的中间被反弹，这会产生较大的速度梯度与色散误差，并给高雷诺数湍流仿真带来很强的不稳定性。这一点同样在第~\ref{chap:siga21} 章中有更详细的说明。
+然而，简单反弹边界的简洁也带来了一些局限性。因为分布函数永远假设在速度方向的中间被反弹，这会产生较大的速度梯度与色散误差，并给高雷诺数湍流仿真带来很强的不稳定性。这一点在第~\ref{chap:siga21} 章中有更详细的说明。
 
 \begin{figure}[htb]
     \centering
@@ -586,6 +583,12 @@ f_{j}(\bm{x},t+1) = f_{j'}(\bm{x},t) - 6 w_{j}\rho\bm{u}_s \cdot \bm{c}_{j}\;,
 其中$q=\|\mathbf{x}_B - \mathbf{x}_W\|/\|\bm{c}_i\|$是边界点到边界的归一化距离，这里我们只考虑了静态边界的情况，在动态边界中可以如公式~\ref{eq:bounce-back} 中一样添加动量项。
 
 在引入基于距离的插值后，反弹边界可以达到二阶精度，但是依然有一些问题。首先是公式~\ref{eq:ibb_2001} 引入了邻居点参与计算，对于GPU实现会降低数据访问效率。其次，当处理复杂外形的几何时，格点可能处于两个边界之间，导致找不到邻居点从而无法完成边界处理。最后，如第~\ref{sec:1_related_works_LBM} 节所介绍的，IBB在~\citet{Bouzidi-2001} 提出这一方法后逐渐发展成为了一类方法，之后的工作提出了诸多不同的构造形式，甚至参数化的构造。这些不同的构造的性能与精度均有所区别。关于这一部分我们将在第~\ref{chap:sig23} 章中继续讨论。
+
+\subsection{浸入边界法}
+浸入边界法 (immersed boundary method，IBM) 是一个在LBM被经常采用的边界处理方法，其一般通过施加惩罚力实现边界条件~\citep{patel2018diffuse,mittal-2008,Li-2020}。在浸入边界法的诸多变种中，锐利界面浸入边界法 (sharp-interface immersed boundary, SI-IBM)~\citep{mittal-2008} 是最为精准的。该方法的图示可见图~\ref{img:bounce_back_scheme}。
+对于边界点，SI-IBM首先重建相邻固体点的分布函数 (在图~\ref{img:bounce_back_scheme} 中标为方框)。之后将该格点投影到固体边界上 (在图~\ref{img:bounce_back_scheme} 中标为$\bm{p}^\perp$)，然后沿着法向$\bm{p}^\perp\!-\!\bm{p}$方向求得一个镜像点$\bm{p}'$。$\bm{p}'$的宏观速度可在固体边界的一侧通过周围点插值得到。因为固体点的速度$\bm{u}_b(\bm{p}^\perp)$是已知的，我们可以容易地计算出$\bm{p}$点的速度$\bm{u}^*(\bm{p}) = 2\bm{u}_b(\bm{p}^\perp) - \bm{u}(\bm{p}')$。显然这个速度会与$\bm{p}$点现有的宏观速度$\bm{u}(\bm{p})$有一个速度差$\Delta\bm{u}(\bm{p}) = \bm{u}^*(\bm{p}) - \bm{u}(\bm{p})$。这个速度差可以构成一个惩罚力$\bm{F}(\bm{p}) = \rho\Delta\bm{u}(\bm{p})$来修正$\bm{p}$点的流体速度。
+
+SI-IBM的一个优势是通过插值，固体边界的大速度梯度会被压制，从而提升稳定性。但是由于它需求有固体内部点参与计算，对于亚网格尺度的物体，SI-IBM并不适合。这一点同样在第~\ref{chap:siga21} 章中有更详细的说明。同时，在物体运动时，SI-IBM需要格点重填 (node refilling)，这会引入速度外插之外的新的误差。
 
 \section{总结与讨论}
 在本章中，第~\ref{sec:2_LBM_origin} 节到第~\ref{sec:lbm_to_ns} 节主要介绍了LBM的理论背景，第~\ref{sec:bg_collision} 节与第~\ref{sec:boundary_treatment} 节主要介绍了LBM两个最核心的部分——碰撞和边界处理部分——的具体实现形式。这两个部分直接决定着LBM仿真的精度。而本文接下来的内容也将围绕这两个部分提出新的处理方法。

@@ -333,7 +333,7 @@ P_{\alpha \beta}^{n e q}=\underbrace{-\rho c_{s}^{2} \tau\left(\frac{\partial u_
 \label{sec:bg_collision}
 在第~\ref{sec:2_LBM_origin} 节的末尾，我们介绍了LBM中的BGK碰撞模型 (即单松弛时间模型) 与多松弛时间模型出现的动机，并在第~\ref{sec:1_related_works_LBM} 节中介绍了基于不同量的MRT模型及其发展过程。由于数量众多，我们无法详细介绍所有的碰撞模型，于是在本节中我们主要介绍与我们工作最相关的两种碰撞模型，分别为自适应中心距碰撞模型与累积量碰撞模型。
 
-\subsection{中心矩碰撞模型}
+\subsection{原始矩与中心矩碰撞模型}
 \label{sec:background_mrt}
 我们在第~\ref{sec:moment} 节中提到了，矩可以联系介观世界中的分布函数与宏观世界中的物理量。那么同理，碰撞过程也可以在矩空间完成。从分布函数到矩的转换可以写作$\mathbf{m}=\mathbf{M}\mathbf{f}$，其中$\mathbf{M}=[\mathbf{M}_0, \mathbf{M}_1, \dots, \mathbf{M}_{q-1}]$是分布函数到矩的变换矩阵，$q$为离散速度的数量。从这里开始，没有特殊说明时，本文都考虑D3Q27，即三维下$q=27$时的情况，因为此时的格子在三维中有着最好的对称性。对于原始矩，我们使用~\citep{PhysRevE.95.013310} 中的构造形式
 \begin{align}

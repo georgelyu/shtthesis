@@ -101,11 +101,11 @@
 \end{equation}
 其中$L$是$\bm{x}$点切削速度方向的集合 (即与固体边界相交的速度方向)。$\bm{c}_i$方向的流固动量交换是
 \begin{equation}
-  \smash{-\bm{c}_{I'}\,(f^*_{i}(\bm{x}) + f^*_{i'}(\bm{x}))}.
+  \smash{\bm{c}_{i'}\,(f^*_{i}(\bm{x}) + f^*_{i'}(\bm{x}))}.
 \end{equation}
 从而，在$\bm{x}$点交换的动量和$\Delta \bm{p}$为
 \begin{equation}
-\Delta \bm{p}(\bm{x})= - \sum_{i\in L} \bm{c}_{i}\,(f^*_{i}(\bm{x}) + f^*_{i'}(\bm{x})),
+\Delta \bm{p}(\bm{x})= \sum_{i \in L} \bm{c}_{i'}\,(f^*_{i}(\bm{x}) + f^*_{i'}(\bm{x})),
 \end{equation}
 其中我们不将$(\Delta x)^3$显式写出 ($\Delta x$是网格大小)，因为在正则化LBE空间中这一项为1。
 那么反弹边界部分所贡献的固体受力是所有点动量交换的和，即
@@ -172,22 +172,29 @@
 所以我们在这一过程中，将固体采样点作为并行单元。对于每一个采样点，我们计算该点到周围的切削网格点的距离 (见图~\ref{img:geometric-computing} (f))，并且比较这个距离与切削网格点当前记录的最近点的距离。如果距离更小的话则更新该采样点为最近点。因为多个线程可能会同时访问同一个流体点，这一过程需要使用原子比较计算。注意公式~\ref{eq:is_in_fluid} 依然需要满足，所以切削网格点状态可以被同时识别。
 这样的好处是，每个固体采样点附近一定存在切削网格点，并且数量接近。这样可以大幅提升GPU的负载均衡，减少无用的线程造成的线程开销，提升GPU占用率。
 
-\section{与现有方法的对比}
-\label{sec:siga21_comp}
-此节中我们将我们的图形方法与图形学中近期提出的 (也是目前最前沿的) LBM仿真方法~\citep{Li-2020} 进行定量与定性的对比。我们还针对计算效率，讨论基于 \citet{Li-2020} 所提方法的性能改进~\citep{Chen-2021} 与我们方法的比较。
-
-\begin{figure}[!htbp]
+\begin{figure}[!tb]
   \centering
     \includegraphics[width=0.85\columnwidth]{figures/taylor-couette-setting-2d.png}
   \bicaption[二维泰勒-库埃特流]{二维泰勒-库埃特流。左图：两个以$\bm{O}$点为圆心的同心圆，半径分别为$r_1$、$r_2$，角速度为$\Omega_1$、$\Omega_2$，通过旋转在中间的圆环中形成泰勒-库埃特流。右图：二维泰勒-库埃特流的解析解速度场模值的可视化。}{2D Taylor-Couette flow. Left: the Taylor-Couette flow runs between two concentric circle boundaries locating at origin $\bm{O}$ with radii $r_1$ and $r_2$ whose rotating speeds are $\Omega_1$ and $\Omega_2$, respectively. Right: visualization of velocity magnitudes of the analytical solution between two rotating circles.}
   \label{img:taylor-couette-setting-2d}
 \end{figure}
 
-\begin{figure}[!htb]
+\section{与现有方法的对比}
+\label{sec:siga21_comp}
+此节中我们将我们的图形方法与图形学中近期提出的 (也是目前最前沿的) LBM仿真方法~\citep{Li-2020} 进行定量与定性的对比。我们还针对计算效率，讨论基于 \citet{Li-2020} 所提方法的性能改进~\citep{Chen-2021} 与我们方法的比较。
+
+\begin{figure}[!tb]
   \centering
     \includegraphics[width=0.94\columnwidth]{figures/taylor-couette-compare-2d.png}
   \bicaption[二维泰勒-库埃特流仿真的对比]{二维泰勒-库埃特流仿真的对比。我们将不同求解器 (从左至右) 得到的不同分辨率 (从上至下) 的二维泰勒-库埃特流数值仿真结果进行可视化，可视化的值为相对误差，场景设置见图~\ref{img:taylor-couette-setting-2d}。图中从左至右依次为原始的简单反弹边界~\citep{Ladd-1994}、\citep{Li-2020} 中的动理学方法、我们的边界处理，以及ANSYS Fluent求解器。ANSYS Fluent在求解时使用了自适应的体网格，平均元素大小与其它求解器中的网格大小相当。}{Comparison of 2D Taylor-Couette flow simulation. We visualize the relative errors of the numerical solution to the 2D Taylor-Couette flow of Fig.~\ref{img:taylor-couette-setting-2d} computed by different solvers (columns) and different resolutions (rows). From left to right: the original bounce-back scheme~\citep{Ladd-1994}, the kinetic solver of~\citep{Li-2020}, our boundary treatment method, as well as the ANSYS Fluent solver using adaptive radial mesh for which the average element area matches the grid cell area used for the other solvers.}
   \label{img:taylor-couette-compare-2d}
+\end{figure}
+
+\begin{figure}[!tb]
+  \centering
+    \includegraphics[width=0.94\columnwidth]{figures/taylor-couette-error-compare.png}
+  \bicaption[不同类型求解器的误差收敛情况]{不同类型求解器的误差收敛情况。我们对二维泰勒-库埃特流进行仿真，并衡量了在不同分辨率下，不同类型的求解器的相对误差，以展示各个求解器的误差收敛情况。相对误差根据公式~\ref{eq:error_metric} 计算得到。}{Convergence for different types of solvers. We simulated the 2D Taylor-Couette flows with different types of solvers and measured the relative errors according to Eq.~\ref{eq:error_metric} to show the convergence for different solvers as resolution increases.}
+  \label{img:taylor-couette-error-compare}
 \end{figure}
 
 \paragraph{二维泰勒-库埃特 (Taylor-Couette) 流仿真}
@@ -202,13 +209,6 @@ u_x^\text{ref} = -\bigl(A + \frac{B}{r^2}\bigr)y, \hspace{4mm} u_y^\text{ref} = 
 A = \frac{\Omega_2 r_2^2 - \Omega_1 r_1^2}{r_2^2 - r_1^2}, \hspace{4mm} B= \frac{(\Omega_1 - \Omega_2)r_1^2r_2^2}{r_2^2 - r_1^2}.
 \end{equation}
 图~\ref{img:taylor-couette-setting-2d} (b) 展示了这个解析解速度分布的可视化。
-
-\begin{figure}[!htbp]
-  \centering
-    \includegraphics[width=0.94\columnwidth]{figures/taylor-couette-error-compare.png}
-  \bicaption[不同类型求解器的误差收敛情况]{不同类型求解器的误差收敛情况。我们对二维泰勒-库埃特流进行仿真，并衡量了在不同分辨率下，不同类型的求解器的相对误差，以展示各个求解器的误差收敛情况。相对误差根据公式~\ref{eq:error_metric} 计算得到。}{Convergence for different types of solvers. We simulated the 2D Taylor-Couette flows with different types of solvers and measured the relative errors according to Eq.~\ref{eq:error_metric} to show the convergence for different solvers as resolution increases.}
-  \label{img:taylor-couette-error-compare}
-\end{figure}
 
 \begin{figure}[!tb]
   \centering

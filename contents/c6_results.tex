@@ -4,7 +4,7 @@
 在本章中，我们展示我们的流体仿真方法在不同领域中的应用。其中，通过第~\ref{chap:siga21} 章中的方法得到的结果均于一个14核Intel CPU、128 GB内存、NVIDIA RTX 3090的工作站上仿真获得；通过第~\ref{chap:sig23} 章中的方法得到的结果均于一个20核Intel CPU、128 GB内存、NVIDIA A100 GPU的工作站上仿真获得。
 
 \section{面向视觉动画的仿真结果}
-下面我们首先展示一系列面向视觉动画的仿真结果。首先使用第~\ref{chap:siga21} 章描述的方法，我们对一系列的复杂几何进行单向与双向流固耦合仿真，以显示我们的方法处理不同类型物体的能力。我们还展示了一些可交互的仿真与离线的高分辨率大规模仿真，包括对一些实际物理现象的复现。
+下面我们首先展示一系列面向视觉动画的仿真结果。首先使用第~\ref{chap:siga21} 章描述的方法，我们对一系列的复杂几何进行单向与双向流固耦合仿真，以显示我们的方法处理不同类型物体的能力。我们还展示了一些可交互的仿真与离线的高分辨率大规模仿真，包括对一些实际物理现象的定性复现。
 
 结果中的展示的烟雾均使用染色粒子对仿真产生的流场进行被动追踪生成，这些粒子最终会被转换成OpenVDB文件~\citep{Museth-2013}，并使用RedShift渲染器~\citep{redshift} 进行渲染。
 
@@ -76,18 +76,18 @@
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/result_city.png}
-  \bicaption[气流经过城市街区的高分辨率仿真]{气流经过城市街区的高分辨率仿真。我们对气流经过城市街区进行高分辨率仿真 (($889\times333\times556$))，建筑中包含诸多细且尖锐的结构。一层相对薄的烟雾从左侧注入，在建筑间产生涡流细节。}{High-resolution simulation of airflow through a city neighborhood. We simulate the airflow passing around and over buildings using a high resolution grid ($889\times333\times556$), where the buildings contain both thin and sharp structures. A layer of smoke particles with relatively small thickness is coming from the left, creating fine vortical structures behind and in between the buildings.}
+  \bicaption[气流经过城市街区的高分辨率仿真]{气流经过城市街区的高分辨率仿真。我们对气流经过城市街区进行高分辨率仿真 ($889\times333\times556$)，建筑中包含诸多细且尖锐的结构。一层相对薄的烟雾从左侧注入，在建筑间产生涡流细节。}{High-resolution simulation of airflow through a city neighborhood. We simulate the airflow passing around and over buildings using a high resolution grid ($889\times333\times556$), where the buildings contain both thin and sharp structures. A layer of smoke particles with relatively small thickness is coming from the left, creating fine vortical structures behind and in between the buildings.}
   \label{img:result-city}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/comparison_delta_wing.png}
   \bicaption[三角翼仿真]{三角翼仿真。通过我们的图形方法得到的薄板三角翼仿真结果 (左图) 与实际实验~\citep{Delery:2001} (右图) 的对比，展示出相同的前缘涡旋结构，表面我们的图形方法在薄结构边界层上的准确性。}{Delta-wing simulation. The airflow over a thin-shell delta-wing simulated with our hybrid coupling approach (left) matches experimental visualizations from~\citep{Delery:2001} (right), exhibiting the same spiral vortex structure near the leading edge of the wing and demonstrating the accuracy of our solver in capturing boundary layer flows around thin structures.}
   \label{img:comparison_delta_wing}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/teaser_f1.png}
   \bicaption[F1赛车的气动仿真]{F1赛车的气动仿真。这里，车身表面上显示了平均压力场 ($C_\text{p}$)，车前的两个发射源中发出染色的粒子对车身及转动的轮胎后方的尾流进行可视化。该仿真使用了五层网格，最细的网格大小为4mm，F1赛车的车身为4.15m。通过我们的GPU加速实现，我们完成了2秒的仿真，在精度可用于工业仿真的同时，仿真耗费的计算时间不足1个小时。}{Aerodynamics of an F1 racing car. Here, the mean pressure field ($C_\text{p}$) is shown on the car body surface, while passively-advected dyed particles from two front sources show the wake flow behind the rotating wheels and the car body. Five-level multiresolution grids are used to capture an effective resolution of 4mm on the body of an F1 racing car measuring 4.15 meters. 
@@ -118,7 +118,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \end{figure}
 
 \paragraph{快速仿真以进行交互式设计}
-我们的流固耦合算法可足够高效，以进行交互式产品设计与测试。作为示例，我们在$200\!\times\!200\!\times\!200$分辨率下对一个旋翼旋转的情况进行仿真。图~\ref{img:result-design} 展示了仿真中的速度场截面。完成1/100秒的仿真所需的计算时间约为0.4秒。这个时间包括数据的读取与可视化 (截面可视化在CPU上完成)。这意味着类似旋翼这类的产品可以使用我们的算法进行快速的气动性能评估，并可基于此优化设计。
+我们的流固耦合算法可足够高效，以进行交互式产品设计与测试。作为示例，我们在$200 \!\times\! 200 \!\times\! 200$分辨率下对一个旋翼旋转的情况进行仿真。图~\ref{img:result-design} 展示了仿真中的速度场截面。完成1/100秒的仿真所需的计算时间约为0.4秒。这个时间包括数据的读取与可视化 (截面可视化在CPU上完成)。这意味着类似旋翼这类的产品可以使用我们的算法进行快速的气动性能评估，并可基于此优化设计。
 
 \paragraph{大规模仿真}
 最后，我们展示一个相对高分辨率的大规模仿真结果，来展示我们方法的可扩展性。该仿真使用两个GPU同时计算，展示了大量烟雾穿过一个高密度城市街区的场景 (见图~\ref{img:result-city})。场景中包含诸多细且尖锐的物体对尾流产生影响。对于这样的大场景湍流仿真，5秒的仿真所需的计算时间为1.5小时左右。正如~\citet{Li-2020} 所讨论的，达到这样的仿真效率对于N-S方法来说是十分困难的，即使同样使用多GPU进行加速。主要原是N-S方法中压力场求解这一步需要求解全局的线性方程组，在高分辨率下会严重影响计算效率。
@@ -129,10 +129,10 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 
 虽然在第~\ref{chap:sig23} 章中，我们主要讨论了如何将该方法应用至工业计算领域，但我们也有一个重要的动机是通过提出一个高精度的流体仿真方法，弥合CG与CFD领域中计算方法的差异。为了展示该方法不止有能力应用于工业领域的仿真，也可以在视觉特效领域，仿真极为复杂的流体现象，以用于真实的视觉特效制作。我们接下来展示一系列使用第~\ref{chap:sig23} 章中的方法得到的面向视觉动画的仿真结果。
 
-图~\ref{img:vis_plane}、\ref{img:teaser_f1} 与~\ref{img:vis_building} (包括下一节中的图~\ref{img:golf_ball_vis}、\ref{img:golf_ball_comp_single_res}、\ref{img:fastback}) 中都包含速度场截面的可视化，这里的可视化是将速度场的模值映射到了不同的颜色上。在映射时，整个网格的速度场通过格点上的速度线性插值获得。我们同时也在一些结果中展示了物体表面的压力系数$C_\text{p}$。压力系数的获取使用第~\ref{sec:pp_surface_pressure} 中介绍的方法以获取更连续的表面压力可视化。根据模型的尺度、计算域的大小与最细网格大小的不同，整个仿真计算过程可能需要几个小时。其中我们的多分辨率网格构建过程一般需要不多于20分钟。
+图\ref{img:teaser_f1}、~\ref{img:vis_plane}与~\ref{img:vis_building} (包括下一节中的图~\ref{img:golf_ball_vis}、\ref{img:golf_ball_comp_single_res}、\ref{img:fastback}) 中都包含速度场截面的可视化，这里的可视化是将速度场的模值映射到了不同的颜色上。在映射时，整个网格的速度场通过格点上的速度线性插值获得。我们同时也在一些结果中展示了物体表面的压力系数$C_\text{p}$。压力系数的获取使用第~\ref{sec:pp_surface_pressure} 中介绍的方法以获取更连续的表面压力可视化。根据模型的尺度、计算域的大小与最细网格大小的不同，整个仿真计算过程可能需要几个小时。其中我们的多分辨率网格构建过程一般需要不多于20分钟。
 
 \paragraph{飞机模型仿真}
-首先，我们对一个缩比的波音787飞机模型进行了高分辨率仿真 (见图~\ref{img:vis_plane})。该场景中，飞机的速度相对较低 (0.16马赫)，攻角为8度。飞机的长度为6.16米，翼展为3.2米。该仿真在两个NVIDIA A100 GPU上完成，最细的网格分辨率为3.75毫米。完成1.7秒仿真消耗的计算时间约为1.8小时。
+首先，我们对一个缩比的波音787飞机模型进行了高分辨率仿真 (见图~\ref{img:vis_plane})。该场景中，飞机的速度相对较低 (0.16马赫)，攻角为$8^{\circ}$。飞机的长度为6.16 $m$，翼展为3.2 $m$。该仿真在两个NVIDIA A100 GPU上完成，最细的网格分辨率为3.75 $mm$。完成1.7秒仿真消耗的计算时间约为1.8小时。
 
 \paragraph{F1赛车仿真}
 我们还对一个F1赛车模型进行了仿真，以展示我们的动态耦合 (见图~\ref{img:teaser_f1})。仿真过程中，轮胎在不停旋转，对赛车尾部的湍流产生影响。F1赛车的车身为4.15m，仿真时使用的计算域大小为$15m\!\times\!4m\!\times\!6m$，完成2秒仿真消耗的计算时间约为0.9小时。
@@ -164,7 +164,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \begin{figure}[htb]
 \centering
   \includegraphics[width=0.75\columnwidth]{figures/sphere_cd_comp.png}
-\bicaption[球的阻力与雷诺数的关系]{球的阻力与雷诺数的关系。在我们的仿真中，球在雷诺数在Re=400,000 (阻力危机) 时，\citep{Tao-2018-b} 与我们的方法都展示出了一个突然的阻力下降，之后又稍有上升，与实际实验~\citep{Morrison-2013,Barati-2014} 一致。}{Drag of a sphere vs. Reynolds number. Just like real-life experiments~\citep{Morrison-2013,Barati-2014} exhibit a sudden drop in drag for a sphere at a Reynolds number around Re=400,000 (drag crisis), both \citep{Tao-2018-b} and our kinetic solver demonstrate a similar drop at roughly the same Re, followed by a partial drag recovery.}
+\bicaption[球的阻力与雷诺数的关系]{球的阻力与雷诺数的关系。在我们的仿真中，球在雷诺数在$Re=400,000$ (阻力危机) 时，\citep{Tao-2018-b} 与我们的方法都展示出了一个突然的阻力下降，之后又稍有上升，与实际实验~\citep{Morrison-2013,Barati-2014} 一致。}{Drag of a sphere vs. Reynolds number. Just like real-life experiments~\citep{Morrison-2013,Barati-2014} exhibit a sudden drop in drag for a sphere at a Reynolds number around $Re=400,000$ (drag crisis), both \citep{Tao-2018-b} and our kinetic solver demonstrate a similar drop at roughly the same Re, followed by a partial drag recovery.}
 \label{img:drag_comp}
 \end{figure}
 
@@ -178,7 +178,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \begin{figure}[htb]
 \centering
   \includegraphics[width=0.99\columnwidth]{figures/golf_ball_vis.png}
-\bicaption[光滑球与高尔夫球在Re=100,000时的对比]{光滑球与高尔夫球在Re=100,000时的对比。即使光滑球 (图中顶部子图) 与高尔夫球 (图中底部子图) 大小相同，只有表面的坑洞区别时，在我们的虚拟风洞测试中，也展现出完全不同的速度场与表面压力 ($C_\text{p}$) 场 (左图)。当我们使用染色粒子对流场进行被动追踪时，我们可以更清楚直观地看到这两者尾流所产生的区别 (右图)，以理解为什么高尔夫球相对光滑球可以飞得更远。}{Ping-pong vs. golf ball at Re=100,000. While a ping-pong ball (top) differs (up to scale) from a golf ball (bottom) only in the absence of tiny dimples on its surface, testing these two balls in our wind tunnel exhibits very different velocity and surface pressure ($C_\text{p}$) fields (left); consequently, the flows visualized via passively-advected dyed particles are dramatically different (right), providing a good intuition of why golf balls can travel much further.}
+\bicaption[光滑球与高尔夫球在$Re=100,000$时的对比]{光滑球与高尔夫球在Re=100,000时的对比。即使光滑球 (图中顶部子图) 与高尔夫球 (图中底部子图) 大小相同，只有表面的坑洞区别时，在我们的虚拟风洞测试中，也展现出完全不同的速度场与表面压力 ($C_\text{p}$) 场 (左图)。当我们使用染色粒子对流场进行被动追踪时，我们可以更清楚直观地看到这两者尾流所产生的区别 (右图)，以理解为什么高尔夫球相对光滑球可以飞得更远。}{Ping-pong vs. golf ball at $Re=100,000$. While a ping-pong ball (top) differs (up to scale) from a golf ball (bottom) only in the absence of tiny dimples on its surface, testing these two balls in our wind tunnel exhibits very different velocity and surface pressure ($C_\text{p}$) fields (left); consequently, the flows visualized via passively-advected dyed particles are dramatically different (right), providing a good intuition of why golf balls can travel much further.}
 \label{img:golf_ball_vis}
 \end{figure}
 
@@ -190,16 +190,16 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \end{figure}
 
 \subsection{球的阻力危机}
-阻力危机是一个很特殊的空气动力学现象，我们用风吹过球的场景对这一现象进行简单描述。可以想象，球在风中是受到了一定的阻力的，通过实验人们发现这个阻力的大小与雷诺数有关。随着雷诺数的上升，起初阻力没有大的变化。但在到达某一个特定的雷诺数后，球受到的阻力会快速且剧烈地下降。这个雷诺数我们可以称为临界雷诺数。这一现象被成为阻力危机现象。想要在数值仿真中预测这一现象是十分具有挑战性的，尤其在没有湍流模型时，因为这一现象要求求解器对边界层必须求解得足够精准。
+在第~\ref{chap:sig23} 章中，我们已经介绍过阻力危机及其为什么是一个特殊的空气动力学现象。我们这里对球的阻力危机现象进行系统性的临界雷诺数预测。我们已经介绍过，当风吹过球时，球在风中是受到了一定的阻力的，通过实验人们发现这个阻力的大小与雷诺数有关。当到达某一个特定的雷诺数后，球受到的阻力会快速且剧烈地下降 (即阻力危机现象)。这个雷诺数我们可以称为临界雷诺数。想要在数值仿真中预测这一现象是十分具有挑战性的，尤其在没有湍流模型时，因为这一现象要求求解器对边界层必须求解得足够精准。
 需要说明的是，球的阻力危机发生在很高的雷诺数条件下，并且受到实际实验条件限制，精准地获取阻力系数也是十分困难的。所以在我们参考的实际实验数据中~\citep{Morrison-2013, Barati-2014}，不同的实验数据也有一定的差异。而图~\ref{img:sphere_wake_comp} (c) 中的实验可视化是通过在球上添加了一个额外的环来增加有效雷诺数，从而在低雷诺数环境中进行的等效实验。
 
 我们的虚拟风洞系统可以定性地重现阻力危机这一现象 (见图~\ref{img:drag_comp})，即在正确的临界雷诺数，球受到的阻力产生明显且剧烈的下降。并且相比使用~\citep{Tao-2018-b} 的LBM求解器，我们的方法在临界雷诺数及之后的范围中预测的阻力系数更接近实验值。
-我们注意到，我们预测出的阻力在临界区域中与实验值相比有一个小的偏移，使得在Re=200,000时我们的预测结果与实验值有一个较大的偏差。关于这一点，我们需要说明的是，即使是实际实验中，阻力系数也是在剧烈变化的。我们这里列出的实验获得的阻力系数值可以被认为是一个时间段内的平均。在这样一个流体正在发生从临界雷诺数前到临界雷诺数后转变的过程中，数值仿真得到的阻力系数也有着剧烈的抖动。在这样一个位置无论是实际实验，或数值仿真，进行准确的预测都是十分困难的。关于这一点，在~\citep{Geier-2017-b} 中有非常详尽的讨论。
+我们注意到，我们预测出的阻力在临界区域中与实验值相比有一个小的偏移，使得在$Re=200,000$时我们的预测结果与实验值有一个较大的偏差。关于这一点，我们需要说明的是，即使是实际实验中，阻力系数也是在剧烈变化的。我们这里列出的实验获得的阻力系数值可以被认为是一个时间段内的平均。在这样一个流体正在发生从临界雷诺数前到临界雷诺数后转变的过程中，数值仿真得到的阻力系数也有着剧烈的抖动。在这样一个位置无论是实际实验，或数值仿真，进行准确的预测都是十分困难的。关于这一点，在~\citep{Geier-2017-b} 中有非常详尽的讨论。
 我们同时注意到，我们的方法在临界雷诺数后的区域，对阻力的预测过大。实验值显示该区域的阻力系数$C_\text{d}$约为0.1，而我们的方法预测在$0.175$附近，但好于~\citep{Tao-2018-b} 中预测的$0.2$。由于这一区域是在极高的雷诺数下，通过直接数值仿真来准确求解边界层，对于现有的流体求解器，均是十分困难的~\citep{Tiwari-2020}。
 
 \subsection{高尔夫球的气动特性}
 我们还在虚拟风洞中测试了高尔夫在高速气流下的气动特性。我们使用的高尔夫球模型有362个坑洞 (美国职业高尔夫球巡回赛的赛事用球拥有最低322个，最高376个坑洞)，坑洞深度与球的直径的比值为0.007。
-如图~\ref{img:golf_ball_cd}，我们通过仿真得到的阻力系数与已发表的实验数据~\citep{Bearman-1976, Aoki-2010}相吻合。这个结果同时可以验证我们的方法对于小尺度的几何变化的敏感性。在Re=100,000时，高尔夫球与表面光滑的球所造成的尾流截然不同。原因在于高尔夫球表面的小坑洞可以产生非常小的边界层涡流，并影响周围的流场，减小层流边界层在固体边界上的附着，这使得高尔夫球表面流场的分离点相比平滑球将更靠后，形成更加收窄的尾流形状，并降低自身阻力。这一点可见图~\ref{img:golf_ball_vis}。
+如图~\ref{img:golf_ball_cd}，我们通过仿真得到的阻力系数与已发表的实验数据~\citep{Bearman-1976, Aoki-2010}相吻合。这个结果同时可以验证我们的方法对于小尺度的几何变化的敏感性。在$Re=100,000$时，高尔夫球与表面光滑的球所造成的尾流截然不同。原因在于高尔夫球表面的小坑洞可以产生非常小的边界层涡流，并影响周围的流场，减小层流边界层在固体边界上的附着，这使得高尔夫球表面流场的分离点相比平滑球将更靠后，形成更加收窄的尾流形状，并降低自身阻力。这一点可见图~\ref{img:golf_ball_vis}。
 注意我们的多分辨率网格是能捕捉到这样的小细节的关键。如果我们采用单分辨率网格，即使总网格数相同，也没有能力捕捉到高尔夫球表面坑洞所造成的薄边界层。这会造成仿真错误地预测边界分离点与尾流形状，并得到大幅升高的阻力系数，见图~\ref{img:golf_ball_comp_single_res} (右)。
 
 \begin{figure}[!htbp]
@@ -252,22 +252,23 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 
 我们将仿真得到的阻力数据画在了图~\ref{img:tum_validation_cd_curve} 中，这里阻力是随时间变化的。从图中可以看出，在流场经历过初始化带来的不稳定阶段后，阻力在约1 $s$后趋于稳定。我们将1.2 $s$至2 $s$区间内的阻力系数平均来得到相应车型配置的阻力系数，并于实际风洞实验值~\citep{Heft-2012b} 相对比，得到的结果可见表~\ref{tab:drivaer_result}。
 注意我们的仿真结果是经过了一次平均值修正后的结果。平均值修正即我们将所有仿真结果与对应实验值误差的平均值减去，这样我们得到的可以认为是误差的变化趋势。这是工业设计中一个常见的做法。因为对于汽车这样的复杂模型，数值实验存在系统的偏差，包括我们之前讨论的地面与车身之间的流场，都会使计算得到的物理量发生整体的偏移。通过平均值修正我们可以弥补这种偏移。
-图~\ref{img:fastback} 中展示了平均速度与压力场，平均的时间区间同样为$1.2s$至$2s$。图中分别展示了静止与旋转轮胎的表面压力，以显示有地面仿真和无地面仿真时的区别。
+图~\ref{img:fastback} 中展示了平均速度与压力场，平均的时间区间同样为1.2 $s$至2 $s$。图中分别展示了静止与旋转轮胎的表面压力，以显示有地面仿真和无地面仿真时的区别。
 与我们的预想相一致，在没有地面仿真时，我们的方法精度更高，所得结果的误差平均约为$0.4\%$。这一结果远小于工业仿真中通常要求的$3\%$误差标准 (这一误差标准是我们与汽车制造商沟通获得的)。在有地面仿真时，我们的最大误差为$3.17\%$，也足以满足工业仿真中的需求 (在有地面仿真时，误差标准可以更宽容，一般在$5\%$)。
 
 \paragraph{与现有工业软件的对比}
 目前有许多商业的工业流体仿真软件，与我们的虚拟风洞系统所描述的功能类似。其中西门子 (Siemens) 的StarCCM+~\citep{Siemens} 与达索 (Dassault Syst{\`e}mes) 的PowerFLOW~\citep{powerflow}是两个较有代表性且被广泛使用的商业流体仿真分析软件，并分别通过基于FVM的N-S求解器与LBM求解器实现流体仿真。两者一般都运行于CPU集群环境。
 因为StarCCM+在进行非稳态仿真时，计算量非常大，仿真时间可达数周，所以StarCCM+更经常被用于稳态求解。而稳态求解的问题是，如面对轮胎旋转这样的场景时，边界必须采取一定的近似。这与实际的物理情况并不相符。PowerFLOW克服了这些问题，但是只能在CPU集群上使用限制了LBM方法的并行优势。
-而我们的方法既继承了动理学方法的优势 (即PowerFLOW软件的优势)，同时又可以在GPU上解算，使得硬件需求大幅下降。如我们使用NVIDIA A100 GPU (拥有6,912个CUDA核) 对DrivAer的快背式模型进行2s的仿真，在没有地面仿真时只需约3个小时即可完成仿真，即每秒的仿真需要10,356 GPU核时。
+而我们的方法既继承了动理学方法的优势 (即PowerFLOW软件的优势)，同时又可以在GPU上解算，使得硬件需求大幅下降。如我们使用NVIDIA A100 GPU (拥有6,912个CUDA核) 对DrivAer的快背式模型进行2 $s$的仿真，在没有地面仿真时只需约3个小时即可完成仿真，即每秒的仿真需要10,356 GPU核时。
 \citet{James-2018} 使用PowerFLOW与StarCCM+分别对DrivAer的方背式模型进行了类似的仿真。在结果达到收敛时，PowerFLOW的仿真在96个CPU的集群上需要约80小时，StarCCM+在128个CPU的集群上需要约13小时。
 假设上述CPU拥有至少8个核心的情况下，通过计算我们可以得知在核数相当时，我们的方法是更高效的。当然因为CPU平台与GPU平台直接比较性能是很困难的，我们这里只非常定性地对效率进行了描述。
 此外，更引人注目的是，在~\citet{James-2018} 所报告的PowerFLOW的计算结果中，并没有显示出有地面仿真与无地面仿真时，阻力系数有明显区别。这与实验数据相违背。其它的结果与实验值~\citep{Heft-2012b} 相对比时，大约均在3\%的误差水平。
 我们需提请注意的是，在该工作中，作者使用了没有后视镜的模型，而我们使用了带有后视镜的模型。此外作者没有提供任何数值修正相关的信息。
-这证明了在DrivAer测试中，精度层面上，我们与现有的工业软件是大致相当的。当然我们也认为我们需要与PowerFLOW与StarCCM+等软件进行更直接的对比，以更明确地确定我们的方法与现有工业软件的优劣。这些我们留在未来的工作中。
+这证明了在DrivAer测试中，我们在精度层面上与现有的工业软件是大致相当的。当然我们也认为我们需要与PowerFLOW与StarCCM+等软件进行更直接的对比，以更明确地确定我们的方法与现有工业软件的优劣。这些我们留在未来的工作中。
 
 \section{气动声学的仿真结果}
+我们接下来针对于气动声学，进行一些初步的实验，以展示我们的方法在这一领域的应用潜力。
 \subsection{平面波的传播仿真}
-平面波是三维空间中最简单的一种波。将某一时刻一个波振动相位相同的点连起来，我们可以得到一系列的同相面 (波阵面)，若我们得到的波阵面均为平面，且这些平面垂直于波的传播方向，我们称这样的波动为平面波 (见图)。我们先对平面波进行仿真，以测试我们的方法声波仿真的能力。在没有物体存在下平面波的传播相对较为简单，且已经被许多工作验证在LBM下该现象可以被准确捕捉~\cite{doi:10.2514/6.2009-3395, viggen2009lattice}。所以我们这里验证在有物体散射时的平面波，具体地来说，我们考虑一个刚性的单位球 (半径$r=1$ $m$的球) 在计算域中时的平面波传播仿真，以同时验证我们的边界处理精度。
+平面波是三维空间中最简单的一种波。将某一时刻一个波振动相位相同的点连起来，我们可以得到一系列的同相面 (波阵面)，若我们得到的波阵面均为平面，且这些平面垂直于波的传播方向，我们称这样的波动为平面波 (见图~\ref{img:plane_wave})。我们先对平面波进行仿真，以测试我们的方法对基础声波仿真的能力。在没有物体存在下平面波的传播相对较为简单，且已经被许多工作验证在LBM下该现象可以被准确捕捉~\cite{doi:10.2514/6.2009-3395, viggen2009lattice}。所以我们这里验证在有物体散射时的平面波，具体地来说，我们考虑一个刚性的单位球 (半径$r=1$ $m$的球) 在计算域中时的平面波传播仿真，以同时验证我们的边界处理精度。
 
 \begin{figure}[!htbp]
   \centering
@@ -286,14 +287,14 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \end{equation}
 其中$j_{l}$是球贝塞尔函数 (spherical Bessel function)，$P_{l}$是$l$阶勒让德多项式 (Legendre polynomials)。
 
-\begin{figure}[!htbp]
+\begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/plane_wave_result.png}
   \bicaption[平面波被刚性球散射的仿真结果]{平面波被刚性球散射的仿真结果。(a) 平面波被刚性球散射时，声场的解析解可视化。(b) 使用LBM对该场景仿真得到的声场可视化。(c) 仿真误差的可视化。}{Simulation result of plane wave scattering by a rigid sphere. (a) Analytical solution of plane wave scattering by a rigid sphere. (b) Visualization of simulated acoustic field using LBM. (c) Visualization of simulation error.}
   \label{img:plane_wave_result}
 \end{figure}
 
-而因为球体的存在，该平面波会被散射。我们假设$p_{\text {scattered}}$是被球散射的声压，则$p_{\text {scattered}}$应该满足亥姆霍兹方程 (Helmholtz equation) 与索末菲辐射条件 (Sommerfeld radiation condition)。则该散射波可以被表达为
+而因为球体的存在，该平面波会被散射。我们假设$p_{\text {scattered}}$是被球散射的声压，则$p_{\text {scattered}}$应该满足亥姆霍兹方程 (Helmholtz equation) 与索末菲辐射条件 (Sommerfeld radiation condition)。所以该散射波可以被表达为
 \begin{equation}
   p_{\text {scattered }}=\sum_{l=0}^{N} A_{l} h_{l}(k r) P_{l}(\cos \theta),
 \end{equation}
@@ -326,9 +327,9 @@ The pressure field is color-mapped over the aircraft body surface, while passive
   \label{img:landing_gear_model}
 \end{figure}
 
-本节对LAGOON模型进行初步的气动声学实验，以验证我们的方法在气动声学上依然可以满足工业标准的要求，所获得的不同方面的结果在下面列出。在实验中，我们设定的场景与CEPRA19风洞中进行实际风洞实验时的场景~\citep{doi:10.2514/6.2015-2993} 相同，即起落架模型置于0.23 Ma (78.99 $m/s$) 的气流中，起落架的直径$D=0.3 \quad m$，雷诺数$Re=1.541\times 10^6$。
+本节对LAGOON模型进行初步的气动声学实验，以验证我们的方法在气动声学上依然可以满足工业标准的要求，所获得的不同方面的结果在下面列出。在实验中，我们设定的场景与CEPRA19风洞中进行实际风洞实验时的场景~\citep{doi:10.2514/6.2015-2993} 相同，即起落架模型置于0.23马赫 (78.99 $m/s$) 的气流中，起落架的直径$D=0.3 \, m$，雷诺数$Re=1.541\times 10^6$。
 
-我们首先展示一些流场的可视化。在图~\ref{img:landing_gear_pressure} 中我们展示起落架在$y=0$平面上的瞬时压力分布，图中清楚地显示出了在高速的流体中，起落架所造成的高压区与低压区。图~\ref{img:landing_gear_pressure} 中我们展示起落架在Q值为$1.0\times 10^6 \quad s^{-2}$时的等值面。这些Q值的等值面显示涡度模值远大于应变速率模值的位置。从图中我们可以看到流体是高度不稳定的，且有很多小的湍流涡旋从起落架上激发。
+我们首先展示一些流场的可视化。在图~\ref{img:landing_gear_pressure} 中我们展示起落架在$y=0$平面上的瞬时压力分布，图中清楚地显示出了在高速的流体中，起落架所造成的高压区与低压区。图~\ref{img:landing_gear_pressure} 中我们展示起落架在Q值为$1.0\times 10^6 \, s^{-2}$时的等值面。这些Q值的等值面显示涡度模值远大于应变速率模值的位置。从图中我们可以看到流体是高度不稳定的，且有很多小的湍流涡旋从起落架上激发。
 
 \begin{figure}[!htbp]
   \centering
@@ -344,7 +345,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
   \label{img:landing_gear_q_criterion}
 \end{figure}
 
-我们接下来展示一些与声音更直接相关的可视化与数值结果。首先在图~\ref{img:landing_gear_divergence} 中我们展示起落架在$y=0$平面上的胀量场分布，以突出声波的分布。从图中我们可以看到两处很明显的声波扰动 (acoustic perturbation) 来源：一处是起落架轮胎的下部，一处是起落架撑杆的顶部。并且我们也可以看到在起落架撑杆的后方 (相对于来流方向)，有很强的湍流对流 (turbulent convection)。为了进一步定性分析，我们在起落架模型的右轮胎上取一个采样点 (见图~\ref{img:landing_gear_frequency} (a))，并测量该点的压力变化。之后使用加窗平均周期图法对压力序列进行处理以获得频谱，见过可见图~\ref{img:landing_gear_frequency} (b)。图中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约$1000Hz$与$1500Hz$出现的声调，与实验相吻合。
+我们接下来展示一些与声音更直接相关的可视化与数值结果。首先在图~\ref{img:landing_gear_divergence} 中我们展示起落架在$y=0$平面上的胀量场分布，以突出声波的分布。从图中我们可以看到两处很明显的声波扰动来源：一处是起落架轮胎的下部，一处是起落架撑杆的顶部。并且我们也可以看到在起落架撑杆的后方 (相对于来流方向)，有很强的湍流对流 (turbulent convection)。为了进一步定性分析，我们在起落架模型的右轮胎上取一个采样点 (见图~\ref{img:landing_gear_frequency} (a))，并测量该点的压力变化。之后使用加窗平均周期图法对压力序列进行处理以获得频谱，见过可见图~\ref{img:landing_gear_frequency} (b)。图中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 \textit{Hz}与1500 \textit{Hz}出现的声调，与实验相吻合。
 
 \begin{figure}[!htbp]
   \centering
@@ -356,6 +357,6 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/landing_gear_frequency.png}
-  \bicaption[LAGOON起落架轮胎采样点的功率谱密度]{LAGOON起落架轮胎采样点的功率谱密度。在右轮胎上的采样点K1 (a) 测得压力序列后进行信号分析，得到该点的功率谱密度 (b)。其中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 Hz与1500 Hz出现的声调，与实验相吻合。}{Power spectral density of a sample point on the LAGOON landing gear tire. We mearsure the pressure sequence from a sample point K1 on the right tire (a) and obtain its power spectral density via signal analysis (b). Blue curve shows our mearsurement and red curve shows the result from CEPRA19 wind tunnel testing. It demonstrates that we can successfully predict the tonal emergence at about 1000 Hz and 1500 Hz, which matches the experiment.}
+  \bicaption[LAGOON起落架轮胎采样点的功率谱密度]{LAGOON起落架轮胎采样点的功率谱密度。在右轮胎上的采样点K1 (a) 测得压力序列后进行信号分析，得到该点的功率谱密度 (b)。其中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 \textit{Hz}与1500 \textit{Hz}出现的声调，与实验相吻合。}{Power spectral density of a sample point on the LAGOON landing gear tire. We mearsure the pressure sequence from a sample point K1 on the right tire (a) and obtain its power spectral density via signal analysis (b). Blue curve shows our mearsurement and red curve shows the result from CEPRA19 wind tunnel testing. It demonstrates that we can successfully predict the tonal emergence at about 1000 \textit{Hz} and 1500 \textit{Hz}, which matches the experiment.}
   \label{img:landing_gear_frequency}
 \end{figure}

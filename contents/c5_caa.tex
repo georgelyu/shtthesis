@@ -7,16 +7,16 @@
 在视觉动画中，我们主要需求真实感的烟雾渲染。而这一过程所需的烟雾数据一般为烟雾的密度场 (表示各个位置烟雾的浓淡)，而我们通过仿真得到的是流体的速度场，这自然需要模拟一个烟雾的传播 (advection) 过程。比较常见的传播方法是欧拉方法，即基于网格的。但是这有诸多的问题，其中最重要的一点是湍流仿真中有非常多的高频信号，而网格的空间采样频率很难捕捉到这些信号~\cite{bridson2015fluid}，以至于传播得到的烟雾十分平滑，失去湍流的特征。而粒子则不受这一限制。对于一个被传播的物理量$q$，粒子的传播方程$Dq/Dt=0$表明粒子上所携带的值不会受到任何的滤波或信息丢失，十分适合我们的需求。所以我们在这里介绍一种通过粒子与网格的混合方法生成烟雾密度场的方法。该方法主要分为三个部分：粒子的生成、粒子的传播、粒子到网格的转换。
 
 \paragraph{粒子的生成}
-首先，我们先在场中确定一块区域，作为粒子的发射端。我们需要对该区域进行采样以真正决定粒子的初始位置。出于不同的需求，可能该区域不同位置的初始烟雾密度会不同，那么我们需要根据密度来进行采样。假如密度是均匀的，我们只需要进行均匀的随机采样。接下来我们要考虑一次性注入与连续注入两种情况。如果是一次性注入，我们只需要确定场中存在的粒子数量$N$，并一次性采样完毕，进行传播得到烟雾的动态。而连续注入时一个需要被确定的量是发射速率 (emission rate) $dN/dt$。即每一个时间步长，我们都应该发射$n=\Delta t dN/dt$个粒子。我们要注意的是，连续注入时需要避免每个时间步长粒子的初始化位置相同的情况。那样会形成多条脉线 (streakline)，而不是形成一个烟雾一样的连续体。
+首先，我们先在场中确定一块区域，作为粒子的发射端。我们需要对该区域进行采样以真正决定粒子的初始位置。出于不同的需求，可能该区域不同位置的初始烟雾密度会不同，那么我们需要根据密度来进行采样。假如密度是均匀的，我们只需要进行均匀的随机采样。接下来我们要考虑一次性注入与连续注入两种情况。如果是一次性注入，我们只需要确定场中存在的粒子数量$N$，并一次性采样完毕，进行传播得到烟雾的动态。而连续注入时一个需要被确定的量是发射速率 (emission rate) $d$$N/dt$。即每一个时间步长，我们都应该发射$n=\Delta t \text{ }$$d$$N/dt$个粒子。我们要注意的是，连续注入时需要避免每个时间步长粒子的初始化位置相同的情况。那样会形成多条脉线 (streakline)，而不是形成一个烟雾一样的连续体。
 
-此外，还有一个问题是，在连续注入时，如果我们在仿真每一帧的开始注入固定量的粒子，令其随速度场传播，当速度足够快时，我们会看到一团团离散的烟雾，这非常影响视觉效果 (见图~\ref{img:smoke_particles})。为了解决这一问题，我们可以给每个粒子一个随机的生成时间，这个随机时间来源于在一个时间步长$dt$内的均匀分布。之后每个粒子只会沿着速度场传播剩余的时间，以达到真正的位置。
+此外，还有一个问题是，在连续注入时，如果我们在仿真每一帧的开始注入固定量的粒子，令其随速度场传播，当速度足够快时，我们会看到一团团离散的烟雾，这非常影响视觉效果。为了解决这一问题，我们可以给每个粒子一个随机的生成时间，这个随机时间来源于在一个时间步长$dt$内的均匀分布。之后每个粒子只会沿着速度场传播剩余的时间，以达到真正的位置。
 
-\begin{figure}[htb]
-  \centering
-    \includegraphics[width=0.7\columnwidth]{figures/smoke_particles.png}
-  \bicaption[粒子传播时的不连续问题]{粒子传播时的不连续问题。在粒子相隔固定时间步长注入，且速度场中速度较快时，会出现不连续的烟雾团 (上图)，而将粒子的生成时间随机化，可以避免这一问题 (下图)。}{Discontinuous proplem when advecting density using particles. If particles are emitted with fixed time interval and the velocities are fast, there will be discrete puffs moving through space (upper), while randomizing the emission time of particles can prevent the problem (bottom).}
-  \label{img:smoke_particles}
-\end{figure}
+% \begin{figure}[htb]
+%   \centering
+%     \includegraphics[width=0.7\columnwidth]{figures/smoke_particles.png}
+%   \bicaption[粒子传播时的不连续问题]{粒子传播时的不连续问题。在粒子相隔固定时间步长注入，且速度场中速度较快时，会出现不连续的烟雾团 (上图)，而将粒子的生成时间随机化，可以避免这一问题 (下图)。}{Discontinuous proplem when advecting density using particles. If particles are emitted with fixed time interval and the velocities are fast, there will be discrete puffs moving through space (upper), while randomizing the emission time of particles can prevent the problem (bottom).}
+%   \label{img:smoke_particles}
+% \end{figure}
 
 \paragraph{粒子的传播}
 粒子的传播是影响精度的核心操作。在这一过程中我们需要求解一个微分方程来确定粒子的位置：
@@ -30,21 +30,21 @@
 \end{equation}
 
 求解该方程最简单也是代价最小的时间积分方法即为前向欧拉 (forward Euler) 方法：
-$\mathbf{x}^{n+1}=\mathbf{x}^{n}+\Delta t \mathbf{u}(\mathbf{x}^{n})$,
+$\mathbf{x}^{n+1}=\mathbf{x}^{n}+\Delta t \, \mathbf{u}(\mathbf{x}^{n})$,
 然而该方法只有一阶的精度。在时间步长不够小时，这一方法会带来很大的误差。而这一误差会随时间累积，最终使数值解与真实解偏差巨大。更精准的时间积分方法，如龙格-库塔 (Runge-Kutta，RK) 方法，可以得到更高阶精度的解。如二阶精度的龙格-库塔方法 (RK2) 可以写作
 \begin{align}
     \begin{split}
-    \mathbf{x}^{n+1 / 2} & =\mathbf{x}^n+\frac{1}{2} \Delta t \, \mathbf{u}\left(\mathbf{x}^n\right), \\
-    \mathbf{x}^{n+1} & =\mathbf{x}^n+\Delta t \, \mathbf{u}\left(\mathbf{x}^{n+1 / 2}\right) .
+    \mathbf{x}^{n+1 / 2} & =\mathbf{x}^n+\frac{1}{2} \Delta t \, \mathbf{u}(\mathbf{x}^n), \\
+    \mathbf{x}^{n+1} & =\mathbf{x}^n+\Delta t \, \mathbf{u}(\mathbf{x}^{n+1 / 2}) .
 \end{split}
 \label{eq:2nd_rk}
 \end{align}
 而三阶精度的龙格-库塔方法 (RK3) 可以写作
 \begin{align}
     \begin{split}
-k_1 & =\mathbf{u}\left(\mathbf{x}^n\right), \\
-k_2 & =\mathbf{u}\left(\mathbf{x}^n+\frac{1}{2} \Delta t \, k_1\right), \\
-k_3 & =\mathbf{u}\left(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2\right), \\
+k_1 & =\mathbf{u}(\mathbf{x}^n), \\
+k_2 & =\mathbf{u}(\mathbf{x}^n+\frac{1}{2} \Delta t \, k_1), \\
+k_3 & =\mathbf{u}(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2), \\
 \mathbf{x}^{n+1} & =\mathbf{x}^n+\frac{2}{9} \Delta t \, k_1+\frac{3}{9} \Delta t \, k_2+\frac{4}{9} \Delta t \, k_3 .
     \end{split}
     \label{eq:3rd_rk}
@@ -69,7 +69,7 @@ k_3 & =\mathbf{u}\left(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2\right), \\
 \frac{1}{2}\left(r+\frac{3}{2}\right)^{2} & ,-\frac{3}{2} \leq r<-\frac{1}{2}, \\
 \frac{3}{4}-r^{2} & ,-\frac{1}{2} \leq r<\frac{1}{2}, \\
 \frac{1}{2}\left(\frac{3}{2}-r\right)^{2} & ,\frac{1}{2} \leq r<\frac{3}{2}, \\
-0 & : \text { 其他情况, }
+0 & , \text {其他情况,}
 \end{array}\right.
 \end{align}
 其中$\Delta x$是网格的大小。公式~\ref{eq:particle_kernel} 中对网格大小做了自适应处理，使得每个粒子对周边的网格格点的贡献是适当的，而不会使烟雾过度模糊或颗粒化。
@@ -90,7 +90,7 @@ k_3 & =\mathbf{u}\left(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2\right), \\
     \label{img:pressure_projection}
   \end{figure}
 
-同时，因为我们需要的仿真输出是不同的物理量，这里使用的后处理方式也和上述不同。除了将数值直接输出外，为了使结果看起来更加直观，很多时候会将物理量进行颜色映射后以图片或动画的形式展现。将仿真域中的物理量以截面的形式提取出来，之后通过颜色映射进行后处理，是一个比较直接的过程。而对于物体表面的物理量 (如物体表面的压力)，则并不是一个直接的过程。原因是在LBM中我们使用了切削网格来处理边界，这使得在有边界存在时，切削网格部分是不完整的 (被固体覆盖的网格点是不存在的，见图~\ref{img:pressure_projection} 中红色网格)，这造成我们无法使用常规的插值方法来获取表面上点的物理量。
+同时，因为我们需要的仿真输出是不同的物理量，这里使用的后处理方式也和上述不同。除了将数值直接输出外，为了使结果看起来更加直观，很多时候会将物理量进行颜色映射后以图片或动画的形式展现。将仿真域中的物理量以截面的形式提取出来，之后通过颜色映射进行后处理，是一个比较直接的过程。而对于物体表面的物理量 (如物体表面的压力)，这并不是一个直接的过程。原因是在LBM中我们使用了切削网格来处理边界，这使得在有边界存在时，切削网格部分是不完整的 (被固体覆盖的网格点是不存在的，见图~\ref{img:pressure_projection} 中红色网格)，这造成我们无法使用常规的插值方法来获取表面上点的物理量。
 
 一个简单的想法是忽略不存在的固体点，而只对物体表面点周围以某个核函数对存在的流体点进行插值。然而这也会带来问题，一个最重要的问题是在切削网格内，物体表面距其法向方向最近的切削网格点的距离也不相同。以图~\ref{img:pressure_projection} 中的情况为例，对于物体表面上的$s_a$与$s_b$点，如果直接从流体网格点插值物理量，则$x_a$与$x_b$点分别有着最大的影响，因为它们分别是沿法向投影后距离$s_a$与$s_b$点最近的流体点。然而即使在同一网格内，在高雷诺数环境下，边界层依然比网格大小要薄很多，这造成这两个点的物理量也会有很大区别。所以在投影到物体表面后会造成物理量的不连续。
 
@@ -104,7 +104,7 @@ k_3 & =\mathbf{u}\left(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2\right), \\
   \label{img:acoustic_problems}
 \end{figure}
 
-使用LBM进行气动声学分析是一个较为特殊的问题。虽然在第~\ref{sec:background} 节中我们已经讨论了，使用LBM进行气动声学仿真是LBM的一大优势，因为LBM可以非常高效地进行可压缩非稳态湍流求解。并且因为LBM本身求出的是弱可压过程，求解气动声与其它物理量并无区别。然而声音是由于非常微弱的气压波动导致，这种波动对精度是十分敏感的。虽然已有一些工作使用LBM进行了气动声分析，并且可以在一定程度上确定声源~\cite{doi:10.2514/6.2013-2256, doi:10.2514/1.J052365, doi:10.2514/6.2015-2993}，但同时也会产生一些错误的声源。这些问题的根本原因是，在分析气动现象时，我们观察物理量的尺度是较大的，而在分析气流导致的声音现象时，观察的尺度会小很多，此时许多之前注意不到的误差均会产生很大的影响 (见图~\ref{img:acoustic_problems})。\citet{ASTOUL2020109645} 主要讨论了两个误差的来源，分别为多分辨率网格的边界，与碰撞模型本身的精度。然而由于声波对误差的敏感性，包括物体边界与计算域边界也同样是误差的来源。可以认为彻底消除这样的误差，在目前阶段看是十分困难的。本文在第~\ref{sec:acoustic_results} 节中展示了通过本文所介绍的方法进行气动声分析的一些初步成果，以验证本文中的方法应用于计算气动声学的能力。而基于此，在提升气动声学分析的精度上，还可以有更多未来的工作。
+使用LBM进行气动声学分析是一个较为特殊的问题。虽然在第~\ref{sec:background} 节中我们已经讨论了，使用LBM进行气动声学仿真是LBM的一大优势，因为LBM可以非常高效地进行可压缩非稳态湍流求解。并且因为LBM本身求出的是弱可压过程，求解气动声与其它物理量并无区别。然而声音是由于非常微弱的气压波动导致，这种波动对精度是十分敏感的。虽然已有一些工作使用LBM进行了气动声分析，并且可以在一定程度上确定声源~\cite{doi:10.2514/6.2013-2256, doi:10.2514/1.J052365, doi:10.2514/6.2015-2993}，但同时也会产生一些错误的声源。这些问题的根本原因是，在分析气动现象时，我们观察物理量的尺度是较大的，而在分析气流导致的声音现象时，观察的尺度会小很多，此时许多之前注意不到的误差均会产生很大的影响 (见图~\ref{img:acoustic_problems})。\citet{ASTOUL2020109645} 主要讨论了两个误差的来源，分别为多分辨率网格的边界，与碰撞模型本身的精度。然而由于声波对误差的敏感性，包括物体边界与计算域边界也同样是误差的来源。我们可以认为在目前阶段看，彻底消除这样的误差是十分困难的。本文在第~\ref{sec:acoustic_results} 节中展示了通过本文所介绍的方法进行气动声分析的一些初步成果，以验证本文中的方法应用于计算气动声学的能力。而基于此，在提升气动声学分析的精度上，还可以有更多未来的工作。
 
 在后处理上，除了气动特征，通常我们还会记录某些采样点压力波动的时间序列，以定量地进行频谱分析。这一过程中，因为采样点也会位于物体表面，所以可以使用与上一节中所述的在物体表面取物理量时同样的处理。在获取到压力的时间序列后，通常使用加窗平均周期图法 (Welch法~\citep{1161901}) 进行频谱分析。具体来说该方法将时间信号序列分割成了多个块 (blocks)，对每个块使用周期图法 (periodogram) 进行谱密度估计后再进行平均。
 

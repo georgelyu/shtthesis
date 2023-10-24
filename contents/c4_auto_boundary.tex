@@ -52,7 +52,7 @@
 % \end{equation}
 % 该式为$H(\bm{f})$在全局平衡态$f_i^{\mathrm{eq}}(\rho=1, \mathbf{u}=0)=\omega_i$处的泰勒展开。
 
-我们回顾，在分布函数$\bm{f}\!=\!\{f_i\}$与中心矩$\bm{m}\!=\!\{m_i\}$之间存在线性变换关系：$\bm{f}\!=\!\bm{T}\bm{m}$。但与中心矩变换不同，累积量变换是非线性的，所以在累积量碰撞模型中应用熵优化依然是非常复杂的。不过我们通过仔细观察后，可以发现在中心矩$m_{\alpha\beta\gamma}$与累积量$k_{\alpha\beta\gamma}$之间有着关键的联系：当阶数$p\!\leq\!3$时，累积量与中心矩是完全相等的，而高阶累积量是对应的中心矩以及其它中心矩的和 (见第~\ref{sec:cumulant} 节)。由于0-2阶的累积量在碰撞过程中需要根据物理规律来确定松弛系数，3阶累积量的松弛系数在~(\citep{Geier-2017} 中已有过优化方法，我们可以基于此推导使熵最大化的高阶累积量松弛系数的\emph{解析解}。
+我们回顾，在分布函数$\bm{f}\!=\!\{f_i\}$与中心矩$\bm{m}\!=\!\{m_i\}$之间存在线性变换关系：$\bm{f}\!=\!\bm{T}\bm{m}$。但与中心矩变换不同，累积量变换是非线性的，所以在累积量碰撞模型中应用熵优化依然是非常复杂的。不过我们通过仔细观察后，可以发现在中心矩$m_{\alpha\beta\gamma}$与累积量$k_{\alpha\beta\gamma}$之间有着关键的联系：当阶数$p\!\leq\!3$时，累积量与中心矩是完全相等的，而高阶累积量是对应的中心矩以及其它中心矩的和 (见第~\ref{sec:cumulant} 节)。由于0-2阶的累积量在碰撞过程中需要根据物理规律来确定松弛系数，3阶累积量的松弛系数在~(\citep{Geier-2017} 中已有过优化方法，我们可以基于此推导使熵最大化的高阶累积量松弛系数的解析解。
 
 我们用$\bm{k}_l=\{k_l, l\!\in\!\mathcal{L}\}$表示3阶及以下的累积量，如上述，这些累积量的松弛系数是已知的。
 接下来我们可以将剩余的累积量，即4到6阶的，表示为$\bm{k}=\{k_h, h\!\in\!\mathcal{H}\}$。那么，伪熵的最大化问题可以被写作
@@ -228,7 +228,7 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 
 \begin{figure}[htb]
     \centering
-      \includegraphics[width=0.7\columnwidth]{figures/propagation.png}
+      \includegraphics[width=0.6\columnwidth]{figures/propagation.png}
     \bicaption[通过传播找到有效的流体点]{通过传播找到有效的流体点。为了找到并标记所有有效的流体点，我们从一个已知的流体点出发 (如图中的$\bm{p}$点)，然后我们找到该点所有的邻接点，检测它们之间的连接有没有与固体边界相交。如果两点间的连接没有与边界相交 (如$\bm{p}\bm{q}$)，则点$\bm{q}$被标记为新的有效流体点。这个过程以广度优先顺序重复，直到找到所有有效的流体点，使所有的连通部分相互连接}{Propagation of valid fluid nodes. To find and tag all valid fluid nodes, we start from an already known fluid node, e.g., node $\bm{p}$ in 2D, then we check its immediate neighbors to see whether a link intersects a boundary. If no intersection is detected (e.g., link $\bm{p}\bm{q}$), the untagged node $\bm{q}$ is tagged as a new valid fluid node. This process repeats in a bread-first search order, enabling internal regions to be connected to the external fluid region.}
     \label{img:propagation}
 \end{figure}
@@ -284,7 +284,7 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 \begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/wei_crash_vis.png}
-  \bicaption[图形学领域中最前沿的LBM方法的发散结果]{图形学领域中最前沿的LBM方法的发散结果。现有的图形学领域中的LBM方法都依赖于中心矩碰撞模型~\citep{Li-2020}。由于中心矩中的不同阶数的矩相对并不独立，且高阶松弛系数不一定准确，在使用多分辨率网格进行仿真时通常会得到发散结果，即使雷诺数并不足够高。这里展示了使用中心矩碰撞模型对$Re=100,000$时风吹过球的仿真结果。边界附近的速度求解错误 (左图) 最终导致整个求解结果发散 (右图中黑色区域)。}{Typical blowup of latest LBM solvers in CG. Existing LBM methods in CG mostly rely on central-moment collision models~\citep{Li-2020,Lyu:2021}. Due to the entangling of various orders of moments and improper high-order relaxation rates, they often blow up at low Reynolds numbers (here, $Re=100,000$) when simulating even a simple flow around the sphere with multiresolution grids, see black region (right), due to spurious velocities near the solid boundary (left).}
+  \bicaption[图形学领域中最前沿的LBM方法的发散结果]{图形学领域中最前沿的LBM方法的发散结果。现有的图形学领域中的LBM方法都依赖于中心矩碰撞模型~\citep{Li-2020}。由于中心矩中的不同阶数的矩相对并不独立，且高阶松弛系数不一定准确，在使用多分辨率网格进行仿真时通常会得到发散结果，即使雷诺数并不足够高。这里展示了使用中心矩碰撞模型对$Re=100,000$时风吹过球的仿真结果。边界附近的速度求解错误 (左图) 最终导致整个求解结果发散 (右图中黑色区域)。}{Typical blowup of latest LBM solvers in CG. Existing LBM methods in CG mostly rely on central-moment collision models~\citep{Li-2020}. Due to the entangling of various orders of moments and improper high-order relaxation rates, they often blow up at low Reynolds numbers (here, $Re=100,000$) when simulating even a simple flow around the sphere with multiresolution grids, see black region (right), due to spurious velocities near the solid boundary (left).}
   \label{img:wei_crash_vis}
   \end{figure}
 

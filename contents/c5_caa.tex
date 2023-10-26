@@ -4,7 +4,7 @@
 在本章中我们讨论将本文中介绍的流体仿真技术扩展应用至不同领域时，一些值得注意的要点，及所需的一些后处理技术。
 
 \section{应用于视觉动画}
-在视觉动画中，我们主要需求真实感的烟雾渲染。而这一过程所需的烟雾数据一般为烟雾的密度场 (表示各个位置烟雾的浓淡)，而我们通过仿真得到的是流体的速度场，这自然需要模拟一个烟雾的传播 (advection) 过程。比较常见的传播方法是欧拉方法，即基于网格的。但是这有诸多的问题，其中最重要的一点是湍流仿真中有非常多的高频信号，而网格的空间采样频率很难捕捉到这些信号~\cite{bridson2015fluid}，以至于传播得到的烟雾十分平滑，失去湍流的特征。而粒子则不受这一限制。对于一个被传播的物理量$q$，粒子的传播方程$Dq/Dt=0$表明粒子上所携带的值不会受到任何的滤波或信息丢失，十分适合我们的需求。所以我们在这里介绍一种通过粒子与网格的混合方法生成烟雾密度场的方法。该方法主要分为三个部分：粒子的生成、粒子的传播、粒子到网格的转换。
+在视觉动画中，我们主要需求真实感的烟雾渲染。而这一过程所需的烟雾数据一般为烟雾的密度场 (表示各个位置烟雾的浓淡)，而我们通过仿真得到的是流体的速度场，这自然需要模拟一个烟雾的传播 (advection) 过程。比较常见的传播方法是欧拉方法，即基于网格的。但是这有诸多的问题，其中最重要的一点是湍流仿真中有非常多的高频信号，而网格的空间采样频率很难捕捉到这些信号~\cite{bridson2015fluid}，从而使得传播得到的烟雾十分平滑，失去湍流的特征。而粒子则不受这一限制。对于一个被传播的物理量$q$，粒子的传播方程$Dq/Dt=0$表明粒子上所携带的值不会受到任何的滤波或信息丢失，十分适合我们的需求。所以我们在这里介绍一种通过粒子与网格的混合方法生成烟雾密度场的方法。该方法主要分为三个部分：粒子的生成、粒子的传播、粒子到网格的转换。
 
 \paragraph{粒子的生成}
 首先，我们先在场中确定一块区域，作为粒子的发射端。我们需要对该区域进行采样以真正决定粒子的初始位置。出于不同的需求，可能该区域不同位置的初始烟雾密度会不同，那么我们需要根据密度来进行采样。假如密度是均匀的，我们只需要进行均匀的随机采样。接下来我们要考虑一次性注入与连续注入两种情况。如果是一次性注入，我们只需要确定场中存在的粒子数量$N$，并一次性采样完毕，进行传播得到烟雾的动态。而连续注入时一个需要被确定的量是发射速率 (emission rate) $d$$N/dt$。即每一个时间步长，我们都应该发射$n=\Delta t \text{ }$$d$$N/dt$个粒子。我们要注意的是，连续注入时需要避免每个时间步长粒子的初始化位置相同的情况。那样会形成多条脉线 (streakline)，而不是形成一个烟雾一样的连续体。
@@ -31,7 +31,7 @@
 
 求解该方程最简单也是代价最小的时间积分方法即为前向欧拉 (forward Euler) 方法：
 $\mathbf{x}^{n+1}=\mathbf{x}^{n}+\Delta t \, \mathbf{u}(\mathbf{x}^{n})$,
-然而该方法只有一阶的精度。在时间步长不够小时，这一方法会带来很大的误差。而这一误差会随时间累积，最终使数值解与真实解偏差巨大。更精准的时间积分方法，如龙格-库塔 (Runge-Kutta，RK) 方法，可以得到更高阶精度的解。如二阶精度的龙格-库塔方法 (RK2) 可以写作
+然而该方法只有一阶的精度。在时间步长不够小时，这一方法会带来很大的误差。而这一误差会随时间累积，最终使数值解与真实解偏差巨大。更精准的时间积分方法，如龙格-库塔 (Runge-Kutta, RK) 方法~\cite{doi:10.1142/S0218127492000641}，可以得到更高阶精度的解。如二阶精度的龙格-库塔方法 (RK2) 可以写作
 \begin{align}
     \begin{split}
     \mathbf{x}^{n+1 / 2} & =\mathbf{x}^n+\frac{1}{2} \Delta t \, \mathbf{u}(\mathbf{x}^n), \\
@@ -86,15 +86,15 @@ k_3 & =\mathbf{u}(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2), \\
   \begin{figure}[!htb]
     \centering
         \includegraphics[width=0.9\columnwidth]{figures/pressure_projection.png}
-    \bicaption[物体表面物理量投影的示意图]{物体表面物理量投影的示意图。图中蓝色网格为流体网格，红色为切削网格，绿色为固体网格，加点的区域为固体覆盖的区域。对于物体表面上的$s_a$与$s_b$点，如果直接从流体网格点插值物理量，则$x_a$与$x_b$点分别有着最大的影响，因为它们分别是沿法向投影后距离$s_a$与$s_b$点最近的流体点。然而因为$x_a$与$x_b$点到物体边界的距离差别较大，这两个点的物理量也会有很大区别，造成物体表面物理量的不连续。而沿着$s_a$与$s_b$点法向向外走一定距离后，分别从$p_a$与$p_b$点插值物理量，可以减轻这一问题。}{Schematics of physical quantities projection to surface. The blue, red and green cells in the firgue represent fluid, cut and solid cells, respectively. The dotted area is covered by solid object. For point $s_a$ and $s_b$ on object surface, if the physical quantities are directly interpolated from the nodes, node $x_a$ and $x_b$ would have the biggest impact, because they are the closest nodes to $s_a$ and $s_b$ after being projected to the surface along the normals, respectively. However, since node $x_a$ and $x_b$ have different distance to the object surface, resulting in largely different physical quantities which is discontinuous on surface. While interpolating from $p_a$ and $p_b$, which are points away from surface along their normals with a fixed distance can lift the problem.}
+    \bicaption[物体表面物理量投影的示意图]{物体表面物理量投影的示意图。图中蓝色网格为流体网格，红色为切削网格，绿色为固体网格，加点的区域为固体覆盖的区域。对于物体表面上的$\mathbf{s}_a$与$\mathbf{s}_b$点，如果直接从流体网格点插值物理量，则$\mathbf{x}_a$与$\mathbf{x}_b$点分别有着最大的影响，因为它们分别是沿法向投影后距离$\mathbf{s}_a$与$\mathbf{s}_b$点最近的流体点。然而因为$\mathbf{x}_a$与$\mathbf{x}_b$点到物体边界的距离差别较大，这两个点的物理量也会有很大区别，造成物体表面物理量的不连续。而沿着$\mathbf{s}_a$与$\mathbf{s}_b$点法向向外走一定距离后，分别从$\mathbf{p}_a$与$\mathbf{p}_b$点插值物理量，可以减轻这一问题。}{Schematics of physical quantities projection to surface. The blue, red and green cells in the firgue represent fluid, cut and solid cells, respectively. The dotted area is covered by solid object. For point $\mathbf{s}_a$ and $\mathbf{s}_b$ on object surface, if the physical quantities are directly interpolated from the nodes, node $\mathbf{x}_a$ and $\mathbf{x}_b$ would have the biggest impact, because they are the closest nodes to $\mathbf{s}_a$ and $\mathbf{s}_b$ after being projected to the surface along the normals, respectively. However, since node $\mathbf{x}_a$ and $\mathbf{x}_b$ have different distance to the object surface, resulting in largely different physical quantities which is discontinuous on surface. While interpolating from $\mathbf{p}_a$ and $\mathbf{p}_b$, which are points away from surface along their normals with a fixed distance can lift the problem.}
     \label{img:pressure_projection}
   \end{figure}
 
 同时，因为我们需要的仿真输出是不同的物理量，这里使用的后处理方式也和上述不同。除了将数值直接输出外，为了使结果看起来更加直观，很多时候会将物理量进行颜色映射后以图片或动画的形式展现。将仿真域中的物理量以截面的形式提取出来，之后通过颜色映射进行后处理，是一个比较直接的过程。而对于物体表面的物理量 (如物体表面的压力)，这并不是一个直接的过程。原因是在LBM中我们使用了切削网格来处理边界，这使得在有边界存在时，切削网格部分是不完整的 (被固体覆盖的网格点是不存在的，见图~\ref{img:pressure_projection} 中红色网格)，这造成我们无法使用常规的插值方法来获取表面上点的物理量。
 
-一个简单的想法是忽略不存在的固体点，而只对物体表面点周围以某个核函数对存在的流体点进行插值。然而这也会带来问题，一个最重要的问题是在切削网格内，物体表面距其法向方向最近的切削网格点的距离也不相同。以图~\ref{img:pressure_projection} 中的情况为例，对于物体表面上的$s_a$与$s_b$点，如果直接从流体网格点插值物理量，则$x_a$与$x_b$点分别有着最大的影响，因为它们分别是沿法向投影后距离$s_a$与$s_b$点最近的流体点。然而即使在同一网格内，在高雷诺数环境下，边界层依然比网格大小要薄很多，这造成这两个点的物理量也会有很大区别。所以在投影到物体表面后会造成物理量的不连续。
+一个简单的想法是忽略不存在的固体点，而只对物体表面点周围以某个核函数对存在的流体点进行插值。然而这也会带来问题，一个最重要的问题是在切削网格内，物体表面距其法向方向最近的切削网格点的距离也不相同。以图~\ref{img:pressure_projection} 中的情况为例，对于物体表面上的$\mathbf{s}_a$与$\mathbf{s}_b$点，如果直接从流体网格点插值物理量，则$\mathbf{x}_a$与$\mathbf{x}_b$点分别有着最大的影响，因为它们分别是沿法向投影后距离$\mathbf{s}_a$与$\mathbf{s}_b$点最近的流体点。然而即使在同一网格内，在高雷诺数环境下，边界层依然比网格大小要薄很多，这造成这两个点的物理量也会有很大区别。所以在投影到物体表面后会造成物理量的不连续。
 
-为了减轻这一问题，我们不以物体表面的点为中心进行插值，而是沿着物理表面的采样点的法向向外走一定距离后，再进行插值。依然以图~\ref{img:pressure_projection} 中为例，为了获取$s_a$与$s_b$点的物理量，分别从$s_a$与$s_b$点，沿表面的法向走一定距离后，从$p_a$与$p_b$点插值物理量。这样可以避免造成因为切削网格点本身的不连续带来的投影不连续问题。
+为了减轻这一问题，我们不以物体表面的点为中心进行插值，而是沿着物理表面的采样点的法向向外走一定距离后，再进行插值。依然以图~\ref{img:pressure_projection} 中为例，为了获取$\mathbf{s}_a$与$\mathbf{s}_b$点的物理量，分别从$\mathbf{s}_a$与$\mathbf{s}_b$点，沿表面的法向走一定距离后，从$\mathbf{p}_a$与$\mathbf{p}_b$点插值物理量。这样可以避免造成因为切削网格点本身的不连续带来的投影不连续问题。
 
 \section{应用于气动声学分析}
 \begin{figure}[!htb]
@@ -104,7 +104,13 @@ k_3 & =\mathbf{u}(\mathbf{x}^n+\frac{3}{4} \Delta t \, k_2), \\
   \label{img:acoustic_problems}
 \end{figure}
 
-使用LBM进行气动声学分析是一个较为特殊的问题。虽然在第~\ref{sec:background} 节中我们已经讨论了，使用LBM进行气动声学仿真是LBM的一大优势，因为LBM可以非常高效地进行可压缩非稳态湍流求解。并且因为LBM本身求出的是弱可压过程，求解气动声与其它物理量并无区别。然而声音是由于非常微弱的气压波动导致，这种波动对精度是十分敏感的。虽然已有一些工作使用LBM进行了气动声分析，并且可以在一定程度上确定声源~\cite{doi:10.2514/6.2013-2256, doi:10.2514/1.J052365, doi:10.2514/6.2015-2993}，但同时也会产生一些错误的声源。这些问题的根本原因是，在分析气动现象时，我们观察物理量的尺度是较大的，而在分析气流导致的声音现象时，观察的尺度会小很多，此时许多之前注意不到的误差均会产生很大的影响 (见图~\ref{img:acoustic_problems})。\citet{ASTOUL2020109645} 主要讨论了两个误差的来源，分别为多分辨率网格的边界，与碰撞模型本身的精度。然而由于声波对误差的敏感性，包括物体边界与计算域边界也同样是误差的来源。我们可以认为在目前阶段看，彻底消除这样的误差是十分困难的。本文在第~\ref{sec:acoustic_results} 节中展示了通过本文所介绍的方法进行气动声分析的一些初步成果，以验证本文中的方法应用于计算气动声学的能力。而基于此，在提升气动声学分析的精度上，还可以有更多未来的工作。
+使用LBM进行气动声学分析是一个较为特殊的问题。虽然在第~\ref{sec:background} 节中我们已经讨论了，使用LBM进行气动声学仿真是LBM的一大优势，因为LBM可以非常高效地进行可压缩非稳态湍流求解。并且因为LBM本身求出的是弱可压过程，求解气动声与其它物理量并无区别。所以我们在第~\ref{chap:sig23} 章提出的高精度流体仿真方法可以直接地应用于气动声求解。然而声音是由于非常微弱的气压波动导致，这种波动对精度是十分敏感的。虽然已有一些工作使用LBM进行了气动声分析，并且可以在一定程度上确定声源~\cite{doi:10.2514/6.2013-2256, doi:10.2514/1.J052365, doi:10.2514/6.2015-2993}，但同时也会产生一些错误的声源。这些问题的根本原因是，在分析气动现象时，我们观察物理量的尺度是较大的，而在分析气流导致的声音现象时，观察的尺度会小很多，此时许多之前注意不到的误差均会产生很大的影响 (见图~\ref{img:acoustic_problems})。\citet{ASTOUL2020109645} 主要讨论了两个误差的来源，分别为多分辨率网格的边界，与碰撞模型本身的精度。然而由于声波对误差的敏感性，包括物体边界与计算域边界也同样是误差的来源。我们可以认为在目前阶段看，彻底消除这样的误差是十分困难的。本文在第~\ref{sec:acoustic_results} 节中展示了通过本文所介绍的方法进行气动声分析的一些初步成果，以验证本文中的方法应用于计算气动声学的能力。而基于此，在提升气动声学分析的精度上，还可以有更多未来的工作。
+
+在面向气动声求解时，一个值得注意的点是LBM中的单位转换。相似性原则 (law of similarity) 告诉我们，雷诺数与几何均相同的两个系统中，气动现象是类似的。所以在观察气动现象时，我们只需保证仿真的雷诺数与需求一致。雷诺数的定义为
+\begin{equation}
+  Re=\frac{LU}{\nu},
+\end{equation}
+其中$L$与$U$分别为特征长度与速度，$\nu$为运动黏度。则在LBM中，我们可以等比例地调整特征速度与运动黏度，在维持雷诺数不变的情况下调整仿真的时间步长。这样的调整经常适用于大场景的仿真，因为增大仿真的时间步长可以直接提升仿真效率。在现实世界中也经常会利用相似性原则，如在实际的风洞实验中经常会使用缩比模型进行实验，在与真实情况中的雷诺数一致的情况下，我们可以观察到类似的气动现象。但这仅适用于气动现象，在进行气动声求解时，我们需要将LBM中的声速$c_s$对应至物理空间中真实的流体声速，否则会对声音的频率产生影响。
 
 在后处理上，除了气动特征，通常我们还会记录某些采样点压力波动的时间序列，以定量地进行频谱分析。这一过程中，因为采样点也会位于物体表面，所以可以使用与上一节中所述的在物体表面取物理量时同样的处理。在获取到压力的时间序列后，通常使用加窗平均周期图法 (Welch法~\citep{1161901}) 进行频谱分析。具体来说该方法将时间信号序列分割成了多个块 (blocks)，对每个块使用周期图法 (periodogram) 进行谱密度估计后再进行平均。
 

@@ -270,7 +270,7 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 \begin{figure}[htb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/entropy_comp.png}
-  \bicaption[不同累积量模型的对比]{不同累积量模型的对比。我们分别用~\citep{Geier-2017} (图中黑色曲线) 与我们的方法 (图中红色曲线) 对球进行风洞实验，并将$C_\text{d}$随时间的变化画在图中。我们分别在雷诺数$Re=100,000$ (a)、$Re=400,000$ (b) 与$Re=800,000$ (c) 时进行实验，$Re=400,000$ 为球发生阻力危机时的雷诺数。从图中可以看出，我们的方法有着更快的收敛速度与更小的结果波动，使我们方法更适合于计算物体的平均阻力。}{Comparing drag for various cumulant models. We plot drag coefficient $C_\text{d}$ over time for a sphere in a flow using the cumulant model of~\citep{Geier-2017} (black) vs. our entropy-based cumulant model (red) for $Re=100,000$ (a), $Re=400,000$ (b) at which drag crisis happens, and $Re=800,000$ (c) indicating better performance of our model as evidenced by faster convergence and smaller fluctuations --- which both imply a more reliable mean drag estimation.}
+  \bicaption[不同累积量模型的对比]{不同累积量模型的对比。我们分别用~\citep{Geier-2017} (图中黑色曲线) 与我们的方法 (图中红色曲线) 对球进行风洞实验，并将$C_\text{d}$随时间的变化画在图中。我们分别在雷诺数$Re=100,000$ (a)、$Re=400,000$ (b) 与$Re=800,000$ (c) 时进行实验，$Re=400,000$ 为球发生阻力危机时的雷诺数。从图中可以看出，我们的方法有着更快的收敛速度与更小的结果波动，使我们方法更适合于计算物体的平均阻力。}{Comparing drag for various cumulant models. We plot drag coefficient $C_\text{d}$ over time for a sphere in a flow using the cumulant model of~\citepen{Geier-2017} (black) vs. our entropy-based cumulant model (red) for $Re=100,000$ (a), $Re=400,000$ (b) at which drag crisis happens, and $Re=800,000$ (c) indicating better performance of our model as evidenced by faster convergence and smaller fluctuations --- which both imply a more reliable mean drag estimation.}
   \label{img:entropy_comp}
   \end{figure}
 
@@ -280,7 +280,7 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 \begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/wake_comp.png}
-  \bicaption[球在发生阻力危机时的尾流]{球在发生阻力危机时的尾流。气流在$Re=400,000$下流过球时，由于固体边界附近的涡的尺度更小，尾流会收窄，从而阻力会下降。这一现象可见实际实验~\citep{Van-1982} (c)。与~\citep{Tao-2018-b} (a) 相比，在同样雷诺数下，我们的边界处理 (b) 捕捉到的边界的分离点更靠后，与实际实验更为接近。}{Wake of sphere in drag crisis. The flow passing through a sphere at $Re=400,000$ is known to exhibit in real-life experiment a narrower turbulent wake than at lower Reynolds numbers~\citep{Van-1982} (c) due to smaller scale vortices generated near the solid boundary, thus reducing drag significantly --- a paradox explained by the boundary-layer theory. Compared to~\citep{Tao-2018-b} (a), our improved boundary treatment scheme at the same Reynolds number (b) captures the separation point farther around the back of the sphere with a narrower wake, better matching the experimental visualization.}
+  \bicaption[球在发生阻力危机时的尾流]{球在发生阻力危机时的尾流。气流在$Re=400,000$下流过球时，由于固体边界附近的涡的尺度更小，尾流会收窄，从而阻力会下降。这一现象可见实际实验~\citep{Van-1982} (c)。与~\citep{Tao-2018-b} (a) 相比，在同样雷诺数下，我们的边界处理 (b) 捕捉到的边界的分离点更靠后，与实际实验更为接近。}{Wake of sphere in drag crisis. The flow passing through a sphere at $Re=400,000$ is known to exhibit in real-life experiment a narrower turbulent wake than at lower Reynolds numbers~\citepen{Van-1982} (c) due to smaller scale vortices generated near the solid boundary, thus reducing drag significantly --- a paradox explained by the boundary-layer theory. Compared to~\citepen{Tao-2018-b} (a), our improved boundary treatment scheme at the same Reynolds number (b) captures the separation point farther around the back of the sphere with a narrower wake, better matching the experimental visualization.}
   \label{img:sphere_wake_comp}
 \end{figure}
 
@@ -293,7 +293,7 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 \begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/wei_crash_vis.png}
-  \bicaption[图形学领域中最前沿的LBM方法的发散结果]{图形学领域中最前沿的LBM方法的发散结果。现有的图形学领域中的LBM方法都依赖于中心矩碰撞模型~\citep{Li-2020}。由于中心矩中的不同阶数的矩相对并不独立，且高阶松弛系数不一定准确，在使用多分辨率网格进行仿真时通常会得到发散结果，即使雷诺数并不足够高。这里展示了使用中心矩碰撞模型对$Re=100,000$时风吹过球的仿真结果。边界附近的速度求解错误 (左图) 最终导致整个求解结果发散 (右图中黑色区域)。}{Typical blowup of latest LBM solvers in CG. Existing LBM methods in CG mostly rely on central-moment collision models~\citep{Li-2020}. Due to the entangling of various orders of moments and improper high-order relaxation rates, they often blow up at low Reynolds numbers (here, $Re=100,000$) when simulating even a simple flow around the sphere with multiresolution grids, see black region (right), due to spurious velocities near the solid boundary (left).}
+  \bicaption[图形学领域中最前沿的LBM方法的发散结果]{图形学领域中最前沿的LBM方法的发散结果。现有的图形学领域中的LBM方法都依赖于中心矩碰撞模型~\citep{Li-2020}。由于中心矩中的不同阶数的矩相对并不独立，且高阶松弛系数不一定准确，在使用多分辨率网格进行仿真时通常会得到发散结果，即使雷诺数并不足够高。这里展示了使用中心矩碰撞模型对$Re=100,000$时风吹过球的仿真结果。边界附近的速度求解错误 (左图) 最终导致整个求解结果发散 (右图中黑色区域)。}{Typical blowup of latest LBM solvers in CG. Existing LBM methods in CG mostly rely on central-moment collision models~\citepen{Li-2020}. Due to the entangling of various orders of moments and improper high-order relaxation rates, they often blow up at low Reynolds numbers (here, $Re=100,000$) when simulating even a simple flow around the sphere with multiresolution grids, see black region (right), due to spurious velocities near the solid boundary (left).}
   \label{img:wei_crash_vis}
   \end{figure}
 

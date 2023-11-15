@@ -75,7 +75,7 @@
 \begin{figure}[htb]
     \centering
       \includegraphics[width=0.99\columnwidth]{figures/fluid_abstraction.png}
-    \bicaption[流体力学中的不同抽象层级]{流体力学中的不同抽象层级。格子玻尔兹曼方法被称作介观方法，是介于微观 (如分子动力学) 与宏观 (基于N-S的方法) 之间的层级。图片来自~\citep{PhysRevE.96.013317}。}{Different abstraction levels of the fluid dynamics. The lattice Boltzmann method is the so-called mesoscopic simulation method between the microscopic particle-based (e.g., molecular dynamics) and macroscopic Navier-Stokes-based methods. Image from~\citep{PhysRevE.96.013317}.}
+    \bicaption[流体力学中的不同抽象层级]{流体力学中的不同抽象层级。格子玻尔兹曼方法被称作介观方法，是介于微观 (如分子动力学) 与宏观 (基于N-S的方法) 之间的层级。图片来自~\citep{PhysRevE.96.013317}。}{Different abstraction levels of the fluid dynamics. The lattice Boltzmann method is the so-called mesoscopic simulation method between the microscopic particle-based (e.g., molecular dynamics) and macroscopic Navier-Stokes-based methods. Image from~\citepen{PhysRevE.96.013317}.}
     \label{img:fluid_abstraction}
 \end{figure}
 
@@ -616,7 +616,7 @@ f_{j}(\bm{x},t+1) = f_{j'}(\bm{x},t) - 6 w_{j}\rho\bm{u}_s \cdot \bm{c}_{j}\;,
 在引入基于距离的插值后，反弹边界可以达到二阶精度，但是依然有一些问题。首先是公式~\ref{eq:ibb_2001} 引入了邻居点参与计算，对于GPU实现会降低数据访问效率。其次，当处理复杂外形的几何时，格点可能处于两个边界之间，导致找不到邻居点从而无法完成边界处理。最后，如第~\ref{sec:1_related_works_LBM} 节所介绍的，IBB在~\citet{Bouzidi-2001} 提出这一方法后逐渐发展成为了一类方法，之后的工作提出了诸多不同的构造形式，甚至参数化的构造。这些不同的构造的性能与精度均有所区别。关于这一部分我们将在第~\ref{chap:sig23} 章中继续讨论。
 
 \subsection{浸入边界法}
-浸入边界法 (Immersed Boundary Method，IBM) 是一个在LBM被经常采用的边界处理方法，其一般通过施加惩罚力实现边界条件~\citep{patel2018diffuse,mittal-2008,Li-2020}。在浸入边界法的诸多变种中，扩散边界浸没边界法 (Diffuse-Interface Immersed Boundary Method, DI-IBM) 与锐利界面浸入边界法 (Sharp-Interface Immersed Boundary Method, SI-IBM)~\citep{mittal-2008} 是最为广泛应用的。我们首先讨论扩散边界浸没边界法。
+浸入边界法 (Immersed Boundary Method，IBM) 是一个在LBM被经常采用的边界处理方法，其一般通过施加惩罚力实现边界条件~\citep{Patel-2018,mittal-2008,Li-2020}。在浸入边界法的诸多变种中，扩散边界浸没边界法 (Diffuse-Interface Immersed Boundary Method, DI-IBM) 与锐利界面浸入边界法 (Sharp-Interface Immersed Boundary Method, SI-IBM)~\citep{mittal-2008} 是最为广泛应用的。我们首先讨论扩散边界浸没边界法。
 
 基于IBM的边界条件均使用预测-修正的思路，即首先忽视固体作用进行流体仿真，之后使用惩罚力对不满足固体边界条件的流体进行修正。在DI-IBM中，惩罚力施加在边界上，所以首先需要对固体表面进行均匀采样。然后对每一个采样点$\mathbf{x}_s$，通过插值得到该点的流体动量$\mathbf{m}_f$。这是通过基于核函数插值实现：
 \begin{align}
@@ -641,14 +641,14 @@ f_{j}(\bm{x},t+1) = f_{j'}(\bm{x},t) - 6 w_{j}\rho\bm{u}_s \cdot \bm{c}_{j}\;,
 \begin{figure}[!tb]
     \centering
       \includegraphics[width=0.8\columnwidth]{figures/leakage.png}
-    \bicaption[浸入边界法的流体泄露问题]{浸入边界法的流体泄露问题。我们用一个薄板将二维的流体域分为两半，并在域的下方放置一个喷射流入口，这个喷射流在使用IBM作为边界条件仿真时会错误地流入域的上方 (见橘色方框)。其中，(a) 使用扩散边界浸没边界法~\citep{patel2018diffuse}，
+    \bicaption[浸入边界法的流体泄露问题]{浸入边界法的流体泄露问题。我们用一个薄板将二维的流体域分为两半，并在域的下方放置一个喷射流入口，这个喷射流在使用IBM作为边界条件仿真时会错误地流入域的上方 (见橘色方框)。其中，(a) 使用扩散边界浸没边界法~\citep{Patel-2018}，
     (b) 使用迭代扩散边界浸没边界法~\citep{zhang2016accuracy}，
-    (c) 使用锐利界面浸入边界法~\citep{seo-2011sharp}，
+    (c) 使用锐利界面浸入边界法~\citep{Seo-2011}，
     (d) 使用基于分布函数修正的浸入边界法~\citep{tao-2018}。}{Fluid leakage caused by immersed boundary method. If a thin shell separates a 2D domain into two chambers, a jet in the lower chamber is erroneously leaking into the upper chamber (see the boxed regions) for
-		(a) the diffuse-interface immersed boundary method~\citep{patel2018diffuse} ,
-		(b) the iterative diffuse-interface immersed boundary method~\citep{zhang2016accuracy},
-		(c) the sharp-interface immersed boundary method~\citep{seo-2011sharp}, and
-		(d) the distribution function correction-based immersed boundary method~\citep{tao-2018}.}
+		(a) the diffuse-interface immersed boundary method~\citepen{Patel-2018} ,
+		(b) the iterative diffuse-interface immersed boundary method~\citepen{zhang2016accuracy},
+		(c) the sharp-interface immersed boundary method~\citepen{Seo-2011}, and
+		(d) the distribution function correction-based immersed boundary method~\citepen{tao-2018}.}
     \label{img:leakage}
 \end{figure}
 

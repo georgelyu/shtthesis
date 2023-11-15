@@ -284,7 +284,7 @@
   \PassOptionsToPackage{style = gb7714-2015}{biblatex}
 \else
   \PassOptionsToClass{zihao = -4}{ctexbook}
-  \PassOptionsToPackage{style = gb7714-2015ay}{biblatex}
+  \PassOptionsToPackage{style = gb7714-2015ay, uniquelist = false}{biblatex}
 \fi
 \PassOptionsToClass{
   UTF8,

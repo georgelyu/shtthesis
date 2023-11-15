@@ -83,14 +83,14 @@
 \begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/comparison_delta_wing.png}
-  \bicaption[三角翼仿真]{三角翼仿真。通过我们的图形方法得到的薄板三角翼仿真结果 (左图) 与实际实验~\citep{Delery:2001} (右图) 的对比，展示出相同的前缘涡旋结构，表面我们的图形方法在薄结构边界层上的准确性。}{Delta-wing simulation. The airflow over a thin-shell delta-wing simulated with our hybrid coupling approach (left) matches experimental visualizations from~\citep{Delery:2001} (right), exhibiting the same spiral vortex structure near the leading edge of the wing and demonstrating the accuracy of our solver in capturing boundary layer flows around thin structures.}
+  \bicaption[三角翼仿真]{三角翼仿真。通过我们的图形方法得到的薄板三角翼仿真结果 (左图) 与实际实验~\citep{Delery:2001} (右图) 的对比，展示出相同的前缘涡旋结构，表面我们的图形方法在薄结构边界层上的准确性。}{Delta-wing simulation. The airflow over a thin-shell delta-wing simulated with our hybrid coupling approach (left) matches experimental visualizations from~\citepen{Delery:2001} (right), exhibiting the same spiral vortex structure near the leading edge of the wing and demonstrating the accuracy of our solver in capturing boundary layer flows around thin structures.}
   \label{img:comparison_delta_wing}
 \end{figure}
 
 \begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/teaser_f1.png}
-  \bicaption[F1赛车的气动仿真]{F1赛车的气动仿真。这里，车身表面上显示了平均压力场 ($C_\text{p}$)，车前的两个发射源中发出染色的粒子对车身及转动的轮胎后方的尾流进行可视化。该仿真使用了五层网格，最细的网格大小为4mm，F1赛车的车身为4.15m。通过我们的GPU加速实现，我们完成了2秒的仿真，在精度可用于工业仿真的同时，仿真耗费的计算时间不足1个小时。}{Aerodynamics of an F1 racing car. Here, the mean pressure field ($C_\text{p}$) is shown on the car body surface, while passively-advected dyed particles from two front sources show the wake flow behind the rotating wheels and the car body. Five-level multiresolution grids are used to capture an effective resolution of 4mm on the body of an F1 racing car measuring 4.15 meters. 
+  \bicaption[F1赛车的气动仿真]{F1赛车的气动仿真。这里，车身表面上显示了平均压力场 ($C_\text{p}$)，车前的两个发射源中发出染色的粒子对车身及转动的轮胎后方的尾流进行可视化。该仿真使用了五层网格，最细的网格大小为4$mm$，F1赛车的车身为4.15$m$。通过我们的GPU加速实现，我们完成了2秒的仿真，在精度可用于工业仿真的同时，仿真耗费的计算时间不足1个小时。}{Aerodynamics of an F1 racing car. Here, the mean pressure field ($C_\text{p}$) is shown on the car body surface, while passively-advected dyed particles from two front sources show the wake flow behind the rotating wheels and the car body. Five-level multiresolution grids are used to capture an effective resolution of 4$mm$ on the body of an F1 racing car measuring 4.15 meters. 
   With our optimized GPU implementation, a 2-second simulation of such a complex model takes less than one hour to compute, with an accuracy meeting current industrial standards for automotive aerodynamics. }
   \label{img:teaser_f1}
 \end{figure}
@@ -165,14 +165,14 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \begin{figure}[htb]
 \centering
   \includegraphics[width=0.75\columnwidth]{figures/sphere_cd_comp.png}
-\bicaption[球的阻力与雷诺数的关系]{球的阻力与雷诺数的关系。在我们的仿真中，球在雷诺数在$Re=400,000$ (阻力危机) 时，\citep{Tao-2018-b} 与我们的方法都展示出了一个突然的阻力下降，之后又稍有上升，与实际实验~\citep{Morrison-2013,Barati-2014} 一致。}{Drag of a sphere vs. Reynolds number. Just like real-life experiments~\citep{Morrison-2013,Barati-2014} exhibit a sudden drop in drag for a sphere at a Reynolds number around $Re=400,000$ (drag crisis), both \citep{Tao-2018-b} and our kinetic solver demonstrate a similar drop at roughly the same Re, followed by a partial drag recovery.}
+\bicaption[球的阻力与雷诺数的关系]{球的阻力与雷诺数的关系。在我们的仿真中，球在雷诺数在$Re=400,000$ (阻力危机) 时，\citep{Tao-2018-b} 与我们的方法都展示出了一个突然的阻力下降，之后又稍有上升，与实际实验~\citep{Morrison-2013,Barati-2014} 一致。}{Drag of a sphere vs. Reynolds number. Just like real-life experiments~\citepen{Morrison-2013,Barati-2014} exhibit a sudden drop in drag for a sphere at a Reynolds number around $Re=400,000$ (drag crisis), both \citepen{Tao-2018-b} and our kinetic solver demonstrate a similar drop at roughly the same Re, followed by a partial drag recovery.}
 \label{img:drag_comp}
 \end{figure}
 
 \begin{figure}[htb]
 \centering
   \includegraphics[width=0.88\columnwidth]{figures/golf_ball_cd.png}
-\bicaption[高尔夫球的阻力与雷诺数的关系]{高尔夫球的阻力与雷诺数的关系。图中绘制了高尔夫球的阻力系数与雷诺数之间的关系，与真实实验~\citep{Bearman-1976,Aoki-2010} 相比，我们的仿真给出了十分相近的结果。注意高尔夫球阻力突然下降 (阻力危机) 的位置与先前图~\ref{img:drag_comp} 所给出的光滑球相比，雷诺数要小得多。}{Drag of golf ball vs. Reynolds number.Compared to the real-world experiments reported in~\citep{Bearman-1976} and~\citep{Aoki-2010} for the drag coefficient of golf ball as a function of the Reynolds number Re, our wind tunnel simulator provides very similar evaluations. Note that the drop in drag coefficient (drag crisis)  happens far earlier than in the case of a smooth sphere, as expected --- see Fig.~\ref{img:drag_comp}.}
+\bicaption[高尔夫球的阻力与雷诺数的关系]{高尔夫球的阻力与雷诺数的关系。图中绘制了高尔夫球的阻力系数与雷诺数之间的关系，与真实实验~\citep{Bearman-1976,Aoki-2010} 相比，我们的仿真给出了十分相近的结果。注意高尔夫球阻力突然下降 (阻力危机) 的位置与先前图~\ref{img:drag_comp} 所给出的光滑球相比，雷诺数要小得多。}{Drag of golf ball vs. Reynolds number.Compared to the real-world experiments reported in~\citepen{Bearman-1976} and~\citepen{Aoki-2010} for the drag coefficient of golf ball as a function of the Reynolds number Re, our wind tunnel simulator provides very similar evaluations. Note that the drop in drag coefficient (drag crisis)  happens far earlier than in the case of a smooth sphere, as expected --- see Fig.~\ref{img:drag_comp}.}
 \label{img:golf_ball_cd}
 \end{figure}
 
@@ -206,7 +206,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/drivaer_model.png}
-  \bicaption[DrivAer模型尾部和底盘的不同配置]{DrivAer模型尾部和底盘的不同配置。尾部的配置 (左图)：快背式 (F)、阶背式 (E) 与方背式 (N)。底盘的配置 (右图)：复杂底盘 (D) 与平滑底盘 (S)。图片来自~\citep{deltransient}。}{Rear end and underbody configurations of DrivAer. Rear end configurations (left): fastback (F), estate back (E) and notchback (N). Underbody configurations (right): detailed (D) and smooth (S). Image from~\citep{deltransient}.}
+  \bicaption[DrivAer模型尾部和底盘的不同配置]{DrivAer模型尾部和底盘的不同配置。尾部的配置 (左图)：快背式 (F)、阶背式 (E) 与方背式 (N)。底盘的配置 (右图)：复杂底盘 (D) 与平滑底盘 (S)。图片来自~\citep{deltransient}。}{Rear end and underbody configurations of DrivAer. Rear end configurations (left): fastback (F), estate back (E) and notchback (N). Underbody configurations (right): detailed (D) and smooth (S). Image from~\citepen{deltransient}.}
   \label{img:drivaer_model}
 \end{figure}
 
@@ -220,7 +220,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.9\columnwidth]{figures/tum_fastback.png}
-  \bicaption[DrivAer fastback汽车的空气动力仿真]{DrivAer fastback汽车的空气动力仿真。我们对DrivAer fastback这样的标准测试车型进行气动仿真，图中展示了垂直的平均速度场截面，与模型表面的平均压力 (平均均指随时间平均)。轮胎在有地面仿真 (蓝色方框内) 与无地面仿真 (红色方框内) 时的平均表面压力可视化也在图中展示。}{DrivAer Fastback aerodynamic simulation.
+  \bicaption[DrivAer快背式汽车的空气动力仿真]{DrivAer快背式汽车的空气动力仿真。我们对DrivAer快背式这样的标准测试车型进行气动仿真，图中展示了垂直的平均速度场截面，与模型表面的平均压力 (平均均指随时间平均)。轮胎在有地面仿真 (蓝色方框内) 与无地面仿真 (红色方框内) 时的平均表面压力可视化也在图中展示。}{DrivAer Fastback aerodynamic simulation.
   A vertical cross-section shows the magnitude of the mean velocity flow around the DrivAer fastback benchmark car model, while the mean pressure over the model surface colors the mesh.
   Mean pressure distributions without (red inset) and with (blue inset) ground simulation are also visualized on the wheels.}
   \label{img:fastback}
@@ -324,7 +324,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.9\columnwidth]{figures/landing_gear_model.png}
-  \bicaption[不同视角下LAGOON起落架模型的示意图]{不同视角下LAGOON起落架模型的示意图。 (a) 等轴测投影; (b) $x-z$平面; (c) $y-z$平面。图片来自~\citep{doi:10.2514/6.2022-2850}。}{Schematics of the LAGOON landing gear at different views. (a) Isometric view; (b) $x-z$ plane; (c) $y-z$ plane. Image from~\citep{doi:10.2514/6.2022-2850}.}
+  \bicaption[不同视角下LAGOON起落架模型的示意图]{不同视角下LAGOON起落架模型的示意图。 (a) 等轴测投影; (b) $x-z$平面; (c) $y-z$平面。图片来自~\citep{doi:10.2514/6.2022-2850}。}{Schematics of the LAGOON landing gear at different views. (a) Isometric view; (b) $x-z$ plane; (c) $y-z$ plane. Image from~\citepen{doi:10.2514/6.2022-2850}.}
   \label{img:landing_gear_model}
 \end{figure}
 
@@ -358,6 +358,6 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 \begin{figure}[!htbp]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/landing_gear_frequency.png}
-  \bicaption[LAGOON起落架轮胎采样点的功率谱密度]{LAGOON起落架轮胎采样点的功率谱密度。在右轮胎上的采样点K1 (a) 测得压力序列后进行信号分析，得到该点的功率谱密度 (b)。其中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 \textit{Hz}与1500 \textit{Hz}出现的声调，与实验相吻合。}{Power spectral density of a sample point on the LAGOON landing gear tire. We mearsure the pressure sequence from a sample point K1 on the right tire (a) and obtain its power spectral density via signal analysis (b). Blue curve shows our mearsurement and red curve shows the result from CEPRA19 wind tunnel testing. It demonstrates that we can successfully predict the tonal emergence at about 1000 \textit{Hz} and 1500 \textit{Hz}, which matches the experiment.}
+  \bicaption[LAGOON起落架轮胎采样点的功率谱密度]{LAGOON起落架轮胎采样点的功率谱密度。在右轮胎上的采样点K1 (a) 测得压力序列后进行信号分析，得到该点的功率谱密度 (b)。其中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 \textit{Hz}与1500 \textit{Hz}出现的声调，与实验相吻合。}{Power spectral density of a sample point on the LAGOON landing gear tire. We mearsure the pressure sequence from a sample point K1 on the right tire (a) and obtain its power spectral density via signal analysis (b). Blue curve shows our mearsurement and red curve shows the result from CEPRA19 wind tunnel testing~\citepen{doi:10.2514/6.2015-2993}. It demonstrates that we can successfully predict the tonal emergence at about 1000 \textit{Hz} and 1500 \textit{Hz}, which matches the experiment.}
   \label{img:landing_gear_frequency}
 \end{figure}

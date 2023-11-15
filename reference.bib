@@ -1,6 +1,7 @@
 @String{JCP = "Journal of Computational Physics" }
 @String{TOG = "ACM Transactions on Graphics" }
 @String{PRE = "Physical Review E" }
+@String{TVCG = "IEEE Transactions on Visualization and Computer Graphics" }
 
 @article{doi:10.2514/1.15993,
   author  = {Li, X. M. and Leung, R. C. K. and So, R. M. C.},
@@ -67,9 +68,9 @@
 }
 
 @article{doi:10.1098/rspa.1952.0060,
-  author  = {Lighthill, Michael James  and Newman, Maxwell Herman Alexander },
+  author  = {Lighthill, Michael James},
   title   = {On sound generated aerodynamically I. General theory},
-  journal = {Proceedings of the Royal Society of London. Series A. Mathematical and Physical Sciences},
+  journal = {Proceedings of the Royal Society A},
   volume  = {211},
   number  = {1107},
   pages   = {564-587},
@@ -133,18 +134,30 @@
   author    = {Foster, Nick and Fedkiw, Ronald},
   title     = {Practical Animation of Liquids},
   year      = {2001},
-  booktitle = {Proceedings of the Annual Conference on Computer Graphics and Interactive Techniques},
-  pages     = {23--30}
+  isbn      = {158113374X},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  booktitle = {Proceedings of the 28th Annual Conference on Computer Graphics and Interactive Techniques},
+  pages     = {23-30},
+  numpages  = {8},
+  location  = {Los Angeles, California},
+  series    = {SIGGRAPH '01}
 }
 
-@inproceedings{Carlson-2004,
-  title     = {Rigid fluid: animating the interplay between rigid bodies and fluid},
-  author    = {Carlson, Mark and Mucha, Peter J and Turk, Greg},
-  booktitle = {ACM Transactions on Graphics},
-  volume    = {23},
-  number    = {3},
-  pages     = {377--384},
-  year      = {2004}
+@article{Carlson-2004,
+  author     = {Carlson, Mark and Mucha, Peter J. and Turk, Greg},
+  title      = {Rigid Fluid: Animating the Interplay between Rigid Bodies and Fluid},
+  year       = {2004},
+  issue_date = {August 2004},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {23},
+  number     = {3},
+  issn       = {0730-0301},
+  journal    = TOG,
+  month      = {aug},
+  pages      = {377-384},
+  numpages   = {8}
 }
 
 @inproceedings{Takahashi-2002,
@@ -156,11 +169,17 @@
 }
 
 @inproceedings{Genevaux-2003,
-  title     = {Simulating Fluid-Solid Interaction.},
-  author    = {G{\'e}nevaux, Olivier and Habibi, Arash and Dischler, Jean-Michel},
-  booktitle = {Graphics Interface},
-  pages     = {31--38},
-  year      = {2003}
+  title        = {Simulating Fluid-Solid Interaction},
+  author       = {Olivier G{'{e}}nevaux and Arash Habibi and Jean-Michel Dischler},
+  booktitle    = {Proceedings of the Graphics Interface 2003 Conference, June 11-13, 2003, Halifax, Nova Scotia, Canada},
+  organization = {CIPS, Canadian Human-Computer Communication Society},
+  publisher    = {Canadian Human-Computer Communications Society and A K Peters Ltd.},
+  issn         = {0713-5424},
+  isbn         = {1-56881-207-8},
+  location     = {Halifax, Nova Scotia},
+  year         = {2003},
+  month        = {June},
+  pages        = {31--38}
 }
 
 @article{Klingner-2006,
@@ -174,21 +193,33 @@
 }
 
 @inproceedings{Chentanez:2006:SCP,
+  author    = {Chentanez, Nuttapong and Goktekin, Tolga G. and Feldman, Bryan E. and O'Brien, James F.},
   title     = {Simultaneous Coupling of Fluids and Deformable Bodies},
-  booktitle = {Symposium on Computer Animation},
-  author    = {Nuttapong Chentanez and Tolga G. Goktekin and Bryan E. Feldman and James F. O'Brien},
-  year      = 2006,
-  pages     = {83--89}
+  year      = {2006},
+  isbn      = {3905673347},
+  publisher = {Eurographics Association},
+  address   = {Goslar, DEU},
+  booktitle = {Proceedings of the 2006 ACM SIGGRAPH/Eurographics Symposium on Computer Animation},
+  pages     = {83-89},
+  numpages  = {7},
+  location  = {Vienna, Austria},
+  series    = {SCA '06}
 }
 
-@inproceedings{Batty-2007,
-  title     = {A fast variational framework for accurate solid-fluid coupling},
-  author    = {Batty, Christopher and Bertails, Florence and Bridson, Robert},
-  booktitle = {ACM Transactions on Graphics},
-  volume    = {26},
-  number    = {3},
-  pages     = {100},
-  year      = {2007}
+@article{Batty-2007,
+  author     = {Batty, Christopher and Bertails, Florence and Bridson, Robert},
+  title      = {A Fast Variational Framework for Accurate Solid-Fluid Coupling},
+  year       = {2007},
+  issue_date = {July 2007},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {26},
+  number     = {3},
+  issn       = {0730-0301},
+  journal    = {ACM Transactions on Graphics},
+  month      = {jul},
+  pages      = {100-es},
+  numpages   = {8}
 }
 
 @article{fang-2020,
@@ -197,7 +228,7 @@
   journal   = {ACM Transactions on Graphics},
   volume    = {39},
   number    = {4},
-  pages     = {51--1},
+  pages     = {Article 51},
   year      = {2020},
   publisher = {ACM New York, NY, USA}
 }
@@ -213,13 +244,13 @@
 }
 
 @article{Teng-2016,
-  author    = {Teng, Yun and Levin, David I. W. and Kim, Theodore},
-  title     = {Eulerian Solid-fluid Coupling},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {35},
-  number    = {6},
-  year      = {2016},
-  articleno = {200}
+  author  = {Teng, Yun and Levin, David I. W. and Kim, Theodore},
+  title   = {Eulerian Solid-fluid Coupling},
+  journal = {ACM Transactions on Graphics},
+  volume  = {35},
+  number  = {6},
+  year    = {2016},
+  pages   = {Article 200}
 }
 
 @inproceedings{Robinson-2008,
@@ -248,20 +279,26 @@
   pages     = {255--259}
 }
 
-@inproceedings{Feldman-2005,
-  title     = {Animating gases with hybrid meshes},
-  author    = {Feldman, Bryan E and O'Brien, James F and Klingner, Bryan M},
-  booktitle = {ACM Transactions on Graphics},
-  volume    = {24},
-  number    = {3},
-  pages     = {904--909},
-  year      = {2005}
+@article{Feldman-2005,
+  author     = {Feldman, Bryan E. and O'Brien, James F. and Klingner, Bryan M.},
+  title      = {Animating Gases with Hybrid Meshes},
+  year       = {2005},
+  issue_date = {July 2005},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {24},
+  number     = {3},
+  issn       = {0730-0301},
+  journal    = {ACM Transactions on Graphics},
+  month      = {jul},
+  pages      = {904-909},
+  numpages   = {6}
 }
 
 @article{dai-2005,
   title   = {Adaptive tetrahedral meshing in free-surface flow},
   author  = {Dai, Meizhong and Schmidt, David P},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {208},
   number  = {1},
   pages   = {228--252},
@@ -279,13 +316,13 @@
 }
 
 @article{Elcott-2007,
-  title     = {Stable, circulation-preserving, simplicial fluids},
-  author    = {Elcott, Sharif and Tong, Yiying and Kanso, Eva and Schr{\"o}der, Peter and Desbrun, Mathieu},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {26},
-  number    = {1},
-  articleno = {4},
-  year      = {2007}
+  title   = {Stable, Circulation-Preserving, Simplicial Fluids},
+  author  = {Elcott, Sharif and Tong, Yiying and Kanso, Eva and Schr{\"o}der, Peter and Desbrun, Mathieu},
+  journal = {ACM Transactions on Graphics},
+  volume  = {26},
+  number  = {1},
+  pages   = {4-es},
+  year    = {2007}
 }
 
 @inproceedings{Misztal:2010,
@@ -297,13 +334,13 @@
 }
 
 @article{Clausen-2013,
-  title     = {Simulating liquids and solid-liquid interactions with {L}agrangian meshes},
-  author    = {Clausen, Pascal and Wicke, Martin and Shewchuk, Jonathan R and O'Brien, James F},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {32},
-  number    = {2},
-  articleno = {17},
-  year      = {2013}
+  title   = {Simulating Liquids and Solid-Liquid Interactions with Lagrangian Meshes},
+  author  = {Clausen, Pascal and Wicke, Martin and Shewchuk, Jonathan R and O'Brien, James F},
+  journal = {ACM Transactions on Graphics},
+  volume  = {32},
+  number  = {2},
+  pages   = {Article 17},
+  year    = {2013}
 }
 
 @inproceedings{Roble-2005,
@@ -317,7 +354,7 @@
 @article{Ng-2009,
   title   = {An efficient fluid-solid coupling algorithm for single-phase flows},
   author  = {Ng, Yen Ting and Min, Chohong and Gibou, Fr{\'e}d{\'e}ric},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {228},
   number  = {23},
   pages   = {8807--8829},
@@ -327,7 +364,7 @@
 @article{gibou-2012,
   title   = {Efficient symmetric positive definite second-order accurate monolithic solver for fluid/solid interactions},
   author  = {Gibou, Fr{\'e}d{\'e}ric and Min, Chohong},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {231},
   number  = {8},
   pages   = {3246--3263},
@@ -345,33 +382,38 @@
 }
 
 @article{Edwards-2014,
-  title     = {Detailed water with coarse grids: combining surface meshes and adaptive discontinuous Galerkin},
-  author    = {Edwards, Essex and Bridson, Robert},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {33},
-  number    = {4},
-  articleno = {136},
-  year      = {2014}
+  title   = {Detailed water with coarse grids: combining surface meshes and adaptive discontinuous Galerkin},
+  author  = {Edwards, Essex and Bridson, Robert},
+  journal = {ACM Transactions on Graphics},
+  volume  = {33},
+  number  = {4},
+  pages   = {Article 136},
+  year    = {2014}
 }
 
 @article{Liu:2015:MVF,
-  author    = {Liu, Beibei and Mason, Gemma and Hodgson, Julian and Tong, Yiying and Desbrun, Mathieu},
-  title     = {Model-reduced Variational Fluid Simulation},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {34},
-  number    = {6},
-  year      = {2015},
-  articleno = {244}
+  author  = {Liu, Beibei and Mason, Gemma and Hodgson, Julian and Tong, Yiying and Desbrun, Mathieu},
+  title   = {Model-reduced Variational Fluid Simulation},
+  journal = {ACM Transactions on Graphics},
+  volume  = {34},
+  number  = {6},
+  year    = {2015},
+  pages   = {Article 244}
 }
 
 @article{Azevedo-2016,
-  title   = {Preserving geometry and topology for fluid flows with thin obstacles and narrow gaps},
-  author  = {Azevedo, Vinicius C and Batty, Christopher and Oliveira, Manuel M},
-  journal = {ACM Transactions on Graphics},
-  volume  = {35},
-  number  = {4},
-  pages   = {97},
-  year    = {2016}
+  author     = {Azevedo, Vinicius C. and Batty, Christopher and Oliveira, Manuel M.},
+  title      = {Preserving Geometry and Topology for Fluid Flows with Thin Obstacles and Narrow Gaps},
+  year       = {2016},
+  issue_date = {July 2016},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {35},
+  number     = {4},
+  issn       = {0730-0301},
+  journal    = {ACM Transactions on Graphics},
+  month      = {jul},
+  pages      = {Article 97}
 }
 
 @article{peer-2015,
@@ -385,65 +427,61 @@
   publisher = {ACM New York, NY, USA}
 }
 
-@article{Ihmsen-2013,
-  title   = {Implicit incompressible SPH},
-  author  = {Ihmsen, Markus and Cornelis, Jens and Solenthaler, Barbara and Horvath, Christopher and Teschner, Matthias},
-  journal = {IEEE Trans. Vis. Comp. Graph.},
-  volume  = {20},
-  number  = {3},
-  pages   = {426--435},
-  year    = {2013}
-}
-
 @inproceedings{Gao:2017,
   author    = {Gao, Yang and Li, Shuai and Qin, Hong and Hao, Aimin},
   title     = {A Novel Fluid-Solid Coupling Framework Integrating FLIP and Shape Matching Methods},
   year      = {2017},
-  booktitle = {Computer Graphics International},
-  articleno = {11}
+  isbn      = {9781450352284},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  booktitle = {Proceedings of the Computer Graphics International Conference},
+  articleno = {11},
+  numpages  = {6},
+  location  = {Yokohama, Japan},
+  series    = {CGI '17}
 }
 
 @article{band-2018,
-  title     = {Pressure boundaries for implicit incompressible SPH},
-  author    = {Band, Stefan and Gissler, Christoph and Ihmsen, Markus and Cornelis, Jens and Peer, Andreas and Teschner, Matthias},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {37},
-  number    = {2},
-  articleno = {14},
-  year      = {2018}
+  title   = {Pressure boundaries for implicit incompressible SPH},
+  author  = {Band, Stefan and Gissler, Christoph and Ihmsen, Markus and Cornelis, Jens and Peer, Andreas and Teschner, Matthias},
+  journal = {ACM Transactions on Graphics},
+  volume  = {37},
+  number  = {2},
+  pages   = {Article 14},
+  year    = {2018}
 }
 
 @article{Zhang-2016,
-  author    = {Zhang, Xinxin and Li, Minchen and Bridson, Robert},
-  title     = {Resolving Fluid Boundary Layers with Particle Strength Exchange and Weak Adaptivity},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {35},
-  number    = {4},
-  month     = jul,
-  year      = {2016},
-  articleno = {76},
-  acmid     = {2925910}
+  author  = {Zhang, Xinxin and Li, Minchen and Bridson, Robert},
+  title   = {Resolving Fluid Boundary Layers with Particle Strength Exchange and Weak Adaptivity},
+  journal = {ACM Transactions on Graphics},
+  volume  = {35},
+  number  = {4},
+  month   = jul,
+  year    = {2016},
+  pages   = {Article 76},
+  acmid   = {2925910}
 }
 
 @article{Fei-2018,
-  author    = {Fei, Yun and Batty, Christopher and Grinspun, Eitan and Zheng, Changxi},
-  title     = {A Multi-scale Model for Simulating Liquid-fabric Interactions},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {37},
-  number    = {4},
-  year      = {2018},
-  articleno = {51},
-  acmid     = {3201392}
+  author  = {Fei, Yun and Batty, Christopher and Grinspun, Eitan and Zheng, Changxi},
+  title   = {A Multi-scale Model for Simulating Liquid-fabric Interactions},
+  journal = {ACM Transactions on Graphics},
+  volume  = {37},
+  number  = {4},
+  year    = {2018},
+  pages   = {Article 51},
+  acmid   = {3201392}
 }
 
 @article{hu-2018,
-  title     = {A moving least squares material point method with displacement discontinuity and two-way rigid body coupling},
-  author    = {Hu, Yuanming and Fang, Yu and Ge, Ziheng and Qu, Ziyin and Zhu, Yixin and Pradhana, Andre and Jiang, Chenfanfu},
-  journal   = {ACM Transactions on Graphics},
-  volume    = {37},
-  number    = {4},
-  articleno = {150},
-  year      = {2018}
+  title   = {A moving least squares material point method with displacement discontinuity and two-way rigid body coupling},
+  author  = {Hu, Yuanming and Fang, Yu and Ge, Ziheng and Qu, Ziyin and Zhu, Yixin and Pradhana, Andre and Jiang, Chenfanfu},
+  journal = {ACM Transactions on Graphics},
+  volume  = {37},
+  number  = {4},
+  pages   = {Article 150},
+  year    = {2018}
 }
 
 @article{Fei-2019,
@@ -452,6 +490,7 @@
   year    = {2019},
   volume  = {38},
   number  = {6},
+  pages   = {Article 190},
   journal = {ACM Transactions on Graphics}
 }
 
@@ -465,10 +504,17 @@
 }
 
 @inproceedings{Kim-2005,
-  booktitle = {Eurographics Workshop on Natural Phenomena},
-  title     = {{FlowFixer: Using BFECC for Fluid Simulation}},
-  author    = {Kim, ByungMoon and Liu, Yingjie and Llamas, Ignacio and Rossignac, Jarek},
-  year      = {2005}
+author = {Kim, ByungMoon and Liu, Yingjie and Llamas, Ignacio and Rossignac, Jarek},
+title = {FlowFixer: Using BFECC for Fluid Simulation},
+year = {2005},
+isbn = {3905673290},
+publisher = {Eurographics Association},
+address = {Goslar, DEU},
+booktitle = {Proceedings of the First Eurographics Conference on Natural Phenomena},
+pages = {51-56},
+numpages = {6},
+location = {Dublin, Ireland},
+series = {NPH'05}
 }
 
 @article{Selle-2008,
@@ -492,20 +538,20 @@
   number    = {4},
   issn      = {0730-0301},
   journal   = TOG,
-  articleno = {85},
+  pages     = {Article 85},
   numpages  = {8},
   keywords  = {energy conservation, reflection, advection, fluid simulation}
 }
 
 @article{Qu-2019,
-  author    = {Qu, Ziyin and Zhang, Xinxin and Gao, Ming and Jiang, Chenfanfu and Chen, Baoquan},
-  title     = {Efficient and Conservative Fluids Using Bidirectional Mapping},
-  year      = {2019},
-  volume    = {38},
-  number    = {4},
-  journal   = TOG,
-  articleno = {128},
-  keywords  = {conservative advection, MCM, fluid simulation}
+  author   = {Qu, Ziyin and Zhang, Xinxin and Gao, Ming and Jiang, Chenfanfu and Chen, Baoquan},
+  title    = {Efficient and Conservative Fluids Using Bidirectional Mapping},
+  year     = {2019},
+  volume   = {38},
+  number   = {4},
+  journal  = TOG,
+  pages    = {Article 128},
+  keywords = {conservative advection, MCM, fluid simulation}
 }
 
 
@@ -526,17 +572,17 @@
 }
 
 @inproceedings{Angelidis-2005,
-author = {Angelidis, Alexis and Neyret, Fabrice},
-title = {Simulation of Smoke Based on Vortex Filament Primitives},
-year = {2005},
-isbn = {1595931988},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-booktitle = {Proceedings of the 2005 ACM SIGGRAPH/Eurographics Symposium on Computer Animation},
-pages = {87-96},
-numpages = {10},
-location = {Los Angeles, California},
-series = {SCA '05}
+  author    = {Angelidis, Alexis and Neyret, Fabrice},
+  title     = {Simulation of Smoke Based on Vortex Filament Primitives},
+  year      = {2005},
+  isbn      = {1595931988},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  booktitle = {Proceedings of the 2005 ACM SIGGRAPH/Eurographics Symposium on Computer Animation},
+  pages     = {87-96},
+  numpages  = {10},
+  location  = {Los Angeles, California},
+  series    = {SCA '05}
 }
 
 @inproceedings{Weissmann-2010,
@@ -544,7 +590,7 @@ series = {SCA '05}
   title     = {Filament-Based Smoke with Vortex Shedding and Variational Reconnection},
   year      = {2010},
   booktitle = {Proceedings of ACM SIGGRAPH},
-  articleno = {115},
+  pages     = {Article 115},
   keywords  = {vortex shedding, panel method, vortex reconnection, vortex filaments, fluid simulation}
 }
 
@@ -557,36 +603,39 @@ series = {SCA '05}
   volume    = {31},
   number    = {4},
   journal   = TOG,
-  articleno = {112},
+  pages     = {Article 112},
   numpages  = {8}
 }
 
 @article{Zhang-2015,
-  author    = {Zhang, Xinxin and Bridson, Robert and Greif, Chen},
-  title     = {Restoring the Missing Vorticity in Advection-Projection Fluid Solvers},
-  year      = {2015},
-  volume    = {34},
-  number    = {4},
-  journal   = TOG,
-  articleno = {52}
+  author  = {Zhang, Xinxin and Bridson, Robert and Greif, Chen},
+  title   = {Restoring the Missing Vorticity in Advection-Projection Fluid Solvers},
+  year    = {2015},
+  volume  = {34},
+  number  = {4},
+  journal = TOG,
+  pages   = {Article 52}
 }
 
 @article{Zhang-2014,
-  author    = {Zhang, Xinxin and Bridson, Robert},
-  title     = {A PPPM Fast Summation Method for Fluids and Beyond},
-  year      = {2014},
-  volume    = {33},
-  number    = {6},
-  journal   = TOG,
-  articleno = {206}
+  author  = {Zhang, Xinxin and Bridson, Robert},
+  title   = {A PPPM Fast Summation Method for Fluids and Beyond},
+  year    = {2014},
+  volume  = {33},
+  number  = {6},
+  journal = TOG,
+  pages   = {Article 206}
 }
 
-@incollection{Desbrun-1996,
-  title     = {Smoothed particles: A new paradigm for animating highly deformable bodies},
+@inproceedings{Desbrun-1996,
   author    = {Desbrun, Mathieu and Gascuel, Marie-Paule},
-  booktitle = {Comp. Anim. \& Simul.},
+  title     = {Smoothed Particles: A new paradigm for animating highly deformable bodies},
+  booktitle = {Computer Animation and Simulation '96},
+  year      = {1996},
+  publisher = {Springer Vienna},
+  address   = {Vienna},
   pages     = {61--76},
-  year      = {1996}
+  isbn      = {978-3-7091-7486-9}
 }
 
 @inproceedings{Muller-2003,
@@ -597,36 +646,43 @@ series = {SCA '05}
   pages     = {154-159}
 }
 
-@inproceedings{Ihmsen-2014-1,
-  booktitle = {Eurographics - State of the Art Reports},
-  editor    = {Sylvain Lefebvre and Michela Spagnuolo},
-  title     = {{SPH Fluids in Computer Graphics}},
-  author    = {Ihmsen, Markus and Orthmann, Jens and Solenthaler, Barbara and Kolb, Andreas and Teschner, Matthias},
-  year      = {2014}
+@inproceedings {Ihmsen-2014-1,
+booktitle = {Eurographics 2014 - State of the Art Reports},
+title = {{SPH Fluids in Computer Graphics}},
+author = {Ihmsen, Markus and Orthmann, Jens and Solenthaler, Barbara and Kolb, Andreas and Teschner, Matthias},
+year = {2014},
+publisher = {The Eurographics Association},
+ISSN = {1017-4656}
 }
 
 @article{Adams-2007,
-author = {Adams, Bart and Pauly, Mark and Keiser, Richard and Guibas, Leonidas J.},
-title = {Adaptively Sampled Particle Fluids},
-year = {2007},
-issue_date = {July 2007},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-volume = {26},
-number = {3},
-issn = {0730-0301},
-journal = TOG,
-month = {jul},
-pages = {48-es},
-numpages = {8}
+  author     = {Adams, Bart and Pauly, Mark and Keiser, Richard and Guibas, Leonidas J.},
+  title      = {Adaptively Sampled Particle Fluids},
+  year       = {2007},
+  issue_date = {July 2007},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {26},
+  number     = {3},
+  issn       = {0730-0301},
+  journal    = TOG,
+  month      = {jul},
+  pages      = {48-es},
+  numpages   = {8}
 }
 
 @inproceedings{Becker-2007,
   author    = {Becker, Markus and Teschner, Matthias},
   title     = {Weakly Compressible SPH for Free Surface Flows},
   year      = {2007},
-  booktitle = {Symposium on Computer Animation},
-  pages     = {209-217}
+  isbn      = {9781595936240},
+  publisher = {Eurographics Association},
+  address   = {Goslar, DEU},
+  booktitle = {Proceedings of the 2007 ACM SIGGRAPH/Eurographics Symposium on Computer Animation},
+  pages     = {209-217},
+  numpages  = {9},
+  location  = {San Diego, California},
+  series    = {SCA '07}
 }
 
 @inproceedings{Solenthaler-2009,
@@ -634,8 +690,22 @@ numpages = {8}
   title     = {Predictive-Corrective Incompressible SPH},
   year      = {2009},
   booktitle = {Proceedings of ACM SIGGRAPH},
-  articleno = {40},
+  pages     = {Article 40},
   numpages  = {6}
+}
+
+@inproceedings{Bender-2015,
+  author    = {Bender, Jan and Koschier, Dan},
+  title     = {Divergence-Free Smoothed Particle Hydrodynamics},
+  year      = {2015},
+  isbn      = {9781450334969},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  booktitle = {Proceedings of the 14th ACM SIGGRAPH / Eurographics Symposium on Computer Animation},
+  pages     = {147-155},
+  numpages  = {9},
+  location  = {Los Angeles, California},
+  series    = {SCA '15}
 }
 
 @inproceedings{Bender-2015,
@@ -648,7 +718,7 @@ numpages = {8}
 
 @article{Ihmsen-2014-2,
   author  = {Ihmsen, Markus and Cornelis, Jens and Solenthaler, Barbara and Horvath, Christopher and Teschner, Matthias},
-  journal = {IEEE Trans. Vis. Comput. Graph.},
+  journal = TVCG,
   title   = {Implicit Incompressible SPH},
   year    = {2014},
   volume  = {20},
@@ -657,15 +727,15 @@ numpages = {8}
 }
 
 @article{Macklin-2013,
-  author    = {Macklin, Miles and M\"{u}ller, Matthias},
-  title     = {Position Based Fluids},
-  year      = {2013},
-  volume    = {32},
-  number    = {4},
-  issn      = {0730-0301},
-  journal   = TOG,
-  articleno = {104},
-  keywords  = {SPH, constraint fluids, position based dynamics, PCISPH, fluid simulation}
+  author   = {Macklin, Miles and M\"{u}ller, Matthias},
+  title    = {Position Based Fluids},
+  year     = {2013},
+  volume   = {32},
+  number   = {4},
+  issn     = {0730-0301},
+  journal  = TOG,
+  pages    = {Article 104},
+  keywords = {SPH, constraint fluids, position based dynamics, PCISPH, fluid simulation}
 }
 
 @incollection{Desbrun-1996,
@@ -696,7 +766,7 @@ numpages = {8}
 
 @article{Brackbill-1986,
   title   = {FLIP: A method for adaptively zoned, particle-in-cell calculations of fluid flows in two dimensions},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {65},
   number  = {2},
   pages   = {314-343},
@@ -717,23 +787,23 @@ numpages = {8}
 }
 
 @article{Jiang-2015,
-  author    = {Jiang, Chenfanfu and Schroeder, Craig and Selle, Andrew and Teran, Joseph and Stomakhin, Alexey},
-  title     = {The Affine Particle-in-Cell Method},
-  year      = {2015},
-  volume    = {34},
-  number    = {4},
-  journal   = TOG,
-  articleno = {51}
+  author  = {Jiang, Chenfanfu and Schroeder, Craig and Selle, Andrew and Teran, Joseph and Stomakhin, Alexey},
+  title   = {The Affine Particle-in-Cell Method},
+  year    = {2015},
+  volume  = {34},
+  number  = {4},
+  journal = TOG,
+  pages   = {Article 51}
 }
 
 @article{Fu-2017,
-  author    = {Fu, Chuyuan and Guo, Qi and Gast, Theodore and Jiang, Chenfanfu and Teran, Joseph},
-  title     = {A Polynomial Particle-in-Cell Method},
-  year      = {2017},
-  volume    = {36},
-  number    = {6},
-  journal   = TOG,
-  articleno = {222}
+  author  = {Fu, Chuyuan and Guo, Qi and Gast, Theodore and Jiang, Chenfanfu and Teran, Joseph},
+  title   = {A Polynomial Particle-in-Cell Method},
+  year    = {2017},
+  volume  = {36},
+  number  = {6},
+  journal = TOG,
+  pages   = {Article 222}
 }
 
 @article{Qu-2022,
@@ -746,26 +816,26 @@ numpages = {8}
   number    = {4},
   issn      = {0730-0301},
   journal   = TOG,
-  articleno = {118},
+  pages     = {Article 118},
   numpages  = {13}
 }
 
 @article{Fei-2021,
-  author    = {Fei, Yun and Guo, Qi and Wu, Rundong and Huang, Li and Gao, Ming},
-  title     = {Revisiting Integration in the Material Point Method: A Scheme for Easier Separation and Less Dissipation},
-  year      = {2021},
-  volume    = {40},
-  number    = {4},
-  journal   = TOG,
-  articleno = {109}
+  author  = {Fei, Yun and Guo, Qi and Wu, Rundong and Huang, Li and Gao, Ming},
+  title   = {Revisiting Integration in the Material Point Method: A Scheme for Easier Separation and Less Dissipation},
+  year    = {2021},
+  volume  = {40},
+  number  = {4},
+  journal = TOG,
+  pages   = {Article 109}
 }
 
 @article{Bhatnagar-1954,
   title    = {A Model for Collision Processes in Gases. I. Small Amplitude Processes in Charged and Neutral One-Component Systems},
   author   = {Bhatnagar, P. L. and Gross, E. P. and Krook, M.},
-  journal  = {Phys. Rev.},
+  journal  = {Physical Review},
   volume   = {94},
-  issue    = {3},
+  number   = {3},
   pages    = {511--525},
   numpages = {0},
   year     = {1954}
@@ -783,9 +853,10 @@ numpages = {8}
 
 @incollection{dHumieres-1992,
   author    = {D'Humi\`eres, Dominique},
-  booktitle = {Rarefied Gas Dynamics: Theory and Simulations},
-  year      = {1992},
   title     = {Generalized Lattice-Boltzmann Equations},
+  year      = {1994},
+  publisher = {American Institute of Aeronautics and Astronautics},
+  booktitle = {Rarefied Gas Dynamics: Theory and Simulations},
   pages     = {450-458}
 }
 
@@ -794,7 +865,7 @@ numpages = {8}
   author    = {Lallemand, Pierre and Luo, Li-Shi},
   journal   = PRE,
   volume    = {61},
-  issue     = {6},
+  number    = {6},
   pages     = {6546--6562},
   numpages  = {0},
   year      = {2000},
@@ -802,9 +873,9 @@ numpages = {8}
 }
 
 @article{Coveney-2002,
-  author  = {D'Humi\`eres, Dominique  and Ginzburg, Irina  and Krafczyk, Manfred  and Lallemand, Pierre  and Luo, Li-Shi },
-  title   = {Multiple-relaxation-time Lattice Boltzmann Models in Three Dimensions},
-  journal = {Phil. Trans. R. Soc. A: Math. Phys. Eng. Sci.},
+  author  = {d'Humières, Dominique  and Ginzburg, Irina  and Krafczyk, Manfred  and Lallemand, Pierre  and Luo, Li-Shi},
+  title   = {Multiple-relaxation-time lattice Boltzmann models in three dimensions},
+  journal = {Philosophical Transactions of the Royal Society A},
   volume  = {360},
   number  = {1792},
   pages   = {437--451},
@@ -816,7 +887,7 @@ numpages = {8}
   author  = {Geier, Martin and Greiner, Andreas and Korvink, Jan G.},
   journal = PRE,
   volume  = {73},
-  issue   = {6},
+  number  = {6},
   pages   = {066705},
   year    = {2006}
 }
@@ -852,7 +923,7 @@ numpages = {8}
 }
 
 @article{Geier-2017,
-  title   = {Parametrization of the Cumulant Lattice Boltzmann Method for Fourth Order Accurate Diffusion Part I: derivation and validation},
+  title   = {Parametrization of the cumulant lattice Boltzmann method for fourth order accurate diffusion part I: Derivation and validation},
   journal = JCP,
   volume  = {348},
   pages   = {862-888},
@@ -865,7 +936,7 @@ numpages = {8}
   author    = {Adhikari, Ronojoy and Succi, Sauro},
   journal   = PRE,
   volume    = {78},
-  issue     = {6},
+  number    = {6},
   pages     = {066701},
   numpages  = {9},
   year      = {2008},
@@ -887,7 +958,7 @@ numpages = {8}
   author  = {Shan, Xiaowen},
   journal = PRE,
   volume  = {100},
-  issue   = {4},
+  number  = {4},
   pages   = {043308},
   year    = {2019}
 }
@@ -902,22 +973,12 @@ numpages = {8}
   author  = {Martin Geier and Martin Schönherr and Andrea Pasquali and Manfred Krafczyk}
 }
 
-@article{Geier-2017,
-  title   = {Parametrization of the Cumulant Lattice Boltzmann Method for Fourth Order Accurate Diffusion Part I: derivation and validation},
-  journal = JCP,
-  volume  = {348},
-  pages   = {862-888},
-  year    = {2017},
-  author  = {Martin Geier and Andrea Pasquali and Martin Schönherr}
-}
-
-
 @article{Zhang-2006,
   title     = {Efficient Kinetic Method for Fluid Simulation beyond the Navier-Stokes Equation},
   author    = {Zhang, Raoyang and Shan, Xiaowen and Chen, Hudong},
   journal   = PRE,
   volume    = {74},
-  issue     = {4},
+  number    = {4},
   pages     = {046703},
   numpages  = {7},
   year      = {2006},
@@ -935,18 +996,20 @@ numpages = {8}
 }
 
 @misc{Malaspinas-2015,
-  author = {Malaspinas, Orestis},
-  title  = {Increasing Stability and Accuracy of the Lattice Boltzmann Scheme: recursivity and regularization},
-  note   = {arXiv:1505.06900 [physics.flu-dyn]},
-  year   = {2015}
+      title={Increasing stability and accuracy of the lattice Boltzmann scheme: recursivity and regularization}, 
+      author={Orestis Malaspinas},
+      year={2015},
+      eprint={1505.06900},
+      archivePrefix={arXiv},
+      url = {https://arxiv.org/abs/1505.06900}
 }
 
 @article{Coreixas-2017,
-  title   = {Recursive Regularization Step for High-order Lattice Boltzmann Methods},
+  title   = {Recursive regularization step for high-order lattice Boltzmann methods},
   author  = {Coreixas, Christophe and Wissocq, Gauthier and Puigt, Guillaume and Boussuge, Jean-Fran\c{c}ois and Sagaut, Pierre},
   journal = PRE,
   volume  = {96},
-  issue   = {3},
+  number  = {3},
   pages   = {033306},
   year    = {2017}
 }
@@ -963,11 +1026,11 @@ numpages = {8}
 }
 
 @article{Karlin-2014,
-  title     = {Gibbs' Principle for the Lattice-kinetic Theory of Fluid Dynamics},
+  title     = {Gibbs' principle for the lattice-kinetic theory of fluid dynamics},
   author    = {Karlin, I. V. and B\"osch, F. and Chikatamarla, S. S.},
   journal   = PRE,
   volume    = {90},
-  issue     = {3},
+  number    = {3},
   pages     = {031302},
   numpages  = {5},
   year      = {2014},
@@ -979,7 +1042,7 @@ numpages = {8}
   author    = {Tang, Xiangshuo and Yu, Yue and Oztekin, Alparslan},
   journal   = PRE,
   volume    = {106},
-  issue     = {1},
+  number    = {1},
   pages     = {015303},
   numpages  = {20},
   year      = {2022},
@@ -1007,14 +1070,15 @@ numpages = {8}
 }
 
 @article{Ansumali-2003,
-  year      = 2003,
-  publisher = {{IOP} Publishing},
+  year      = {2003},
+  month     = {sep},
+  publisher = {},
   volume    = {63},
   number    = {6},
-  pages     = {798--804},
-  author    = {Sandosh Ansumali and Ilya V. Karlin and Hans C. {\"O}ttinger},
-  title     = {Minimal Entropic Kinetic Models for Hydrodynamics},
-  journal   = {Europhysics Letters ({EPL})}
+  pages     = {798},
+  author    = {S. Ansumali and  I. V. Karlin and  H. C. {\"O}ttinger},
+  title     = {Minimal entropic kinetic models for hydrodynamics},
+  journal   = {Europhysics Letters}
 }
 
 @article{Karlin-1999,
@@ -1025,14 +1089,16 @@ numpages = {8}
   pages     = {182--188},
   author    = {I. V. Karlin and A. Ferrante and H. C. Öttinger},
   title     = {Perfect Entropy Functions of the Lattice Boltzmann Method},
-  journal   = {Europhysics Letters ({EPL})}
+  journal   = {Europhysics Letters}
 }
 
 @misc{Hou-1994,
-  author = {Hou, Shuling and Sterling, James and Chen, Shiyi and Doolen, Gary D.},
-  title  = {A Lattice Boltzmann Subgrid Model for High Reynolds Number Flows},
-  note   = {arXiv:comp-gas/9401004},
-  year   = {1994}
+       author = {{Hou}, S. and {Sterling}, J. and {Chen}, S. and {Doolen}, G.~D.},
+        title = "{A Lattice Boltzmann Subgrid Model for High Reynolds Number Flows}",
+         year = 1994,
+archivePrefix = {arXiv},
+       eprint = {comp-gas/9401004},
+       utl = {https://arxiv.org/abs/comp-gas/9401004}
 }
 
 @article{Krafczyk-2003,
@@ -1057,7 +1123,7 @@ numpages = {8}
 
 @article{Malaspinas-2014,
   title   = {Wall model for large-eddy simulation based on the lattice Boltzmann method},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {275},
   pages   = {25-40},
   year    = {2014},
@@ -1108,7 +1174,7 @@ numpages = {8}
   author    = {Kr\"amer, Andreas and Wilde, Dominik and K\"ullmer, Knut and Reith, Dirk and Foysi, Holger},
   journal   = PRE,
   volume    = {100},
-  issue     = {2},
+  number    = {2},
   pages     = {023302},
   numpages  = {16},
   year      = {2019},
@@ -1121,7 +1187,8 @@ numpages = {8}
   journal = TOG,
   volume  = {39},
   number  = {4},
-  year    = {2020}
+  year    = {2020},
+  pages = {Article 47}
 }
 
 @inproceedings{Bailey-2009,
@@ -1155,25 +1222,25 @@ numpages = {8}
 }
 
 @article{Geier-2017-c,
-  author         = {Geier, Martin and Schönherr, Martin},
-  title          = {Esoteric Twist: An Efficient in-Place Streaming Algorithmus for the Lattice Boltzmann Method on Massively Parallel Hardware},
-  journal        = {Computation},
-  volume         = {5},
-  year           = {2017},
-  number         = {2},
-  article-number = {19},
-  issn           = {2079-3197}
+  author  = {Geier, Martin and Schönherr, Martin},
+  title   = {Esoteric Twist: An Efficient in-Place Streaming Algorithmus for the Lattice Boltzmann Method on Massively Parallel Hardware},
+  journal = {Computation},
+  volume  = {5},
+  year    = {2017},
+  number  = {2},
+  pages   = {Article 19},
+  issn    = {2079-3197}
 }
 
 @article{Moritz-2022,
-  author         = {Lehmann, Moritz},
-  title          = {Esoteric Pull and Esoteric Push: Two Simple In-Place Streaming Schemes for the Lattice Boltzmann Method on GPUs},
-  journal        = {Computation},
-  volume         = {10},
-  year           = {2022},
-  number         = {6},
-  article-number = {92},
-  issn           = {2079-3197}
+  author  = {Lehmann, Moritz},
+  title   = {Esoteric Pull and Esoteric Push: Two Simple In-Place Streaming Schemes for the Lattice Boltzmann Method on GPUs},
+  journal = {Computation},
+  volume  = {10},
+  year    = {2022},
+  number  = {6},
+  pages   = {Article 92},
+  issn    = {2079-3197}
 }
 
 @phdthesis{Marson-2022,
@@ -1188,7 +1255,7 @@ numpages = {8}
   author   = {Marson, Francesco and Thorimbert, Yann and Chopard, Bastien and Ginzburg, Irina and L\"{a}tt, Jonas},
   journal  = PRE,
   volume   = {103},
-  issue    = {5},
+  number   = {5},
   pages    = {053308},
   numpages = {26},
   year     = {2021}
@@ -1224,7 +1291,7 @@ numpages = {8}
 }
 
 @article{Geier-2015,
-  title   = {The Cumulant Lattice Boltzmann Equation in Three Dimensions: theory and validation},
+  title   = {The cumulant lattice Boltzmann equation in three dimensions: Theory and validation},
   journal = {Computers \& Mathematics with Applications},
   volume  = {70},
   number  = {4},
@@ -1238,7 +1305,7 @@ numpages = {8}
   author    = {Ginzburg, Irina and D'Humi\`eres, Dominique},
   journal   = PRE,
   volume    = {68},
-  issue     = {6},
+  number    = {6},
   pages     = {066614},
   numpages  = {30},
   year      = {2003},
@@ -1255,7 +1322,7 @@ numpages = {8}
 }
 
 @article{Bouzidi-2001,
-  title     = {Momentum Transfer of a Lattice-Boltzmann Fluid with Boundaries},
+  title     = {Momentum transfer of a Boltzmann-lattice fluid with boundaries},
   author    = {Bouzidi, M'hamed and Firdaouss, Mouaouia and Lallemand, Pierre},
   journal   = {Physics of Fluids},
   volume    = {13},
@@ -1327,7 +1394,7 @@ numpages = {8}
 }
 
 @article{Chen-2013,
-  title     = {Sharp-interface Immersed Boundary Lattice Boltzmann Method with Reduced Spurious-pressure Oscillations for Moving Boundaries},
+  title     = {Sharp-interface immersed boundary lattice Boltzmann method with reduced spurious-pressure oscillations for moving boundaries},
   author    = {Chen, Li and Yu, Yang and Hou, Guoxiang},
   journal   = {Physical Review E},
   volume    = {87},
@@ -1368,7 +1435,7 @@ numpages = {8}
   author    = {Dupuis, Alexandre and Chopard, Bastien},
   journal   = PRE,
   volume    = {67},
-  issue     = {6},
+  number    = {6},
   pages     = {066707},
   numpages  = {7},
   year      = {2003},
@@ -1407,12 +1474,13 @@ numpages = {8}
 }
 
 @article{Hasert-2014,
-  title   = {Complex Fluid Simulations with the Parallel Tree-based Lattice Boltzmann Solver Musubi},
-  journal = {J. Comp. Sci.},
+  title   = {Complex fluid simulations with the parallel tree-based Lattice Boltzmann solver Musubi},
+  journal = {Journal of Computational Science},
   volume  = {5},
   number  = {5},
   pages   = {784-794},
   year    = {2014},
+  issn    = {1877-7503},
   author  = {Manuel Hasert and Kannan Masilamani and Simon Zimny and Harald Klimach and Jiaxing Qi and J\"org Bernsdorf and Sabine Roller}
 }
 
@@ -1448,7 +1516,7 @@ numpages = {8}
   author    = {Gendre, F\'elix and Ricot, Denis and Fritz, Guillaume and Sagaut, Pierre},
   journal   = PRE,
   volume    = {96},
-  issue     = {2},
+  number    = {2},
   pages     = {023311},
   numpages  = {17},
   year      = {2017},
@@ -1456,7 +1524,7 @@ numpages = {8}
 }
 
 @article{Astoul-2021,
-  title   = {Lattice Boltzmann Method for Computational Aeroacoustics on Non-uniform Meshes: a direct grid coupling approach},
+  title   = {Lattice Boltzmann method for computational aeroacoustics on non-uniform meshes: A direct grid coupling approach},
   journal = JCP,
   volume  = {447},
   pages   = {110667},
@@ -1466,7 +1534,7 @@ numpages = {8}
 
 @article{Li-2019,
   author  = {Li, Wei and Bai, Kai and Liu, Xiaopei},
-  journal = {IEEE Trans. Vis. Comput. Graph.},
+  journal = TVCG,
   title   = {Continuous-Scale Kinetic Fluid Simulation},
   year    = {2019},
   volume  = {25},
@@ -1495,10 +1563,10 @@ numpages = {8}
 }
 
 @book{golub2013matrix,
-  title     = {Matrix computations},
+  title     = {Matrix Computations},
   author    = {Golub, Gene H and Van Loan, Charles F},
   year      = {2013},
-  publisher = {JHU press}
+  publisher = {JHU Press}
 }
 
 @article{smolarkiewicz1992class,
@@ -1544,7 +1612,7 @@ numpages = {8}
 @article{bermudez1998upwind,
   title     = {Upwind schemes for the two-dimensional shallow water equations with variable depth using unstructured meshes},
   author    = {Berm{\'u}dez, Alfredo and Dervieux, Alain and Desideri, Jean-Antoine and V{\'a}zquez, M Elena},
-  journal   = {Computer methods in applied mechanics and engineering},
+  journal   = {Computer Methods in Applied Mechanics and Engineering},
   volume    = {155},
   number    = {1-2},
   pages     = {49--72},
@@ -1573,7 +1641,7 @@ numpages = {8}
 }
 @article{HARTEN1983357,
   title   = {High resolution schemes for hyperbolic conservation laws},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {49},
   number  = {3},
   pages   = {357-393},
@@ -1593,7 +1661,7 @@ numpages = {8}
 
 @article{YEE1985327,
   title   = {Implicit total variation diminishing (TVD) schemes for steady-state calculations},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {57},
   number  = {3},
   pages   = {327-360},
@@ -1604,7 +1672,7 @@ numpages = {8}
 
 @article{HARTEN19973,
   title   = {Uniformly High Order Accurate Essentially Non-oscillatory Schemes, III},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {131},
   number  = {1},
   pages   = {3-47},
@@ -1615,7 +1683,7 @@ numpages = {8}
 
 @article{SHU1988439,
   title   = {Efficient implementation of essentially non-oscillatory shock-capturing schemes},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {77},
   number  = {2},
   pages   = {439-471},
@@ -1626,7 +1694,7 @@ numpages = {8}
 
 @article{SHU198932,
   title   = {Efficient implementation of essentially non-oscillatory shock-capturing schemes, II},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {83},
   number  = {1},
   pages   = {32-78},
@@ -1637,7 +1705,7 @@ numpages = {8}
 
 @article{LIU1994200,
   title   = {Weighted Essentially Non-oscillatory Schemes},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {115},
   number  = {1},
   pages   = {200-212},
@@ -1649,14 +1717,14 @@ numpages = {8}
 @inproceedings{barth1990higher,
   title     = {Higher order solution of the Euler equations on unstructured grids using quadratic reconstruction},
   author    = {Barth, Timothy and Frederickson, Paul},
-  booktitle = {28th aerospace sciences meeting},
-  pages     = {13},
+  booktitle = {28th Aerospace Sciences Meeting},
+  pages     = {Article 13},
   year      = {1990}
 }
 
 @article{HU199997,
   title   = {Weighted Essentially Non-oscillatory Schemes on Triangular Meshes},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {150},
   number  = {1},
   pages   = {97-127},
@@ -1675,7 +1743,7 @@ numpages = {8}
 @article{cockburn1989tvb2,
   title   = {TVB Runge-Kutta local projection discontinuous Galerkin finite element method for conservation laws. II. General framework},
   author  = {Cockburn, Bernardo and Shu, Chi-Wang},
-  journal = {Mathematics of computation},
+  journal = {Mathematics of Computation},
   volume  = {52},
   number  = {186},
   pages   = {411--435},
@@ -1685,7 +1753,7 @@ numpages = {8}
 @article{cockburn1989tvb3,
   title     = {TVB Runge-Kutta local projection discontinuous Galerkin finite element method for conservation laws III: one-dimensional systems},
   author    = {Cockburn, Bernardo and Lin, San-Yih and Shu, Chi-Wang},
-  journal   = {Journal of computational Physics},
+  journal   = JCP,
   volume    = {84},
   number    = {1},
   pages     = {90--113},
@@ -1706,7 +1774,7 @@ numpages = {8}
 @article{cockburn2001runge,
   title     = {Runge--Kutta discontinuous Galerkin methods for convection-dominated problems},
   author    = {Cockburn, Bernardo and Shu, Chi-Wang},
-  journal   = {Journal of scientific computing},
+  journal   = {Journal of Scientific Computing},
   volume    = {16},
   pages     = {173--261},
   year      = {2001},
@@ -1723,7 +1791,7 @@ numpages = {8}
 @article{bassi1997high,
   title     = {A high-order accurate discontinuous finite element method for the numerical solution of the compressible Navier--Stokes equations},
   author    = {Bassi, Francesco and Rebay, Stefano},
-  journal   = {Journal of computational physics},
+  journal   = JCP,
   volume    = {131},
   number    = {2},
   pages     = {267--279},
@@ -1753,19 +1821,19 @@ numpages = {8}
 }
 
 @book{hesthaven2007nodal,
-  title     = {Nodal discontinuous Galerkin methods: algorithms, analysis, and applications},
+  title     = {Nodal Discontinuous Galerkin Methods: Algorithms, Analysis, and Applications},
   author    = {Hesthaven, Jan S and Warburton, Tim},
   year      = {2007},
-  publisher = {Springer Science \& Business Media}
+  publisher = {Springer}
 }
 
 @article{frisch1986lattice,
   title     = {Lattice-gas automata for the Navier-Stokes equation},
   author    = {Frisch, Uriel and Hasslacher, Brosl and Pomeau, Yves},
-  journal   = {Physical review letters},
+  journal   = {Physical Review Letters},
   volume    = {56},
   number    = {14},
-  pages     = {1505},
+  pages     = {1505-1508},
   year      = {1986},
   publisher = {APS}
 }
@@ -1780,7 +1848,7 @@ numpages = {8}
 @article{higuera1989boltzmann,
   title     = {Boltzmann approach to lattice gas simulations},
   author    = {Higuera, F J and Jim{\'e}nez, Javier},
-  journal   = {Europhysics letters},
+  journal   = {Europhysics Letters},
   volume    = {9},
   number    = {7},
   pages     = {663},
@@ -1791,7 +1859,7 @@ numpages = {8}
 @article{higuera1989lattice,
   title     = {Lattice gas dynamics with enhanced collisions},
   author    = {Higuera, F J and Succi, S and Benzi, R},
-  journal   = {Europhysics letters},
+  journal   = {Europhysics Letters},
   volume    = {9},
   number    = {4},
   pages     = {345},
@@ -1810,19 +1878,11 @@ numpages = {8}
   publisher = {IOP Publishing}
 }
 
-@article{d1992generalized,
-  title     = {Generalized lattice-Boltzmann equations},
-  author    = {d'Humieres, Dominique},
-  journal   = {Rarefied gas dynamics},
-  year      = {1992},
-  publisher = {AIAA}
-}
-
 @book{kundu2015fluid,
-  title     = {Fluid mechanics},
+  title     = {Fluid Mechanics},
   author    = {Kundu, Pijush K and Cohen, Ira M and Dowling, David R},
   year      = {2015},
-  publisher = {Academic press}
+  publisher = {Academic Press}
 }
 
 @article{shan2006kinetic,
@@ -1847,7 +1907,7 @@ numpages = {8}
 }
 
 @book{huang2008statistical,
-  title     = {Statistical mechanics},
+  title     = {Statistical Mechanics},
   author    = {Huang, Kerson},
   year      = {1987},
   publisher = {John Wiley \& Sons}
@@ -1857,8 +1917,14 @@ numpages = {8}
   author    = {Grinspun, Eitan and Hirani, Anil N. and Desbrun, Mathieu and Schr\"{o}der, Peter},
   title     = {Discrete Shells},
   year      = {2003},
-  booktitle = {Symposium on Computer Animation},
-  pages     = {62–67}
+  isbn      = {1581136595},
+  publisher = {Eurographics Association},
+  address   = {Goslar, DEU},
+  booktitle = {Proceedings of the 2003 ACM SIGGRAPH/Eurographics Symposium on Computer Animation},
+  pages     = {62-67},
+  numpages  = {6},
+  location  = {San Diego, California},
+  series    = {SCA '03}
 }
 
 @inproceedings{Bridson:2003,
@@ -1866,24 +1932,24 @@ numpages = {8}
   title     = {Simulation of clothing with folds and wrinkles},
   year      = {2003},
   booktitle = {Symposium on Computer Animation},
-  pages     = {28–36}
+  pages     = {28-36}
 }
 
 @article{DiscreteRods,
-  author    = {Bergou, Mikl\'{o}s and Wardetzky, Max and Robinson, Stephen and Audoly, Basile and Grinspun, Eitan},
-  title     = {Discrete Elastic Rods},
-  year      = {2008},
-  journal   = {ACM Transactions on Graphics},
-  articleno = {63}
-}
-
-@article{Fei-2019,
-  author  = {Fei, Yun and Batty, Christopher and Grinspun, Eitan and Zheng, Changxi},
-  title   = {A Multi-Scale Model for Coupling Strands with Shear-Dependent Liquid},
-  year    = {2019},
-  volume  = {38},
-  number  = {6},
-  journal = {ACM Transactions on Graphics}
+  author     = {Bergou, Mikl\'{o}s and Wardetzky, Max and Robinson, Stephen and Audoly, Basile and Grinspun, Eitan},
+  title      = {Discrete Elastic Rods},
+  year       = {2008},
+  issue_date = {August 2008},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {27},
+  number     = {3},
+  issn       = {0730-0301},
+  journal    = {ACM Trans. Graph.},
+  month      = {aug},
+  pages      = {1-12},
+  numpages   = {12},
+  keywords   = {rods, discrete differential geometry, strands, discrete holonomy}
 }
 
 @article{Takahashi:2019,
@@ -1896,30 +1962,20 @@ numpages = {8}
   year    = {2019}
 }
 
-@article{Li-2018,
-  title   = {Continuous-Scale Kinetic Fluid Simulation},
-  author  = {Wei Li and Kai Bai and Xiapei Liu},
-  journal = {IEEE Trans. Vis. Comp. Graph.},
-  year    = {2019},
-  volume  = {25},
-  number  = {9},
-  pages   = {2694--2709}
-}
-
 @article{Chen-2021,
-  title   = {GPU Optimization for High-Quality Kinetic Fluid Simulation},
-  author  = {Yixin Chen and Wei Li and Rui Fan and Xiaopei Liu},
+  author  = {Chen, Yixin and Li, Wei and Fan, Rui and Liu, Xiaopei},
   journal = {IEEE Transactions on Visualization and Computer Graphics},
-  year    = {2021},
-  volume  = {},
-  number  = {},
-  pages   = {}
+  title   = {GPU Optimization for High-Quality Kinetic Fluid Simulation},
+  year    = {2022},
+  volume  = {28},
+  number  = {9},
+  pages   = {3235-3251}
 }
 
 @article{patel2018diffuse,
   title     = {Diffuse interface immersed boundary method for multi-fluid flows with arbitrarily moving rigid bodies},
   author    = {Patel, Jitendra Kumar and Natarajan, Ganesh},
-  journal   = {Journal of Computational Physics},
+  journal   = JCP,
   volume    = {360},
   pages     = {202--228},
   year      = {2018},
@@ -1929,7 +1985,7 @@ numpages = {8}
 @article{mittal-2008,
   title     = {A versatile sharp interface immersed boundary method for incompressible flows with complex boundaries},
   author    = {Mittal, Rajat and Dong, Haibo and Bozkurttas, Meliha and Najjar, FM and Vargas, Abel and Von Loebbecke, Alfred},
-  journal   = {Journal of Computational Physics},
+  journal   = JCP,
   volume    = {227},
   number    = {10},
   pages     = {4825--4852},
@@ -1938,7 +1994,7 @@ numpages = {8}
 }
 
 @article{dunbar2006spatial,
-  title     = {A spatial data structure for fast Poisson-disk sample generation},
+  title     = {A Spatial Data Structure for Fast Poisson-Disk Sample Generation},
   author    = {Dunbar, Daniel and Humphreys, Greg},
   journal   = {ACM Transactions on Graphics},
   volume    = {25},
@@ -1962,12 +2018,9 @@ numpages = {8}
 @misc{youtube_2014,
   url       = {https://www.youtube.com/watch?v=quDLzxmJl5I},
   title     = {Automotive Aerodynamics Episode 1: Flow Visualizations of MR2, RX7, Supra, FRS},
-  journal   = {YouTube},
-  publisher = {YouTube},
   year      = {2014},
   month     = {Sep},
-  author    = {Feltham, Grahaml},
-  urldate   = {2019-04-08}
+  author    = {Feltham, Grahaml}
 }
 
 @article{Delery:2001,
@@ -2045,7 +2098,7 @@ numpages = {8}
   author       = {{Siemens PLM Software}},
   year         = {2023},
   organization = {Siemens},
-  url = {https://plm.sw.siemens.com/en-US/simcenter/fluids-thermal-simulation/star-ccm/}
+  url          = {https://plm.sw.siemens.com/en-US/simcenter/fluids-thermal-simulation/star-ccm/}
 }
 
 @manual{Simulia,
@@ -2053,17 +2106,17 @@ numpages = {8}
   author       = {{Simulia Corp.}, Dassault Syst\`emes},
   year         = {2023},
   organization = {Dassault Syst\`emes},
-  url = {https://www.3ds.com/products-services/simulia/}
+  url          = {https://www.3ds.com/products-services/simulia/}
 }
 
 @article{Lyu:2021,
-  author    = {Lyu, Chaoyang and Li, Wei and Desbrun, Mathieu and Liu, Xiaopei},
-  title     = {Fast and Versatile Fluid-Solid Coupling for Turbulent Flow Simulation},
-  year      = {2021},
-  volume    = {40},
-  number    = {6},
-  journal   = TOG,
-  articleno = {201}
+  author  = {Lyu, Chaoyang and Li, Wei and Desbrun, Mathieu and Liu, Xiaopei},
+  title   = {Fast and Versatile Fluid-Solid Coupling for Turbulent Flow Simulation},
+  year    = {2021},
+  volume  = {40},
+  number  = {6},
+  journal = TOG,
+  pages   = {Article 201}
 }
 
 @article{Tao-2018-b,
@@ -2096,13 +2149,17 @@ numpages = {8}
 }
 
 @inproceedings{Karras-2012,
-  author    = {Karras, Tero},
-  title     = {Maximizing Parallelism in the Construction of BVHs, Octrees, and k-d Trees},
-  year      = {2012},
-  isbn      = {9783905674415},
-  booktitle = {Proceedings of the ACM SIGGRAPH / Eurographics Conference on High-Performance Graphics},
-  pages     = {33-37},
-  numpages  = {5}
+author = {Karras, Tero},
+title = {Maximizing Parallelism in the Construction of BVHs, Octrees, and k-d Trees},
+year = {2012},
+isbn = {9783905674415},
+publisher = {Eurographics Association},
+address = {Goslar, DEU},
+booktitle = {Proceedings of the Fourth ACM SIGGRAPH / Eurographics Conference on High-Performance Graphics},
+pages = {33-37},
+numpages = {5},
+location = {Paris, France},
+series = {EGGH-HPG'12}
 }
 
 @article{Mei-2002,
@@ -2110,7 +2167,7 @@ numpages = {8}
   author    = {Mei, Renwei and Yu, Dazhi and Shyy, Wei and Luo, Li-Shi},
   journal   = PRE,
   volume    = {65},
-  issue     = {4},
+  number    = {4},
   pages     = {041203},
   numpages  = {14},
   year      = {2002},
@@ -2118,13 +2175,13 @@ numpages = {8}
 }
 
 @article{Aultman-2022,
-  author         = {Aultman, Matthew and Auza-Gutierrez, Rodrigo and Disotell, Kevin and Duan, Lian},
-  title          = {Effects of Wheel Rotation on Long-Period Wake Dynamics of the DrivAer Fastback Model},
-  journal        = {Fluids},
-  volume         = {7},
-  year           = {2022},
-  number         = {1},
-  article-number = {19}
+  author  = {Aultman, Matthew and Auza-Gutierrez, Rodrigo and Disotell, Kevin and Duan, Lian},
+  title   = {Effects of Wheel Rotation on Long-Period Wake Dynamics of the DrivAer Fastback Model},
+  journal = {Fluids},
+  volume  = {7},
+  year    = {2022},
+  number  = {1},
+  pages   = {Article 19}
 }
 
 @article{Romani-2022,
@@ -2140,7 +2197,7 @@ numpages = {8}
 @inproceedings{Hou-2019,
   title     = {Lattice-Boltzmann and Navier-Stokes simulations of the partially dressed, cavity-closed nose landing gear benchmark case},
   author    = {Hou, Yu and Angland, David and Sengissen, Alois and Scotto, Aline},
-  booktitle = {25th AIAA/CEAS aeroacoustics conference},
+  booktitle = {25th AIAA/CEAS Aeroacoustics Conference},
   pages     = {2555},
   year      = {2019}
 }
@@ -2241,16 +2298,16 @@ numpages = {8}
 @inproceedings{Imre-2017,
   title     = {Efficient GPU-accelerated computation of isosurface similarity maps},
   author    = {Imre, Martin and Jun Tao and Chaoli Wang},
-  booktitle = {2017 IEEE Pacific Visualization Symposium},
+  booktitle = {2017 IEEE Pacific Visualization Symposium (PacificVis)},
   pages     = {180-184},
   year      = {2017}
 }
 
-@manual{redshift,
+@software{redshift,
   title  = {{Redshift renderer}},
   author = {{Maxon}},
   year   = {2023},
-  url = {https://www.redshift3d.com/product}
+  url    = {https://www.redshift3d.com/product}
 }
 
 @article{Tiwari-2020,
@@ -2265,7 +2322,7 @@ numpages = {8}
 
 @article{Geier-2017-b,
   title   = {Parametrization of the cumulant lattice Boltzmann method for fourth order accurate diffusion part II: Application to flow around a sphere at drag crisis},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {348},
   pages   = {889-898},
   year    = {2017},
@@ -2279,30 +2336,35 @@ numpages = {8}
   publisher = {The Parabolic Press}
 }
 
-@inbook{Heft-2011,
+@inproceedings{Heft-2011,
   author    = {Angelina Heft and Thomas Indinger and Nikolaus Adams},
   title     = {Investigation of Unsteady Flow Structures in the Wake of a Realistic Generic Car Model},
   booktitle = {29th AIAA Applied Aerodynamics Conference},
   chapter   = {},
   pages     = {},
+  location  = {Honolulu, Hawaii},
+  publisher = {American Institute of Aeronautics and Astronautics},
   year      = {2011}
 }
 
 @inproceedings{Heft-2012,
-  author       = {Heft, Angelina I. and Indinger, Thomas and Adams, Nikolaus A.},
-  title        = {{Experimental and Numerical Investigation of the DrivAer Model}},
-  volume       = {Volume 1: Symposia, Parts A and B},
-  series       = {Fluids Engineering Division Summer Meeting},
-  pages        = {41-51},
-  year         = {2012},
-  organization = {American Society of Mechanical Engineers}
+  author = {Heft, Angelina I. and Indinger, Thomas and Adams, Nikolaus A.},
+  title  = {Experimental and Numerical Investigation of the DrivAer Model},
+  volume = {1: Symposia, Parts A and B},
+  series = {Fluids Engineering Division Summer Meeting},
+  pages  = {41-51},
+  year   = {2012},
+  month  = {07}
 }
-
-@techreport{Heft-2012b,
-  title       = {Introduction of a new realistic generic car model for aerodynamic investigations},
-  author      = {Heft, Angelina I and Indinger, Thomas and Adams, Nikolaus A},
-  year        = {2012},
-  institution = {SAE Technical Paper}
+    
+@inproceedings{Heft-2012b,
+  author    = {Heft, Angelina I. and Indinger, Thomas and Adams, Nikolaus A.},
+  title     = {Introduction of a New Realistic Generic Car Model for Aerodynamic Investigations},
+  booktitle = {SAE 2012 World Congress & Exhibition},
+  publisher = {SAE International},
+  month     = {apr},
+  year      = {2012},
+  issn      = {0148-7191}
 }
 
 @manual{powerflow,
@@ -2310,45 +2372,46 @@ numpages = {8}
   author       = {{Exa/3DS}},
   year         = {2023},
   organization = {Dassault Syst\`emes},
-  url = {https://www.3ds.com/products-services/simulia/products/powerflow/}
+  url          = {https://www.3ds.com/products-services/simulia/products/powerflow/}
 }
 
 @article{James-2018,
-  title     = {Development and Initial Testing of a Full-Scale DrivAer Generic Realistic Wind Tunnel Correlation and Calibration Model.},
-  author    = {James, Taryn and Lewington, Neil and Krueger, Lothar and Lentzen, Manfred and Chalupa, Karel and Hupertz, Burkhard and Woodiga, Sudesh},
-  journal   = {SAE Int. J. Passenger Cars-Mechanical Systems},
-  volume    = {11},
-  number    = {5},
-  pages     = {353--368},
-  year      = {2018},
-  publisher = {SAE International}
+author={James, Taryn and Krueger, Lothar and Lentzen, Manfred and Woodiga, Sudesh and Chalupa, Karel and Hupertz, Burkhard and Lewington, Neil},
+title={Development and Initial Testing of a Full-Scale DrivAer Generic Realistic Wind Tunnel Correlation and Calibration Model},
+journal={SAE International Journal of Passenger Cars - Mechanical Systems},
+volume={11},
+number={5},
+pages={353--367},
+month={apr},
+year={2018},
+issn={1946-3995}
 }
 
 @article{Wei:2022,
-  author    = {Li, Wei and Ma, Yihui and Liu, Xiaopei and Desbrun, Mathieu},
-  title     = {Efficient Kinetic Simulation of Two-Phase Flows},
-  year      = {2022},
-  volume    = {41},
-  number    = {4},
-  journal   = TOG,
-  articleno = {114},
-  numpages  = {17}
+  author   = {Li, Wei and Ma, Yihui and Liu, Xiaopei and Desbrun, Mathieu},
+  title    = {Efficient Kinetic Simulation of Two-Phase Flows},
+  year     = {2022},
+  volume   = {41},
+  number   = {4},
+  journal  = TOG,
+  pages    = {Article 114},
+  numpages = {17}
 }
 
 @article{Wei:2023,
-  author    = {Li, Wei and Desbrun, Mathieu},
-  title     = {Fluid-Solid Coupling in Kinetic Two-Phase Flow Simulation},
-  year      = {2023},
-  volume    = {42},
-  number    = {4},
-  journal   = TOG,
-  articleno = {XXX}
+  author  = {Li, Wei and Desbrun, Mathieu},
+  title   = {Fluid-Solid Coupling in Kinetic Two-Phase Flow Simulation},
+  year    = {2023},
+  volume  = {42},
+  number  = {4},
+  journal = TOG,
+  pages   = {Article 123}
 }
 
 @article{xu2006immersed,
   title     = {An immersed interface method for simulating the interaction of a fluid with moving boundaries},
   author    = {Xu, Sheng and Wang, Z Jane},
-  journal   = {Journal of Computational Physics},
+  journal   = JCP,
   volume    = {216},
   number    = {2},
   pages     = {454--493},
@@ -2413,7 +2476,7 @@ numpages = {8}
   publisher = {Association for Computing Machinery},
   address   = {New York, NY, USA},
   booktitle = {ACM SIGGRAPH 2016 Courses},
-  articleno = {22},
+  pages     = {Article 22},
   numpages  = {8},
   location  = {Anaheim, California},
   series    = {SIGGRAPH '16}
@@ -2423,7 +2486,7 @@ numpages = {8}
   author    = {De Rosis, Alessandro},
   journal   = PRE,
   volume    = {95},
-  issue     = {1},
+  number    = {1},
   pages     = {013310},
   numpages  = {16},
   year      = {2017},
@@ -2436,7 +2499,7 @@ numpages = {8}
   author    = {Saito, Shimpei and Abe, Yutaka and Koyama, Kazuya},
   journal   = PRE,
   volume    = {96},
-  issue     = {1},
+  number    = {1},
   pages     = {013317},
   numpages  = {18},
   year      = {2017},
@@ -2456,11 +2519,11 @@ numpages = {8}
   issn       = {0730-0301},
   journal    = TOG,
   month      = {jul},
-  articleno  = {27},
+  pages      = {Article 27},
   numpages   = {22}
 }
 
-@inbook{doi:10.2514/6.2008-2816,
+@inproceedings{doi:10.2514/6.2008-2816,
   author    = {Eric Manoha and Jean Bulté and Bastien Caruelle},
   title     = {Lagoon : An Experimental Database for the Validation of CFD/CAA Methods for Landing Gear Noise Prediction},
   booktitle = {14th AIAA/CEAS Aeroacoustics Conference (29th AIAA Aeroacoustics Conference)},
@@ -2469,7 +2532,7 @@ numpages = {8}
   year      = {2008}
 }
 
-@inbook{doi:10.2514/6.2009-3277,
+@inproceedings{doi:10.2514/6.2009-3277,
   author    = {Eric Manoha and Jean Bulte and Vlad Ciobaca and Bastien Caruelle},
   title     = {LAGOON: Further Analysis of Aerodynamic Experiments and Early Aeroacoustics Results},
   booktitle = {15th AIAA/CEAS Aeroacoustics Conference (30th AIAA Aeroacoustics Conference)},
@@ -2481,7 +2544,7 @@ numpages = {8}
 @inproceedings{deltransient,
   title     = {Transient Fluid Structure Simulation of Ground Vehicles},
   author    = {Del Pin, Facundo and {\c{C}}aldichoury, I{\~n}aki and Paz, Rodrigo R and Huang, Chien-Jung},
-  booktitle = {16th international LS-DYNA users conference},
+  booktitle = {16th International LS-DYNA Users Conference},
   year      = {2020}
 }
 
@@ -2546,7 +2609,7 @@ numpages = {8}
   author    = {McNamara, Guy R. and Zanetti, Gianluigi},
   journal   = {Phys. Rev. Lett.},
   volume    = {61},
-  issue     = {20},
+  number    = {20},
   pages     = {2332--2335},
   numpages  = {0},
   year      = {1988},
@@ -2568,18 +2631,24 @@ numpages = {8}
 @article{doi:10.1098/rsta.1969.0031,
   author  = {Ffowcs Williams, J. E.  and Hawkings, D. L.  and Lighthill, Michael James },
   title   = {Sound generation by turbulence and surfaces in arbitrary motion},
-  journal = {Philosophical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences},
+  journal = {Philosophical Transactions of the Royal Society A},
   volume  = {264},
   number  = {1151},
   pages   = {321-342},
   year    = {1969}
 }
 
-@misc{hardin1993computational,
-  title     = {Computational Aeroacoustics, ICASE/NASASeries},
-  author    = {Hardin, Jay C and Hussaini, M Yousuff},
+@inproceedings{hardin1993computational,
+  author    = {Lighthill, James},
+  editor    = {Hardin, Jay C.
+               and Hussaini, M. Y.},
+  title     = {The Final Panel Discussion},
+  booktitle = {Computational Aeroacoustics},
   year      = {1993},
-  publisher = {Springer}
+  publisher = {Springer New York},
+  address   = {New York, NY},
+  pages     = {499--513},
+  isbn      = {978-1-4613-8342-0}
 }
 
 @inproceedings{10.1145/3214745.3214778,
@@ -2590,7 +2659,7 @@ numpages = {8}
   publisher = {Association for Computing Machinery},
   address   = {New York, NY, USA},
   booktitle = {ACM SIGGRAPH 2018 Talks},
-  articleno = {76},
+  pages     = {Article 76},
   numpages  = {2},
   location  = {Vancouver, British Columbia, Canada},
   series    = {SIGGRAPH '18}
@@ -2614,7 +2683,7 @@ numpages = {8}
   journal = {计算机辅助设计与图形学学报},
   volume  = {25},
   number  = {03},
-  pages  = {312-321},
+  pages   = {312-321},
   year    = {2013},
   issn    = {1003-9775}
 }
@@ -2653,7 +2722,7 @@ numpages = {8}
   publisher = {Association for Computing Machinery},
   address   = {New York, NY, USA},
   booktitle = {ACM SIGGRAPH 2010 Papers},
-  articleno = {48},
+  pages     = {Article 48},
   numpages  = {10},
   location  = {Los Angeles, California},
   series    = {SIGGRAPH '10}
@@ -2671,7 +2740,7 @@ numpages = {8}
   issn       = {0730-0301},
   journal    = TOG,
   month      = {nov},
-  articleno  = {199},
+  pages      = {Article 199},
   numpages   = {9}
 }
 
@@ -2715,12 +2784,11 @@ numpages = {8}
   pages   = {289-302}
 }
 
-@inbook{doi:10.2514/6.2009-3395,
+@inproceedings{doi:10.2514/6.2009-3395,
   author    = {Guillaume Brès and Franck Pérot and David Freed},
   title     = {Properties of the Lattice Boltzmann Method for Acoustics},
   booktitle = {15th AIAA/CEAS Aeroacoustics Conference (30th AIAA Aeroacoustics Conference)},
-  chapter   = {},
-  pages     = {},
+  pages     = {3395},
   year      = {2009}
 }
 
@@ -2765,7 +2833,7 @@ numpages = {8}
   author    = {Lehmann, Moritz and Krause, Mathias J. and Amati, Giorgio and Sega, Marcello and Harting, Jens and Gekle, Stephan},
   journal   = PRE,
   volume    = {106},
-  issue     = {1},
+  number    = {1},
   pages     = {015308},
   numpages  = {28},
   year      = {2022},
@@ -2778,7 +2846,7 @@ numpages = {8}
   author    = {Bridson, Robert},
   year      = {2015},
   publisher = {CRC press},
-  edition   = {Second}
+  edition   = {2nd ed}
 }
 
 @inbook{doi:10.2514/6.2013-2256,
@@ -2801,7 +2869,7 @@ numpages = {8}
 
 @article{ASTOUL2020109645,
   title   = {Analysis and reduction of spurious noise generated at grid refinement interfaces with the lattice Boltzmann method},
-  journal = {Journal of Computational Physics},
+  journal = JCP,
   volume  = {418},
   pages   = {109645},
   year    = {2020},
@@ -2822,76 +2890,78 @@ numpages = {8}
 }
 
 @article{THORIMBERT2022101864,
-title = {Local mesh refinement sensor for the lattice Boltzmann method},
-journal = {Journal of Computational Science},
-volume = {64},
-pages = {101864},
-year = {2022},
-issn = {1877-7503},
-author = {Y. Thorimbert and D. Lagrava and O. Malaspinas and B. Chopard and C. Coreixas and J. {de Santana Neto} and R. Deiterding and J. Latt},
+  title   = {Local mesh refinement sensor for the lattice Boltzmann method},
+  journal = {Journal of Computational Science},
+  volume  = {64},
+  pages   = {101864},
+  year    = {2022},
+  issn    = {1877-7503},
+  author  = {Y. Thorimbert and D. Lagrava and O. Malaspinas and B. Chopard and C. Coreixas and J. {de Santana Neto} and R. Deiterding and J. Latt}
 }
 
 @article{tao-2018,
-  title={A distribution function correction-based immersed boundary-lattice {B}oltzmann method with truly second-order accuracy for fluid-solid flows},
-  author={Tao, Shi and He, Qing and Chen, Baiman and Huang, Simin},
-  journal={arXiv preprint arXiv:1803.09380},
-  year={2018}
+  title   = {A distribution function correction-based immersed boundary-lattice {B}oltzmann method with truly second-order accuracy for fluid-solid flows},
+  author  = {Tao, Shi and He, Qing and Chen, Baiman and Huang, Simin},
+  journal = {arXiv preprint arXiv:1803.09380},
+  year    = {2018}
 }
 
 @article{zhang2016accuracy,
-  title={Accuracy improvement of the immersed boundary--lattice {B}oltzmann coupling scheme by iterative force correction},
-  author={Zhang, Chunze and Cheng, Yongguang and Zhu, Luoding and Wu, Jiayang},
-  journal={Computers \& Fluids},
-  volume={124},
-  pages={246--260},
-  year={2016},
+  title   = {Accuracy improvement of the immersed boundary--lattice {B}oltzmann coupling scheme by iterative force correction},
+  author  = {Zhang, Chunze and Cheng, Yongguang and Zhu, Luoding and Wu, Jiayang},
+  journal = {Computers \& Fluids},
+  volume  = {124},
+  pages   = {246--260},
+  year    = {2016}
 }
 
 @article{seo-2011sharp,
-	title={A sharp-interface immersed boundary method with improved mass conservation and reduced spurious pressure oscillations},
-	author={Seo, Jung Hee and Mittal, Rajat},
-	journal={Journal of Computational Physics},
-	volume={230},
-	number={19},
-	pages={7347--7363},
-	year={2011},
-	publisher={Elsevier}
+  title     = {A sharp-interface immersed boundary method with improved mass conservation and reduced spurious pressure oscillations},
+  author    = {Seo, Jung Hee and Mittal, Rajat},
+  journal   = JCP,
+  volume    = {230},
+  number    = {19},
+  pages     = {7347--7363},
+  year      = {2011},
+  publisher = {Elsevier}
 }
 
-@Article{B918055A,
-author ="Kobel, Stefan and Valero, Ana and Latt, Jonas and Renaud, Philippe and Lutolf, Matthias",
-title  ="Optimization of microfluidic single cell trapping for long-term on-chip culture",
-journal  ="Lab Chip",
-year  ="2010",
-volume  ="10",
-issue  ="7",
-pages  ="857-863",
-publisher  ="The Royal Society of Chemistry"
+@article{B918055A,
+  author    = {Kobel, Stefan and Valero, Ana and Latt, Jonas and Renaud, Philippe and Lutolf, Matthias},
+  title     = {Optimization of microfluidic single cell trapping for long-term on-chip culture},
+  journal   = {Lab Chip},
+  year      = {2010},
+  volume    = {10},
+  number    = {7},
+  pages     = {857-863},
+  publisher = {The Royal Society of Chemistry}
 }
 
 @article{doi:10.1142/S0129183113400081,
-author = {PARMIGIANI, ANDREA and LATT, JONAS and BEGACEM, MOHAMED BEN and CHOPARD, BASTIEN},
-title = {A LATTICE BOLTZMANN SIMULATION OF THE RHONE RIVER},
-journal = {International Journal of Modern Physics C},
-volume = {24},
-number = {12},
-pages = {1340008},
-year = {2013}
+  author  = {PARMIGIANI, ANDREA and LATT, JONAS and BEGACEM, MOHAMED BEN and CHOPARD, BASTIEN},
+  title   = {A LATTICE BOLTZMANN SIMULATION OF THE RHONE RIVER},
+  journal = {International Journal of Modern Physics C},
+  volume  = {24},
+  number  = {12},
+  pages   = {1340008},
+  year    = {2013}
 }
 
 @inproceedings{coreixas2015round,
-  title={Round cavity noise simulations using lattice-Boltzmann solver},
-  author={Coreixas, Christophe},
-  booktitle={11th PEGASUS-AIAA Student Conference},
-  year={2015}
+  title     = {Round Cavity Noise Simulations using Lattice-Boltzmann Solver},
+  author    = {Coreixas, Christophe},
+  booktitle = {11th PEGASUS-AIAA Student Conference},
+  year      = {2015},
+  publisher = {American Institute of Aeronautics and Astronautics},
+  location  = {Salon de Provence, France}
 }
 
 @article{doi:10.1142/S0218127492000641,
-author = {Cartwright, Julyan H. E. and Piro, Oreste},
-title = {The Dynamics of Runge-Kutta Methods},
-journal = {International Journal of Bifurcation and Chaos},
-volume = {02},
-number = {03},
-pages = {427-449},
-year = {1992}
+  author  = {Cartwright, Julyan H. E. and Piro, Oreste},
+  title   = {The Dynamics of Runge-Kutta Methods},
+  journal = {International Journal of Bifurcation and Chaos},
+  volume  = {02},
+  number  = {03},
+  pages   = {427-449},
+  year    = {1992}
 }

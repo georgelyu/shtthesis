@@ -62,7 +62,7 @@
     f_{i}(\mathbf{x}+\mathbf{c}_i \Delta t,t+\Delta t)=f_{i}(\mathbf{x},t)-\tilde{\omega}(f_{i}(\mathbf{x},t)-f_{i}^{eq}(\mathbf{x},t)).
     \label{eq:LBM_in_one_BGK}
 \end{equation}
-公式~\ref{eq:LBM_in_one_BGK} 中，所有的分布函数都以相同的速率向平衡态松弛，虽然这样非常地简洁高效，但是这种方法没有考虑对于分布函数中有物理意义和没有物理意义的部分是否需要分开处理。之后~\citet{d1992generalized} 证明散射矩阵$\mathbf{A}$可以由一组特征基得到，这为多松弛时间模型的出现奠定了基础。
+公式~\ref{eq:LBM_in_one_BGK} 中，所有的分布函数都以相同的速率向平衡态松弛，虽然这样非常地简洁高效，但是这种方法没有考虑对于分布函数中有物理意义和没有物理意义的部分是否需要分开处理。之后~\citet{dHumieres-1992} 证明散射矩阵$\mathbf{A}$可以由一组特征基得到，这为多松弛时间模型的出现奠定了基础。
 
 这种对碰撞本身的效果建模，而不是对微观过程建模的想法，最早可见于连续玻尔兹曼方程中的BGK碰撞模型~\citep{Bhatnagar-1954}。这个想法背后的动机是碰撞过程的大部分细节并不会对宏观量产生影响，所以可以将这些过程省略。除了质量与动量守恒之外，BGK模型还满足$\mathrm{H}$-定理 (H-theorem)，即分布函数会向平衡态趋近。基于BGK的LBM也是最简洁、最常见的LBM模型。
 

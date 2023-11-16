@@ -38,6 +38,7 @@
 我们将在下面依次介绍这四部分内容。
 
 \subsection{累积量碰撞模型的高阶松弛系数优化}
+\label{sec:collision_sig23}
 在碰撞过程中，高阶松弛系数对仿真 (尤其是湍流仿真) 有着很大的影响，但在累积量模型中，4阶及更高阶的松弛系数并没有有效的约束。一个自然的想法是将现有的一些高阶松弛系数优化方法引入累积量模型，从而进一步提升其精度与稳定性。我们在第~\ref{sec:background_acmmrt} 节中讨论了一些典型的高阶松弛系数优化的方法，但是由于累积量模型的空间变换是非线性的，我们无法直接应用~\citep{Li-2020} 中的回归方法，或~\citep{Kramer-2019} 中的熵优化方法。所以在本节中，我们通过一定的推导，将~\citep{Kramer-2019} 中的熵优化方法推广至累积量碰撞模型中。下面我们介绍推导过程。
 
 % 首先，我们先介绍熵优化的基本思想。分布函数的平衡态$f^\text{eq}_i$可以使熵函数$H(f_i)$取得最大值 (在密度、动量保持不变的前提下)。该熵函数$H(f_i)$定义为
@@ -121,6 +122,7 @@
   \end{figure}
 
 \subsection{单点插值反弹边界处理}
+\label{sec:sig23_boundary}
 \paragraph{静态边界处理}
 在虚拟风洞的绝大多数情况中，目的都是对某个物体进行气动的性能测试。所以在虚拟风洞的应用中，边界处理的重要性是不言而喻的。
 我们在第~\ref{sec:boundary_treatment} 节中已经讨论了简单反弹边界和插值反弹边界的形式。其中简单反弹边界虽然构造形式非常简单，但是在边界形状复杂时，一般只有一阶精度。从而在计算固体受力时，误差及波动是非常剧烈的 (见图~\ref{img:bnd_comp} 中展示的风在高雷诺数下吹过球时，球的阻力系数$C_\text{d}$变化)。
@@ -264,6 +266,44 @@ f_i(\bm{x}_b, t\!+\!1) &= f^\text{eq}_i(\bm{x}_b, t\!+\!1) + f^\text{neq}_{i}(\b
 在LBM中，分布函数的迁移是必须要访问邻接点的。而GPU中数据的访问顺序又直接影响显存的数据吞吐量，进而影响计算效率。所以设计一定的数据布局以适应LBM的访问对LBM的效率也有很大影响 (尤其是在多分辨率网格中)。
 首先整体上，我们依然使用~\citep{Chen-2021} 中的数组结构体结构。一个需要注意的点是，我们构建出的网格中，有效流体点并不一定连续，所以我们需要一个紧凑且GPU友好的数据结构来存储有效流体点的索引。然而在我们的测试中，完美空间哈希 (perfect spatial hashing)~\citep{Lefebvre-2006} 或用于稀疏矩阵的紧凑存储结构~\citep{Greathouse-2014} 表现均不够好。在测试中两者均会增加显存读取频率并使数据访问更不连续，造成计算效率下降。使用针对不规则数据的z-排序 (z-ordering) 结构~\citep{Chen-2021} 也并没有获得预期的性能提升。
 所以，为了实现简单，我们生成了一个简单的索引映射 (index map)，即以x-y-z顺序，直接在一个线性数组中记录所有流体点的显存索引。这样的数据布局与~\citep{Chen-2021} 中的基于块的存储方法的性能接近，但实现会简单很快。我们认为多分辨率LBM网格的数据布局也是未来可以改进的方向之一。
+
+至此，我们完成了对整体仿真方法的介绍，方法的概览可见算法~\ref{alg:alg_sec4}。
+
+\begin{algorithm}[!p]
+  \vspace*{2.5mm}
+  \SetKwInput{KwIn}{输入}
+	\SetKwComment{Comment}{$\triangleright$\ }{}
+  \KwIn{总仿真时间$T$}
+	$t \gets 0$\;
+	\SetKwBlock{Init}{初始化}{}
+	\SetKwBlock{Col}{碰撞}{}
+	\SetKwBlock{Stream}{迁移}{}
+	\SetKwBlock{Post}{后处理}{end}
+	\Init{
+		多分辨率网格构建\Comment*[r]{第~\ref{sec:multi-res} 节}
+		对速度方向与物体求交\Comment*[r]{第~\ref{sec:sig23_alg_optimal} 节}
+		初始化$\rho$, $\bm{u}$与$f_i$;
+	}
+	\While{$t < T$}{
+		\Col{
+			将$\bm{f}$映射至$\bm{k}$\Comment*[r]{\cite{Geier-2017}}
+			计算松弛后的$\bm{k}^*$\Comment*[r]{第~\ref{sec:collision_sig23} 节}
+      将$\bm{k}^*$映射至$\bm{f}$\Comment*[r]{\cite{Geier-2017}}
+		}
+		\Stream{
+			\Switch{速度方向类型}{
+				\uCase{切削网格方向}{边界处理\Comment*[r]{第~\ref{sec:sig23_boundary} 节}}
+				\uCase{地面方向}{地面处理\Comment*[r]{第~\ref{sec:sig23_boundary} 节}}
+				\Other{正常迁移\Comment*[r]{公式~\ref{eq:LBM_streaming_in_one}}}
+			}
+		}
+		\Post{
+			计算固体受力\Comment*[r]{第~\ref{sec:sig23_boundary} 节}
+		}
+	}
+	\BlankLine
+	\caption{使用新的单点插值反弹边界处理与熵优化累积量碰撞模型的多分辨率流体仿真方法}\label{alg:alg_sec4}
+\end{algorithm}
 
 \section{与现有方法的对比}
 \label{sec:4_comp}

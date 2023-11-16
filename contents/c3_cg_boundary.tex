@@ -46,9 +46,11 @@
 我们将在下面依次介绍这三部分内容。
 
 \subsection{双面简单反弹边界}
+\label{sec:DBB}
 在第~\ref{sec:boundary_treatment} 节中，我们回顾了简单反弹边界方法。一般来说，反弹边界都只应用于流体点。然而随着物体的运动，流体点可能被固体覆盖成为固体点，固体点也可能重新变为流体点。这个转换过程不止需要追踪格点状态，并且需要进行速度的插值，甚至外插，来完成格点的重建。这样会在高雷诺数下在固体边界上产生很强的耗散误差。为了避免这一现象，我们对所有切削网格内的点都进行分布函数反弹，而不只针对流体点。我们称该方法为双面简单反弹边界方法。这样的话，我们就不再需要区分固体点和流体点，并进行相关的格点追踪与重建。该方法依旧可以避免流体泄露，即使有亚网格物体存在。但这并没有改善固体边界的速度锯齿现象与大速度梯度造成的误差，所以我们引入下一节中介绍的速度修正方法。
 
 \subsection{切削网格的速度修正}
+\label{sec:VelocityCorrection}
 我们期望获得一个速度的修正，那么势必我们需求一个理想的速度的分布，即我们认为正确的速度分布是什么样子。因为我们在这里主要考虑如何高效、灵活地处理复杂几何，而不是纯粹地追求精度，在平衡精度、效率与实现的难易度后，我们在这里谋求一个一阶 (线性) 精度的边界处理。我们注意到简单反弹边界本身也是一阶精度的，这也是我们没有采用更高阶的插值反弹边界的原因。我们在后面也通过一系列的结果展示，这一方案在实现较为简洁的前提下，对于如视觉动画制作这样的应用已经足够。我们在第~\ref{chap:sig23} 章中会介绍更高阶精度的边界处理方法，以进一步扩展我们的方法的应用范围。
 
 当我们确立出发点为谋求线性精度的边界处理后，我们提出在双面简单反弹边界之后，通过沿固体边界的法向方向对速度线性插值，来对速度场进行修正。修正的方式为对流场施加惩罚力。更具体地说，我们先通过切削网格点周围的固体和流体速度线性插值，得到一个切削网格点上的期望速度。之后通过当前速度与期望速度的差计算惩罚力，从而修正速度场。
@@ -93,6 +95,7 @@
 我们的惩罚力修正是基于法向方向的线性速度插值。这个修正在比较抽象的层面可以被认为是一个滤波器，来压制在高雷诺数下，简单反弹边界造成的固体边界周围的速度震荡。这个修正可以有效地提升在湍流流固耦合仿真的稳定性，使得我们在相对粗糙的网格中也能获得视觉上可信的仿真结果。然而，这依然只是一个一阶的线性修正，所以要获得高物理精度的仿真需要高分辨率网格作为基础。但考虑到我们的动机是灵活、高效地求解复杂几何物体，我们不考虑在构造更加复杂的速度修正方法。
 
 \subsection{固体受力}
+\label{sec:solid_force}
 因为要做到流固的双向耦合，我们需要讨论流体中固体的受力，也即流体传递给固体的动量。我们在边界中使用了反弹边界与速度修正的结合，所以我们在讨论固体受力时也分为两部分来讨论。我们首先讨论双面反弹边界对固体受力的贡献。在双面反弹边界之后，我们先将由公式~\ref{eq:bounce-back} 带来的动量交换进行累计。更具体地说，迁移过程后，$t$时刻$\bm{x}$点的动量可以表达为
 \begin{equation}
   \bm{p}(\bm{x}) = \sum_{i \in L}\bm{c}_if^*_i(\bm{x},t).
@@ -134,6 +137,7 @@
 
 \section{算法优化}
 \subsection{几何近似}
+\label{sec:EGC}
 我们的混合边界处理中需要许多的几何计算，如将流体点投影至固体表面，或将速度方向与固体边界进行求交等。我们还需要识别切削网格点，以及它们的状态 (属于流体区域或固体区域)。许多工作阐述了如何准确地进行这样的几何计算~\citep{Azevedo-2016,Robinson:2009}。但由于固体边界的形状可能十分复杂，这一过程可能非常耗时，不利于维持LBM高并行度的优势。
 为了在效率与精度间取得平衡，我们提出一系列的几何近似计算方法，以在不影响视觉可信度的情况下提升计算效率。
 
@@ -179,6 +183,31 @@
   \bicaption[二维泰勒-库埃特流]{二维泰勒-库埃特流。左图：两个以$\bm{O}$点为圆心的同心圆，半径分别为$r_1$、$r_2$，角速度为$\Omega_1$、$\Omega_2$，通过旋转在中间的圆环中形成泰勒-库埃特流。右图：二维泰勒-库埃特流的解析解速度场模值的可视化。}{2D Taylor-Couette flow. Left: the Taylor-Couette flow runs between two concentric circle boundaries locating at origin $\bm{O}$ with radii $r_1$ and $r_2$ whose rotating speeds are $\Omega_1$ and $\Omega_2$, respectively. Right: visualization of velocity magnitudes of the analytical solution between two rotating circles.}
   \label{img:taylor-couette-setting-2d}
 \end{figure}
+
+至此，我们完成了对整体边界处理方法部分的介绍，整体方法的概览可见算法~\ref{alg:alg_sec3}。
+
+\begin{algorithm}[!htb]
+  \vspace*{2.5mm}
+  \SetKwInput{KwIn}{输入}
+	\SetKwComment{Comment}{$\triangleright$\ }{}
+  \KwIn{总仿真时间$T$}
+	$t \gets 0$\;
+	\While{$t < T$}
+	{
+		切削网格识别\Comment*[r]{第~\ref{sec:EGC} 节}
+		计算切削网格投影点\Comment*[r]{第~\ref{sec:EGC} 节}
+		迁移\Comment*[r]{公式~\ref{eq:LBM_streaming_in_one}}
+		反弹边界处理\Comment*[r]{第~\ref{sec:DBB} 节与第~\ref{sec:EGC} 节}
+		更新流体宏观量\Comment*[r]{公式~\ref{eq:rho_u}}
+		计算速度修正\Comment*[r]{第~\ref{sec:VelocityCorrection} 节}
+		碰撞\Comment*[r]{第~\ref{sec:background_mrt} 节}
+		计算固体受力\Comment*[r]{第~\ref{sec:solid_force} 节}
+		$t \gets t + \Delta t$\;
+	}
+	\BlankLine
+	\caption{可处理通用复杂几何的混合边界处理方法}
+  \label{alg:alg_sec3}
+\end{algorithm}
 
 \section{与现有方法的对比}
 \label{sec:siga21_comp}

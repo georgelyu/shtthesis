@@ -1,7 +1,7 @@
 \chapter{仿真结果与验证}
 \label{chap:results}
 
-在本章中，我们展示我们的流体仿真方法在不同领域中的应用。其中，通过第~\ref{chap:siga21} 章中的方法得到的结果均于一个14核Intel CPU、128 GB内存、NVIDIA RTX 3090的工作站上仿真获得；通过第~\ref{chap:sig23} 章中的方法得到的结果均于一个20核Intel CPU、128 GB内存、NVIDIA A100 GPU的工作站上仿真获得。
+在本章中，我们展示我们的流体仿真方法在不同领域中的应用。其中，通过第~\ref{chap:siga21} 章中的方法得到的结果均于一个14核Intel CPU、128 GB内存、NVIDIA RTX 3090的工作站上仿真获得；通过第~\ref{chap:sig23} 章中的方法得到的结果均于一个20核Intel CPU、128 GB内存、NVIDIA A100 GPU的工作站上仿真获得。本章中所有仿真的参数及性能总结可见本章末尾的表~\ref{tab:parameter-time}。
 
 \section{面向视觉动画的仿真结果}
 下面我们首先展示一系列面向视觉动画的仿真结果。首先使用第~\ref{chap:siga21} 章描述的方法，我们对一系列的复杂几何进行单向与双向流固耦合仿真，以显示我们的方法处理不同类型物体的能力。我们还展示了一些可交互的仿真与离线的高分辨率大规模仿真，包括对一些实际物理现象的定性复现。
@@ -266,7 +266,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
 我们需提请注意的是，在该工作中，作者使用了没有后视镜的模型，而我们使用了带有后视镜的模型。此外作者没有提供任何数值修正相关的信息。
 这证明了在DrivAer测试中，我们在精度层面上与现有的工业软件是大致相当的。当然我们也认为我们需要与PowerFLOW与StarCCM+等软件进行更直接的对比，以更明确地确定我们的方法与现有工业软件的优劣。这些我们留在未来的工作中。
 
-\section{气动声学的仿真结果}
+\section{面向气动声学的仿真结果}
 我们接下来针对于气动声学，进行一些初步的实验，以展示我们的方法在这一领域的应用潜力。
 \subsection{平面波的传播仿真}
 平面波是三维空间中最简单的一种波。将某一时刻一个波振动相位相同的点连起来，我们可以得到一系列的同相面 (波阵面)，若我们得到的波阵面均为平面，且这些平面垂直于波的传播方向，我们称这样的波动为平面波 (见图~\ref{img:plane_wave})。我们先对平面波进行仿真，以测试我们的方法对基础声波仿真的能力。在没有物体存在下平面波的传播相对较为简单，且已经被许多工作验证在LBM下该现象可以被准确捕捉~\cite{doi:10.2514/6.2009-3395, viggen2009lattice}。所以我们这里验证在有物体散射时的平面波，具体地来说，我们考虑一个刚性的单位球 (半径$r=1$ $m$的球) 在计算域中时的平面波传播仿真，以同时验证我们的边界处理精度。
@@ -361,3 +361,48 @@ The pressure field is color-mapped over the aircraft body surface, while passive
   \bicaption[LAGOON起落架轮胎采样点的功率谱密度]{LAGOON起落架轮胎采样点的功率谱密度。在右轮胎上的采样点K1 (a) 测得压力序列后进行信号分析，得到该点的功率谱密度 (b)。其中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 \textit{Hz}与1500 \textit{Hz}出现的声调，与实验相吻合。}{Power spectral density of a sample point on the LAGOON landing gear tire. We mearsure the pressure sequence from a sample point K1 on the right tire (a) and obtain its power spectral density via signal analysis (b). Blue curve shows our mearsurement and red curve shows the result from CEPRA19 wind tunnel testing~\citepen{doi:10.2514/6.2015-2993}. It demonstrates that we can successfully predict the tonal emergence at about 1000 \textit{Hz} and 1500 \textit{Hz}, which matches the experiment.}
   \label{img:landing_gear_frequency}
 \end{figure}
+
+\begin{sidewaystable}[!p]
+	\bicaption[仿真参数及性能统计表]{仿真参数及性能统计表。}{Statistics of simulation parameters and performance.}\vspace*{-4mm}
+	\begin{center}
+		\renewcommand{\arraystretch}{0.8}
+		%\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+		%\setlength{\tabcolsep}{0.8mm}{
+		\scalebox{0.87}
+		{
+			\begin{tabular}{lccccccccc}
+        \toprule
+				{案例} & {域大小} ($m^3$) & {网格数} & {最小$\Delta x$} & {黏度} ($\nu$) & {流体速度} & {GPU数量} & {网格构建时长} & {仿真$1s$用时} \\
+				\midrule
+				图~\ref{img:result-tube} (顶图)					& 0.5$\times$0.3$\times$0.5		& 1 				& 1.3 $mm$					& $4.4\!\times\!10^{-5}$	& 1.0 $m/s$			& 1					& - 					& 3.05 $min.$			\\
+				图~\ref{img:result-tube} (底图)					& 0.5$\times$0.3$\times$0.5		& 1 				& 1.3 $mm$					& $4.4\!\times\!10^{-7}$	& 1.0 $m/s$			& 1					& - 					& 3.05 $min.$			\\
+				图~\ref{img:result-thin-shell-sub-grid}			& 12$\times$4$\times$4			& 1 				& 2.5 $cm$					& $1.56\!\times\!10^{-5}$	& 20.0 $m/s$		& 1					& - 					& 1.42 $min.$			\\
+				图~\ref{img:result-blowing-leaves}				& 5$\times$6$\times$5			& 1 				& 2.0 $cm$					& $1.56\!\times\!10^{-5}$	& 20.0 $m/s$		& 1					& - 					& 2.29 $min.$			\\
+				图~\ref{img:result-rotating-torus}				& 0.7$\times$0.3$\times$0.7 	& 1 				& 2.0 $mm$					& $1.0\!\times\!10^{-6}$	& 1.0 $m/s$			& 1					& - 					& 1.07 $min.$			\\
+				图~\ref{img:result-thin-rod-sub-grid} (中图)	& 0.8$\times$0.2$\times$0.4		& 1 				& 2.0 $mm$					& $1.0\!\times\!10^{-6}$	& 1.0 $m/s$			& 1					& - 					& 0.70 $min.$			\\
+			 	图~\ref{img:result-thin-rod-sub-grid} (右图)	& 0.8$\times$0.2$\times$0.4		& 1 				& 2.0 $mm$					& $1.0\!\times\!10^{-6}$	& 1.0 $m/s$			& 1					& - 					& 0.73 $min.$			\\
+				图~\ref{img:result-wind-turbine}				& 0.8$\times$0.4$\times$0.4		& 1 				& 1.2 $mm$					& $1.0\!\times\!10^{-6}$	& 1.5 $m/s$			& 1					& - 					& 16.99 $min.$			\\
+				图~\ref{img:teaser_concorde}					& 0.8$\times$0.2$\times$0.3		& 1 				& 0.1 $mm$					& $1.0\!\times\!10^{-6}$	& 1.0 $m/s$			& 1					& - 					& 12.12 $min.$			\\
+				图~\ref{img:result-design}						& 0.4$\times$0.4$\times$0.4		& 1 				& 2.0 $mm$					& $1.0\!\times\!10^{-6}$	& 1.3 $m/s$			& 1					& - 					& 0.51 $min.$			\\
+				图~\ref{img:result-city}						& 0.8$\times$0.3$\times$0.5		& 1 				& 0.9 $mm$					& $1.0\!\times\!10^{-6}$	& 1.0 $m/s$			& 2					& - 					& 18.27 $min.$			\\
+				图~\ref{img:comparison_delta_wing}				& 0.8$\times$0.3$\times$0.4		& 1 				& 1.2 $mm$					& $5.0\!\times\!10^{-6}$	& 0.5 $m/s$			& 1					& - 					& 5.48 $min.$			\\
+				图~\ref{img:teaser_f1}            				& 15$\times$4$\times$6			& 5 				& 4.0 $mm$					& $2.0\!\times\!10^{-5}$	& 41.67 $m/s$		& 1					& 1.58 $min.$			& 27.59 $min.$			\\
+				图~\ref{img:vis_building}      					& 25$\times$8$\times$25			& 6 				& 5.0 $mm$					& $1.6\!\times\!10^{-4}$	& 10 $m/s$			& 1					& 2.82 $min.$			& 32.57 $min.$			\\
+				图~\ref{img:vis_plane}         					& 25$\times$12$\times$20		& 7 				& 3.75 $mm$					& $2.0\!\times\!10^{-5}$	& 55.56 $m/s$		& 2					& 15.70 $min.$			& 63.09 $min.$			\\
+				图~\ref{img:vis_pipe}          					& 7.84$\times$12$\times$4.96	& 5 				& 3.5 $mm$					& $1.6\!\times\!10^{-5}$	& 5 $m/s$			& 1					& 1.72 $min.$			& 8.80 $min.$			\\
+				图~\ref{img:golf_ball_vis} (a) 					& 17.6$\times$17.6$\times$17.6	& 6 				& 3.125 $mm$				& $1.6\!\times\!10^{-4}$	& 10 $m/s$			& 1					& 3.18 $min.$			& 31.53 $min.$			\\
+				图~\ref{img:golf_ball_vis} (b) 					& 17.6$\times$17.6$\times$17.6	& 6 				& 3.125 $mm$				& $1.6\!\times\!10^{-4}$	& 10 $m/s$			& 1					& 3.13 $min.$			& 30.01 $min.$			\\
+				DrivAer快背式 (无GS)        					& 40$\times$20$\times$16		& 7 				& 4.0 $mm$					& $1.57\!\times\!10^{-5}$	& 16 $m/s$			& 1					& 6.03 $min.$			& 49.29 $min.$			\\
+				DrivAer阶背式 (无GS)        					& 40$\times$20$\times$16		& 7 				& 4.0 $mm$					& $1.57\!\times\!10^{-5}$	& 16 $m/s$			& 1					& 7.43 $min.$			& 83.78 $min.$			\\
+				DrivAer方背式 (无GS)        					& 40$\times$20$\times$16		& 7 				& 4.0 $mm$					& $1.57\!\times\!10^{-5}$	& 16 $m/s$			& 1					& 7.27 $min.$			& 79.29 $min.$			\\
+				DrivAer快背式 (有GS)         					& 40$\times$20$\times$16		& 7 				& 4.0 $mm$					& $1.57\!\times\!10^{-5}$	& 16 $m/s$			& 1					& 5.93 $min.$			& 90.73 $min.$			\\
+				DrivAer阶背式 (有GS)         					& 40$\times$20$\times$16		& 7 				& 4.0 $mm$					& $1.57\!\times\!10^{-5}$	& 16 $m/s$			& 1					& 7.83 $min.$			& 126.40 $min.$			\\
+				DrivAer方背式 (有GS)         					& 40$\times$20$\times$16		& 7 				& 4.0 $mm$					& $1.57\!\times\!10^{-5}$	& 16 $m/s$			& 1					& 8.00 $min.$			& 120.73 $min.$			\\
+				图~\ref{img:plane_wave_result}          		& 1$\times$1$\times$1			& 1 				& 5 $mm$					& $1.48\!\times\!10^{-5}$	& 0 $m/s$			& 1					& -						& 6.46 $min.$			\\
+				LAGOON起落架			          				& 20$\times$20$\times$20		& 8 				& 1.25 $mm$					& $1.48\!\times\!10^{-5}$	& 78.99 $m/s$		& 1					& 7.62 $min.$			& 608.23 $min.$			\\
+        \bottomrule
+		\end{tabular}}
+	\end{center}
+	\vspace{-3.5mm}
+	\label{tab:parameter-time}
+\end{sidewaystable}

@@ -346,7 +346,7 @@ The pressure field is color-mapped over the aircraft body surface, while passive
   \label{img:landing_gear_q_criterion}
 \end{figure}
 
-我们接下来展示一些与声音更直接相关的可视化与数值结果。首先在图~\ref{img:landing_gear_divergence} 中我们展示起落架在$y=0$平面上的胀量场分布，以突出声波的分布。从图中我们可以看到两处很明显的声波扰动来源：一处是起落架轮胎的下部，一处是起落架撑杆的顶部。并且我们也可以看到在起落架撑杆的后方 (相对于来流方向)，有很强的湍流对流 (turbulent convection)。为了进一步定性分析，我们在起落架模型的右轮胎上取一个采样点 (见图~\ref{img:landing_gear_frequency} (a))，并测量该点的压力变化。之后使用加窗平均周期图法对压力序列进行处理以获得频谱，见过可见图~\ref{img:landing_gear_frequency} (b)。图中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 \textit{Hz}与1500 \textit{Hz}出现的声调，与实验相吻合。
+我们接下来展示一些与声音更直接相关的可视化与数值结果。首先在图~\ref{img:landing_gear_divergence} 中我们展示起落架在$y=0$平面上的胀量场分布，以突出声波的分布。从图中我们可以看到两处很明显的声波扰动来源：一处是起落架轮胎的下部，一处是起落架撑杆的顶部。并且我们也可以看到在起落架撑杆的后方 (相对于来流方向)，有很强的湍流对流 (turbulent convection)。为了进一步定性分析，我们在起落架模型的右轮胎上取一个采样点 (见图~\ref{img:landing_gear_frequency} (a))，并测量该点的压力变化。之后使用加窗平均周期图法对压力序列进行处理以获得频谱，见过可见图~\ref{img:landing_gear_frequency} (b)。图中蓝色线条为我们测得的结果，红色线条为CEPRA19风洞中的实际实验结果~\citep{doi:10.2514/6.2015-2993}。结果显示我们可以成功预测在约1000 \textit{Hz}与1500 \textit{Hz}出现的声调，与实验相吻合。我们注意到在2000 \textit{Hz}之后，频率的曲线开始与实验值出现偏差。这一问题主要来源于分辨率不足导致的数值误差~\citep{doi:10.2514/6.2015-2993}。
 
 \begin{figure}[!htbp]
   \centering

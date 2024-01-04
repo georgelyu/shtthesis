@@ -54,7 +54,7 @@ LBM的另一独特优势为，LBM对低速 (马赫数低于0.3) 的可压缩非�
 对于不可压缩的流体，典型的显式有限体积法必须与压力投影阶段相结合，以得到无旋的速度场~\citep{https://doi.org/10.1002/fld.310, pember1996higher}。为了提高稳定性，对速度和压力进行离散时，通常会使用交错网格。虽然在结构化网格中实现这一点并不难，但非结构网格中这依然有一定的挑战~\citep{herbin2012staggered, gao2012unstructured, bermudez1998upwind}。此外，也有工作提出了更高阶的有限体积方法，如k-exact有限体积方法~\citep{barth1990higher}与WENO有限体积方法~\citep{HU199997}等。
 
 \paragraph{有限元方法}
-有限元方法将仿真域离散为许多小区域 (即有限元)，每个单元可以看作是整个解的一个分段的近似。通过有限元方法求解偏微分方程通常先要将方程改写为弱形式，这个求解的方法称作伽辽金 (Galerkin) 方法。而因为其采用连续函数空间，使得每个单元之间无法完全独立，在求解时需要求解一个全局的庞大线性方程组，所需的计算消耗使得该方法并未在流体仿真领域得到广泛应用。而随后，间断伽辽金 (Discontinuous Galerki, DG) 方法被提出，最早其被用于求解中子运输方程~\citep{reed1973triangular}，与龙格-库塔 (Runge-Kutta) 方法结合后被推广并应用到双曲守恒律方程的求解中~\citep{cockburn2001runge, cockburn1990runge, cockburn1989tvb2, cockburn1989tvb3}。在此之后该方法也开始被应用于CFD领域~\citep{Zienkiewicz-2013, lomtev1999discontinuous, bassi1997high}。为了改进DG方法计算量大等缺点，无积分型 (quadrature-dree) DG~\citep{atkins1998quadrature}与节点型 (nodal) DG~\citep{hesthaven2007nodal}也被相应提出。
+有限元方法将仿真域离散为许多小区域 (即有限元)，每个单元可以看作是整个解的一个分段的近似。通过有限元方法求解偏微分方程通常先要将方程改写为弱形式，这个求解的方法称作伽辽金 (Galerkin) 方法。而因为其采用连续函数空间，使得每个单元之间无法完全独立，在求解时需要求解一个全局的庞大线性方程组，所需的计算消耗使得该方法并未在流体仿真领域得到广泛应用。而随后，间断伽辽金 (Discontinuous Galerkin, DG) 方法被提出，最早其被用于求解中子运输方程~\citep{reed1973triangular}，与龙格-库塔 (Runge-Kutta) 方法结合后被推广并应用到双曲守恒律方程的求解中~\citep{cockburn2001runge, cockburn1990runge, cockburn1989tvb2, cockburn1989tvb3}。在此之后该方法也开始被应用于CFD领域~\citep{Zienkiewicz-2013, lomtev1999discontinuous, bassi1997high}。为了改进DG方法计算量大等缺点，无积分型 (quadrature-free) DG~\citep{atkins1998quadrature}与节点型 (nodal) DG~\citep{hesthaven2007nodal}也被相应提出。
 
 % Sec 1.2.2
 \subsection{计算机图形学中的流体仿真方法}

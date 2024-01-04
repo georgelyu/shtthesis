@@ -211,7 +211,7 @@
 
 \section{与现有方法的对比}
 \label{sec:siga21_comp}
-此节中我们将我们的图形方法与图形学中近期提出的 (也是目前最前沿的) LBM仿真方法~\citep{Li-2020} 进行定量与定性的对比。我们还针对计算效率，讨论基于 \citet{Li-2020} 所提方法的性能改进~\citep{Chen-2021} 与我们方法的比较。
+此节中我们将我们提出的仿真方法与图形学中近期提出的 (也是目前最前沿的) LBM仿真方法~\citep{Li-2020} 进行定量与定性的对比。我们还针对计算效率，讨论基于 \citet{Li-2020} 所提方法的性能改进~\citep{Chen-2021} 与我们方法的比较。
 
 \begin{figure}[!tb]
   \centering
@@ -243,18 +243,18 @@ A = \frac{\Omega_2 r_2^2 - \Omega_1 r_1^2}{r_2^2 - r_1^2}, \hspace{4mm} B= \frac
 \begin{figure}[!tb]
   \centering
     \includegraphics[width=0.99\columnwidth]{figures/ns-compare-2d.png}
-  \bicaption[与二维N-S求解器的对比]{与二维N-S求解器的对比。我们仿真一个二维的薄板在流体中旋转的场景，仿真分辨率为$256\times256$。顶图：由基于切削网格方法的N-S求解器~\citep{Azevedo-2016} 得到的速度场模值；底图：我们的图形方法获得的速度场模值。(a)、(c) 与 (b)、(d) 分别从仿真中的同一帧截取。虽然两个仿真方法的结果都在视觉上可以接受，但是我们的方法有着更多涡流的细节，证明了我们的方法更适合于湍流的仿真场景。}{Comparison with 2D N-S solver. We simulated a 2D thin plate spinning in a fluid using a grid resolution of $256\times256$. Top: velocity magnitude plot from a cut-cell-based NS solver~\citepen{Azevedo-2016}; Bottom: velocity magnitude plot from our solver for the same frames as (a) and (b). Although both solvers retain good boundary velocities, ours produces much more detailed vortices, making it significantly more suitable for solving coupling in a turbulent flow scenario.}
+  \bicaption[与二维N-S求解器的对比]{与二维N-S求解器的对比。我们仿真一个二维的薄板在流体中旋转的场景，仿真分辨率为$256\times256$。顶图：由基于切削网格方法的N-S求解器~\citep{Azevedo-2016} 得到的速度场模值；底图：通过我们提出的仿真方法获得的速度场模值。(a)、(c) 与 (b)、(d) 分别从仿真中的同一帧截取。虽然两个仿真方法的结果都在视觉上可以接受，但是我们的方法有着更多涡流的细节，证明了我们的方法更适合于湍流的仿真场景。}{Comparison with 2D N-S solver. We simulated a 2D thin plate spinning in a fluid using a grid resolution of $256\times256$. Top: velocity magnitude plot from a cut-cell-based NS solver~\citepen{Azevedo-2016}; Bottom: velocity magnitude plot from our solver for the same frames as (a) and (b). Although both solvers retain good boundary velocities, ours produces much more detailed vortices, making it significantly more suitable for solving coupling in a turbulent flow scenario.}
   \label{img:cut-cell-based-NS-solver}
 \end{figure}
 
-我们使用了不同的求解器，对该边界驱动的流体进行求解，求解器分别为 (a) 使用原始简单反弹边界~\citep{Ladd-1994} 的动理学方法、(b) DI-IBM~\citep{Li-2020}、(c) 我们的图形方法与 (d) 使用N-S方法的商业求解器ANSYS Fluent~\citep{Ansys-2014}。在使用ANSYS Fluent求解时，我们采用了自适应的体网格，平均元素大小与其它求解器中的网格大小相当。由于其使用的是贴体网格，ANSYS Fluent的误差应该会更小。
+我们使用了不同的求解器，对该边界驱动的流体进行求解，求解器分别为 (a) 使用原始简单反弹边界~\citep{Ladd-1994} 的动理学方法、(b) DI-IBM~\citep{Li-2020}、(c) 我们的方法与 (d) 使用N-S方法的商业求解器ANSYS Fluent~\citep{Ansys-2014}。在使用ANSYS Fluent求解时，我们采用了自适应的体网格，平均元素大小与其它求解器中的网格大小相当。由于其使用的是贴体网格，ANSYS Fluent的误差应该会更小。
 图~\ref{img:taylor-couette-compare-2d} 展示了不同求解器 (从左至右) 在不同分辨率 (从上至下) 下的相对误差的分布。从图中可以看到我们的方法相比其它方法拥有更小误差同时，也随着分辨率上升而更快地达到收敛。
 
 我们还测量了不同求解器结果的加权$\ell_2$误差：
 \begin{equation}\label{eq:error_metric}
 \epsilon = \frac{\sum_i w(\bm{x}_i)\|\bm{u}(\bm{x}_i)-\bm{u}^{\text{ref}}(\bm{x}_i)\|_2}{\sum_i w(\bm{x}_i)\|\bm{u}^{\text{ref}}(\bm{x}_i)\|_2}\;,
 \end{equation}
-其中$\bm{x}_i$是流体域中的一个格点，$\bm{u}^{\text{ref}}$是解析解，权重$w(\bm{x}_i) \!=\! 4|r-\bar{r}|$，$\bar{r}\!=\!(r_1+r_2)/2$。这个权重存在的目的是更多地体现边界附近的误差，因为我们本质上在对比边界处理。图~\ref{img:taylor-couette-error-compare} 展示了不同求解器的误差随分辨率上升的变化情况。显然，我们的图形方法比起其它两个动理学边界处理方法都有着更好的表现。并且，我们的图形方法在分辨率足够高时，也优于ANSYS Fluent。
+其中$\bm{x}_i$是流体域中的一个格点，$\bm{u}^{\text{ref}}$是解析解，权重$w(\bm{x}_i) \!=\! 4|r-\bar{r}|$，$\bar{r}\!=\!(r_1+r_2)/2$。这个权重存在的目的是更多地体现边界附近的误差，因为我们本质上在对比边界处理。图~\ref{img:taylor-couette-error-compare} 展示了不同求解器的误差随分辨率上升的变化情况。显然，我们的方法比起其它两个动理学边界处理方法都有着更好的表现。并且，我们的方法在分辨率足够高时，也优于ANSYS Fluent。
 
 \begin{figure}[htbp]
   \centering
@@ -264,7 +264,7 @@ A = \frac{\Omega_2 r_2^2 - \Omega_1 r_1^2}{r_2^2 - r_1^2}, \hspace{4mm} B= \frac
 \end{figure}
 
 \paragraph{与基于切削网格的二维N-S求解器的对比}
-CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的流固耦合方法。其中基于切削网格的方法是精度与计算效率均相对较高的方法。于是我们与~\citep{Azevedo-2016} 中的基于切削网格的N-S方法进行对比。该方法在切削网格构造了类似有限体积法中的网格以提升精度。我们使用该方法与我们的图形方法分别仿真了一个二维的薄板以角速度$\omega_s = 3 \text{ } rad/s$旋转的场景，并将得到的速度场展示在图~\ref{img:cut-cell-based-NS-solver} 中。由于~\citet{Azevedo-2016} 求解的是无黏度的欧拉方程，我们在我们的仿真中也将黏度设为0 ($\nu\!=\!0$)。虽然~\citet{Azevedo-2016} 的方法得到了不错的结果，但是在流场中只有大涡，即使流体本身是无粘的，而我们的方法可以提供更多的湍流细节。我们注意到目前也有一些更加精准的N-S求解器，如~\citep{Zehnder-2018,Qu-2019}，但这些方法的计算效率是显著不如动理学方法的~\citep{Li-2020}。从上述分析可得，我们的方法拥有较为独特的优势，即提供更为精准且高效的湍流仿真，同时可以对不同类型的复杂几何进行耦合。
+CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的流固耦合方法。其中基于切削网格的方法是精度与计算效率均相对较高的方法。于是我们与~\citep{Azevedo-2016} 中的基于切削网格的N-S方法进行对比。该方法在切削网格构造了类似有限体积法中的网格以提升精度。我们使用该方法与我们的方法分别仿真了一个二维的薄板以角速度$\omega_s = 3 \text{ } rad/s$旋转的场景，并将得到的速度场展示在图~\ref{img:cut-cell-based-NS-solver} 中。由于~\citet{Azevedo-2016} 求解的是无黏度的欧拉方程，我们在我们的仿真中也将黏度设为0 ($\nu\!=\!0$)。虽然~\citet{Azevedo-2016} 的方法得到了不错的结果，但是在流场中只有大涡，即使流体本身是无粘的，而我们的方法可以提供更多的湍流细节。我们注意到目前也有一些更加精准的N-S求解器，如~\citep{Zehnder-2018,Qu-2019}，但这些方法的计算效率是显著不如动理学方法的~\citep{Li-2020}。从上述分析可得，我们的方法拥有较为独特的优势，即提供更为精准且高效的湍流仿真，同时可以对不同类型的复杂几何进行耦合。
 
 \paragraph{与图形学中现有方法的对比}
 近来，\citet{Li-2020} 提出了一个基于动理学方法的双向流固耦合湍流求解方法，该方法使用DI-IBM处理固体边界。然而这一方法有一定的局限性。首先因为DI-IBM在边界两侧施加惩罚力，其在求解亚网格物体的流固耦合时，会有流体穿透的现象。图~\ref{img:comparison_with_ib} 展示了一个三维的喷射流打向一个薄板，其中图 (a) 使用了 \citet{Li-2020} 的方法，并出现了不应该存在的流体穿透现象 (图中红框)。图 (b) 使用了我们的方法，没有产生类似的现象。
@@ -272,7 +272,7 @@ CG领域中的N-S方法已经发展得较为成熟，且拥有一系列不同的
 \begin{figure}[!tb]
   \centering
     \includegraphics[width=0.95\columnwidth]{figures/comparsion_car_ib_ours.png}
-  \bicaption[DI-IBM~\citep{Li-2020} (顶图) 与我们的图形方法 (底图) 进行气动仿真的对比]{DI-IBM~\citep{Li-2020} (顶图) 与我们的图形方法 (底图) 进行气动仿真的对比。速度场截面使用颜色可视化 (单位为$km/h$)。我们的仿真更贴近图~\ref{img:car_wind_tunnel} 中风洞的实际实验，而DI-IBM在车顶即开始发生边界层分离，不切合实际情况。}{Comparison of aerodynamic simulations. DI-IB method~\citepen{Li-2020} (top) vs. our result (bottom), using a visualization showing the color-coded velocity field magnitude (in $km/h$) of a cross section. While our simulation matches the wind-tunnel visualization of air flow around a car as Fig.~\ref{img:car_wind_tunnel} demonstrates, the DI-IB method, on the other hand, fails to have accurate boundary treatment, leading to unreasonable boundary layer separation at the top of the car.}
+  \bicaption[DI-IBM~\citep{Li-2020} (顶图) 与我们的方法 (底图) 进行气动仿真的对比]{DI-IBM~\citep{Li-2020} (顶图) 与我们的方法 (底图) 进行气动仿真的对比。速度场截面使用颜色可视化 (单位为$km/h$)。我们的仿真更贴近图~\ref{img:car_wind_tunnel} 中风洞的实际实验，而DI-IBM在车顶即开始发生边界层分离，不切合实际情况。}{Comparison of aerodynamic simulations. DI-IB method~\citepen{Li-2020} (top) vs. our result (bottom), using a visualization showing the color-coded velocity field magnitude (in $km/h$) of a cross section. While our simulation matches the wind-tunnel visualization of air flow around a car as Fig.~\ref{img:car_wind_tunnel} demonstrates, the DI-IB method, on the other hand, fails to have accurate boundary treatment, leading to unreasonable boundary layer separation at the top of the car.}
   \label{img:comparsion_car_ib_ours}
 \end{figure}
 
